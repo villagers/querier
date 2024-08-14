@@ -9,8 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using Querier.SqlQuery;
 using MySql.Data.MySqlClient;
-using SqlKata.Compilers;
-using SqlKata.Execution;
 
 namespace Querier
 {
@@ -28,12 +26,6 @@ namespace Querier
 
         public Query(string table)
         {
-            _sqlQuery = new SqlQuery.SqlQuery(table);
-
-
-            //var db = new QueryFactory(null, null);
-            //db.Query("table").AddComponent
-
             _queryMeasures = new List<QueryMeasure>();
             _queryDimension = new List<QueryDimension>();
             _queryFilters = new List<QueryFilter>();
@@ -200,7 +192,6 @@ namespace Querier
 
         public IQuery Limit(int limit)
         {
-            _sqlQuery.Limit(limit);
             _limit = limit;
 
             return this;
