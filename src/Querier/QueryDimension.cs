@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Querier
 {
-    public class QueryDimension<TEntity>
+    public class QueryDimension
     {
         public required string Property { get; set; }
         public string? OrderBy { get; set; }
