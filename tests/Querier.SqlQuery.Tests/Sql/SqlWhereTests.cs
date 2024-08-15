@@ -65,6 +65,13 @@ namespace Querier.SqlQuery.Tests.Sql
             Assert.Equal("select * from orders where id not in (1, 2, 3)", _query.New().From("orders").Where("id").NotIn($"({string.Join(", ", new int[] { 1, 2, 3 })})").Compile().CompiledSql);
 
             Assert.Equal("select * from orders where id = all (select id from orders where total > 10)", _query.New().From("orders").WhereAll("id", "=", q => q.From("orders").Select("id").WhereGreater("total", 10)).Compile().CompiledSql);
+            Assert.Equal("select * from orders where id = all (select id from orders where total > 10)", _query.New().From("orders").Where("id").All("=", q => q.From("orders").Select("id").WhereGreater("total", 10)).Compile().CompiledSql);
+            
+            Assert.Equal("select * from orders where id = any (select id from orders where total > 10)", _query.New().From("orders").WhereAny("id", "=", q => q.From("orders").Select("id").WhereGreater("total", 10)).Compile().CompiledSql);
+            Assert.Equal("select * from orders where id = any (select id from orders where total > 10)", _query.New().From("orders").Where("id").Any("=", q => q.From("orders").Select("id").WhereGreater("total", 10)).Compile().CompiledSql);
+
+            Assert.Equal("select * from orders where exists (select id from orders where total > 10)", _query.New().From("orders").WhereExists(q => q.From("orders").Select("id").WhereGreater("total", 10)).Compile().CompiledSql);
+            Assert.Equal("select * from orders where not exists (select id from orders where total > 10)", _query.New().From("orders").WhereNotExists(q => q.From("orders").Select("id").WhereGreater("total", 10)).Compile().CompiledSql);
         }
     }
 }

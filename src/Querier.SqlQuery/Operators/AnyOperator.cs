@@ -24,11 +24,11 @@ namespace Querier.SqlQuery.Operators
                 .AddToken("@column")
                 .AddToken(Operator)
                 .AddToken("any")
-                .AddToken("@value")
                 .Build();
 
             var compiled = Query.Compile();
             var queryTz = new SqlTokenizer().AddToken(sqlTz).AddToken($"({compiled.Sql})").Build();
+
             var result = new SqlOperatorResult()
             {
                 Sql = queryTz,

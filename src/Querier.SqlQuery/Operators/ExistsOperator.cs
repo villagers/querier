@@ -3,6 +3,7 @@ using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,6 @@ namespace Querier.SqlQuery.Operators
 {
     public class ExistsOperator<TQuery> : AbstractLogicalOperator where TQuery : IQuery<TQuery>, new()
     {
-        public required string Column { get; set; }
         public required TQuery Query { get; set; }
 
         public override SqlOperatorResult Compile()
@@ -20,19 +20,17 @@ namespace Querier.SqlQuery.Operators
                 .AddToken(AndOrOperator)
                 .AddToken(NotOperator)
                 .AddToken("exists")
-                .AddToken("@value")
                 .Build();
 
-            var rawSql = Query.Compile().Sql;
+            var compiled = Query.Compile();
+            var queryTz = new SqlTokenizer().AddToken(sqlTz).AddToken($"({compiled.Sql})").Build();
+
             var result = new SqlOperatorResult()
             {
-                Sql = sqlTz,
-                SqlParameters = new Dictionary<string, object>()
-                {
-                    { "@value", rawSql }
-                }
+                Sql = queryTz,
+                NameParameters = compiled.NameParameters ?? new Dictionary<string, string>(),
+                SqlParameters = compiled?.SqlParameters ?? new Dictionary<string, object>()
             };
-
             result.NameParameters = result.NameParameters.Select((e, i) =>
             {
                 result.Sql = result.Sql.Replace(e.Key, $"@name{i}");

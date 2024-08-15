@@ -161,7 +161,6 @@ namespace Querier.SqlQuery
                 _select.Remove(select);
             }
         }
-
         public TQuery Where(string column, AbstractOperator @operator)
         {
             _whereColumn = column;
@@ -345,72 +344,33 @@ namespace Querier.SqlQuery
 
         public TQuery WhereAll(string column, string @operator, Func<TQuery, TQuery> query)
         {
-            var newT = new TQuery();
-            var newQuery = query.Invoke(newT);
+            var newQuery = query.Invoke(new TQuery());
             return Where(column, new AllOperator<TQuery>() { Column = column, Query = newQuery, Operator = @operator });
         }
-        public TQuery All(string column, string @operator, Func<TQuery, TQuery> query)
+        public TQuery All(string @operator, Func<TQuery, TQuery> query)
         {
             var newQuery = query.Invoke(new TQuery());
-            return Where(_whereColumn, new AllOperator<TQuery>() { Column = column, Query = newQuery, Operator = @operator });
+            return Where(_whereColumn, new AllOperator<TQuery>() { Column = _whereColumn, Query = newQuery, Operator = @operator });
         }
-        public TQuery WhereNotAll(string column, string @operator, Func<TQuery, TQuery> query)
+        public TQuery WhereAny(string column, string @operator, Func<TQuery, TQuery> query)
         {
             var newQuery = query.Invoke(new TQuery());
-            return Where(column, new AllOperator<TQuery>() { Column = column, Query = newQuery, Operator = @operator }.Not());
+            return Where(column, new AnyOperator<TQuery>() { Column = column, Query = newQuery, Operator = @operator });
         }
-        public TQuery NotAll(string column, string @operator, Func<TQuery, TQuery> query)
+        public TQuery Any(string @operator, Func<TQuery, TQuery> query)
         {
             var newQuery = query.Invoke(new TQuery());
-            return Where(_whereColumn, new AllOperator<TQuery>() { Column = column, Query = newQuery, Operator = @operator }.Not());
+            return Where(_whereColumn, new AnyOperator<TQuery>() { Column = _whereColumn, Query = newQuery, Operator = @operator });
         }
-        public TQuery WhereAny(string column, string @operator, TQuery query)
+        public TQuery WhereExists(Func<TQuery, TQuery> query)
         {
-            return Where(column, new AnyOperator<TQuery>() { Column = column, Query = query, Operator = @operator });
+            var newQuery = query.Invoke(new TQuery());
+            return Where("", new ExistsOperator<TQuery>() { Query = newQuery });
         }
-        public TQuery Any(string column, string @operator, TQuery query)
+        public TQuery WhereNotExists(Func<TQuery, TQuery> query)
         {
-            return Where(_whereColumn, new AnyOperator<TQuery>() { Column = column, Query = query, Operator = @operator });
-        }
-        public TQuery WhereNotAny(string column, string @operator, TQuery query)
-        {
-            return Where(column, new AnyOperator<TQuery>() { Column = column, Query = query, Operator = @operator }.Not());
-        }
-        public TQuery NotAny(string column, string @operator, TQuery query)
-        {
-            return Where(_whereColumn, new AnyOperator<TQuery>() { Column = column, Query = query, Operator = @operator }.Not());
-        }
-        public TQuery WhereExists(string column, TQuery query)
-        {
-            return Where(column, new ExistsOperator<TQuery>() { Column = column, Query = query });
-        }
-        public TQuery Exists(string column, TQuery query)
-        {
-            return Where(_whereColumn, new ExistsOperator<TQuery>() { Column = column, Query = query });
-        }
-        public TQuery WhereNotExists(string column, TQuery query)
-        {
-            return Where(column, new ExistsOperator<TQuery>() { Column = column, Query = query }.Not());
-        }
-        public TQuery NotExists(string column, TQuery query)
-        {
-            return Where(_whereColumn, new ExistsOperator<TQuery>() { Column = column, Query = query }.Not());
-        }
-        public TQuery WhereSome(string column, string @operator, TQuery query)
-        {
-            return Where(column, new SomeOperator<TQuery>() { Column = column, Query = query, Operator = @operator });
-        }
-        public TQuery Some(string column, string @operator, TQuery query)
-        {
-            return Where(_whereColumn, new SomeOperator<TQuery>() { Column = column, Query = query, Operator = @operator });
-        }
-        public TQuery WhereNotSome(string column, string @operator, TQuery query)
-        {
-            return Where(column, new SomeOperator<TQuery>() { Column = column, Query = query, Operator = @operator }.Not());
-        }
-        public TQuery NotSome(string column, string @operator, TQuery query)
-        {
-            return Where(_whereColumn, new SomeOperator<TQuery>() { Column = column, Query = query, Operator = @operator }.Not());
+            var newQuery = query.Invoke(new TQuery());
+            return Where("", new ExistsOperator<TQuery>() { Query = newQuery }.Not());
         }
         public TQuery WhereNull(string column)
         {

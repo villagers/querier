@@ -50,24 +50,14 @@ namespace Querier.SqlQuery.Interfaces
         TQuery WhereIn(string column, object value);
         TQuery NotIn(object value);
         TQuery WhereNotIn(string column, object value);
-
-
-        TQuery All(string column, string @operator, Func<TQuery, TQuery> query);
+        TQuery All(string @operator, Func<TQuery, TQuery> query);
         TQuery WhereAll(string column, string @operator, Func<TQuery, TQuery> query);
-        TQuery NotAll(string column, string @operator, Func<TQuery, TQuery> query);
-        TQuery WhereNotAll(string column, string @operator, Func<TQuery, TQuery> query);
-        TQuery WhereAny(string column, string @operator, TQuery query);
-        TQuery WhereExists(string column, TQuery query);
-        TQuery WhereNotAny(string column, string @operator, TQuery query);
-        TQuery WhereNotExists(string column, TQuery query);
-        TQuery WhereNotSome(string column, string @operator, TQuery query);
-        TQuery WhereSome(string column, string @operator, TQuery query);
-        TQuery Any(string column, string @operator, TQuery query);
-        TQuery Exists(string column, TQuery query);
-        TQuery NotAny(string column, string @operator, TQuery query);
-        TQuery NotExists(string column, TQuery query);
-        TQuery NotSome(string column, string @operator, TQuery query);
-        TQuery Some(string column, string @operator, TQuery query);
+        TQuery Any(string @operator, Func<TQuery, TQuery> query);
+        TQuery WhereAny(string column, string @operator, Func<TQuery, TQuery> query);
+
+        TQuery WhereExists(Func<TQuery, TQuery> query);
+        TQuery WhereNotExists(Func<TQuery, TQuery> query);
+
         TQuery Or();
         TQuery Or(object value, object? secondValue = null);
         TQuery And();
