@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="MySql\" />
+    <Folder Include="Unit\MySql\" />
   </ItemGroup>
 
 </Project>

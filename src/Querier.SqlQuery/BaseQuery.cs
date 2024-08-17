@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Interfaces;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Operators;
 using Querier.SqlQuery.Tokenizers;
@@ -14,10 +15,8 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery
 {
-    public class Query<TQuery> : IQuery<TQuery> where TQuery : IQuery<TQuery>, new()
+    public class BaseQuery<TQuery> : BaseAbstractQuery, IBaseQuery<TQuery> where TQuery : IBaseQuery<TQuery>, new()
     {
-        TQuery _parent;
-
         public SqlTable<TQuery> _table;
         protected readonly List<SqlSelect> _select;
         protected readonly List<SqlWhere> _where;
@@ -32,11 +31,13 @@ namespace Querier.SqlQuery
         protected string _whereColumn = string.Empty;
 
         protected bool _distinct = false;
-
+        protected int? _limit;
+        protected virtual string NameParameterOpening { get; set; } = "";
+        protected virtual string NameParameterClosing { get; set; } = "";
         protected virtual string NameParameterPlaceholder { get; set; } = "@n";
         protected virtual string SqlParameterPlaceholder { get; set; } = "@p";
 
-        public Query()
+        public BaseQuery()
         {
             _table = new SqlTable<TQuery>();
             _select = new List<SqlSelect>();
@@ -52,9 +53,10 @@ namespace Querier.SqlQuery
         {
             return new TQuery();
         }
-        public TQuery Parent(TQuery parentQuery)
+
+        public virtual TQuery Limit(int limit)
         {
-            _parent = parentQuery;
+            _limit = limit;
             return (TQuery)(object)this;
         }
 
@@ -448,10 +450,8 @@ namespace Querier.SqlQuery
             return (TQuery)(object)this;
         }
 
-        public virtual SqlQueryResult Compile()
+        public override SqlTokenizer CompileTokens(SqlQueryResult result)
         {
-            var result = new SqlQueryResult();
-
             var queryTz = new SqlTokenizer();
 
             var selectQuery = CreateSelect();
@@ -461,50 +461,57 @@ namespace Querier.SqlQuery
             var orderByQuery = CreateOrderBy();
 
             queryTz.AddToken(selectQuery.Sql);
-
-            foreach (var param in selectQuery.SqlParameters)
-            {
-                result.SqlParameters.Add(param.Key, param.Value);
-            }
-            foreach (var param in selectQuery.NameParameters)
-            {
-                result.NameParameters.Add(param.Key, param.Value);
-            }
-
             queryTz.AddToken(tableQuery.Sql);
-            foreach (var param in tableQuery.SqlParameters)
-            {
-                result.SqlParameters.Add(param.Key, param.Value);
-            }
-            foreach (var param in tableQuery.NameParameters)
-            {
-                result.NameParameters.Add(param.Key, param.Value);
-            }
-
             queryTz.AddToken(whereQuery.Sql);
-            foreach (var param in whereQuery.SqlParameters)
-            {
-                result.SqlParameters.Add(param.Key, param.Value);
-            }
-
             queryTz.AddToken(groupByQuery.Sql);
-            foreach (var param in groupByQuery.SqlParameters)
-            {
-                result.SqlParameters.Add(param.Key, param.Value);
-            }
-
             queryTz.AddToken(orderByQuery.Sql);
-            foreach (var param in orderByQuery.SqlParameters)
-            {
-                result.SqlParameters.Add(param.Key, param.Value);
-            }
 
-            result.Sql = queryTz.Build(" ");
-
-            return result;
-
+            return queryTz;
+        }
+        public override Dictionary<string, string> CompileNameParameters(SqlQueryResult result)
+        {
+            return NameParameters
+                .Select((e, i) =>
+                {
+                    result.Sql = result.Sql.Replace(e.Key, $"{NameParameterPlaceholder}{i}");
+                    return new KeyValuePair<string, string>($"{NameParameterPlaceholder}{i}", e.Value);
+                }).ToDictionary();
+        }
+        public override Dictionary<string, object> CompileSqlParameters(SqlQueryResult result)
+        {
+            return SqlParameters.Select((e, i) => new KeyValuePair<string, object>($"{SqlParameterPlaceholder}{i}", e.Value)).ToDictionary();
         }
 
+        public virtual SqlQueryResult Compile()
+        {
+            SqlParameters = new Dictionary<string, object>();
+            NameParameters = new Dictionary<string, string>();
+
+            var result = new SqlQueryResult();
+
+            var queryTz = CompileTokens(result);
+            result.SqlParameters = CompileSqlParameters(result);
+            result.NameParameters = CompileNameParameters(result);
+
+            result.Sql = queryTz.Build(" ");
+            result.CompiledSql = new string(result.Sql);
+            result = CompileSql(result);
+
+            return result;
+        }
+        public override SqlQueryResult CompileSql(SqlQueryResult result)
+        {
+            foreach (var param in result.NameParameters)
+            {
+                result.CompiledSql = result.CompiledSql.Replace(param.Key, $"{NameParameterOpening}{param.Value}{NameParameterClosing}");
+            }
+            foreach (var param in SqlParameters)
+            {
+                result.CompiledSql = result.CompiledSql.Replace(param.Key, param.Value.ToString());
+            }
+
+            return result;
+        }
 
         public virtual SqlQueryResult CreateTable()
         {
@@ -681,5 +688,7 @@ namespace Querier.SqlQuery
             result.Sql = orderTz.Build();
             return result;
         }
+
+
     }
 }

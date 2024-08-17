@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Tls;
+using Querier.SqlQuery.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

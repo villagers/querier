@@ -9,35 +9,40 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using Querier.SqlQuery;
 using MySql.Data.MySqlClient;
+using Querier.SqlQuery.Interfaces;
+using System.Data.SqlClient;
+using Dapper;
 
 namespace Querier
 {
-    public class Query : IQuery
+    public class Query<TQuery> : IQuery where TQuery : IBaseQuery<TQuery>, new()
     {
         private readonly List<QueryMeasure> _queryMeasures;
         private readonly List<QueryDimension> _queryDimension;
         private QueryTimeDimension _queryTimeDimension;
 
-        private int _limit = 50000;
         private List<QueryFilter> _queryFilters;
 
 
-        private readonly SqlQuery.SqlQuery _sqlQuery;
+        private readonly TQuery _query;
+        private readonly IQueryDbConnection _connection;
 
-        public Query(string table)
+        public Query(TQuery query, IQueryDbConnection connection)
         {
+            _query = query;
             _queryMeasures = new List<QueryMeasure>();
             _queryDimension = new List<QueryDimension>();
             _queryFilters = new List<QueryFilter>();
+            _connection = connection;
         }
 
         public IQuery Create(string table)
         {
-            return new Query(table);
+            return new Query<TQuery>(_query, _connection);
         }
         public IQuery Filter(string property, string op, object? args)
         {
-            _sqlQuery.WhereEqual(property, args);
+            _query.WhereEqual(property, args);
             _queryFilters.Add(new QueryFilter()
             {
                 Property = property,
@@ -48,7 +53,7 @@ namespace Querier
         }
         public IQuery AndFilter(string property, string op, object? args)
         {
-            _sqlQuery.WhereEqual(property, args);
+            _query.WhereEqual(property, args);
             _queryFilters.Add(new QueryFilter()
             {
                 Property = property,
@@ -59,7 +64,7 @@ namespace Querier
         }
         public IQuery OrFilter(string property, string op, object? args)
         {
-            _sqlQuery.WhereEqual(property, args);
+            _query.WhereEqual(property, args);
             _queryFilters.Add(new QueryFilter()
             {
                 Property = property,
@@ -70,11 +75,11 @@ namespace Querier
         }
         public IQuery Measure(string aggregation, string property, string? orderBy = null)
         {
-            _sqlQuery.Select(aggregation, property);
+            _query.Select(aggregation, property);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                _sqlQuery.OrderBy(property, orderBy);
+                _query.OrderBy(property, orderBy);
             }
 
             var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
@@ -85,11 +90,11 @@ namespace Querier
 
         public IQuery MeasureCount(string property, string? orderBy = null)
         {
-            _sqlQuery.SelectCount(property);
+            _query.SelectCount(property);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                _sqlQuery.OrderBy(property, orderBy);
+                _query.OrderBy(property, orderBy);
             }
 
             var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
@@ -100,11 +105,11 @@ namespace Querier
 
         public IQuery MeasureSum(string property, string? orderBy = null)
         {
-            _sqlQuery.SelectSum(property);
+            _query.SelectSum(property);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                _sqlQuery.OrderBy(property, orderBy);
+                _query.OrderBy(property, orderBy);
             }
 
             var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
@@ -115,11 +120,11 @@ namespace Querier
 
         public IQuery MeasureAvg(string property, string? orderBy = null)
         {
-            _sqlQuery.SelectAvg(property);
+            _query.SelectAvg(property);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                _sqlQuery.OrderBy(property, orderBy);
+                _query.OrderBy(property, orderBy);
             }
 
             var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
@@ -130,11 +135,11 @@ namespace Querier
 
         public IQuery MeasureMin(string property, string? orderBy = null)
         {
-            _sqlQuery.SelectMin(property);
+            _query.SelectMin(property);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                _sqlQuery.OrderBy(property, orderBy);
+                _query.OrderBy(property, orderBy);
             }
 
             var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
@@ -145,11 +150,11 @@ namespace Querier
 
         public IQuery MeasureMax(string property, string? orderBy = null)
         {
-            _sqlQuery.SelectMax(property);
+            _query.SelectMax(property);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                _sqlQuery.OrderBy(property, orderBy);
+                _query.OrderBy(property, orderBy);
             }
 
             var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
@@ -160,7 +165,7 @@ namespace Querier
 
         public IQuery Dimension(string property)
         {
-            _sqlQuery.Select(property).GroupBy(property);
+            _query.Select(property).GroupBy(property);
 
             var dimension = new QueryDimension() { Property = property };
             _queryDimension.Add(dimension);
@@ -169,7 +174,7 @@ namespace Querier
         }
         public IQuery TimeDimension(string property)
         {
-            _sqlQuery.Select(property).GroupBy(property);
+            _query.Select(property).GroupBy(property);
 
             _queryTimeDimension = new QueryTimeDimension() { Property = property };
 
@@ -177,14 +182,14 @@ namespace Querier
         }
         public IQuery TimeDimension(string property, TimeDimensionPart timeDimensionPart)
         {
-            _sqlQuery.Select(property).GroupBy(property);
+            _query.Select(property).GroupBy(property);
             _queryTimeDimension = new QueryTimeDimension() { Property = property, TimeDimensionPart = timeDimensionPart };
 
             return this;
         }
         public IQuery OrderBy(string property, string direction)
         {
-            _sqlQuery.OrderBy(property, direction);
+            _query.OrderBy(property, direction);
             _queryTimeDimension = new QueryTimeDimension() { Property = property };
 
             return this;
@@ -192,8 +197,7 @@ namespace Querier
 
         public IQuery Limit(int limit)
         {
-            _limit = limit;
-
+            _query.Limit(limit);
             return this;
         }
 
@@ -241,11 +245,14 @@ namespace Querier
         public QueryResult Execute()
         {
 
-            var complie = _sqlQuery.Compile();
+            
+            var complie = _query.Compile();
+            
 
-            var sasd = new List<object>().AsQueryable().GroupBy("").ToQueryString();
-
-
+            using (var connection = _connection.Connection)
+            {
+                var product = connection.Query(complie.Sql, new[] { complie.NameParameters });
+            }
             return new QueryResult();
 
             //var selectors = new List<string>();

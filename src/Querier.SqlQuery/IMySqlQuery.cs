@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery
 {
-    public interface IMySqlQuery : IQuery<MySqlQuery>
+    public interface IMySqlQuery : IBaseQuery<MySqlQuery>
     {
     }
 }

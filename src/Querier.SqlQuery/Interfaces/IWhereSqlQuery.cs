@@ -2,7 +2,7 @@
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface IWhereQuery<TQuery> where TQuery : IQuery<TQuery>, new()
+    public interface IWhereSqlQuery<TQuery> where TQuery : IBaseQuery<TQuery>, new()
     {
         TQuery Where(string column);
         TQuery Where(string column, object value);

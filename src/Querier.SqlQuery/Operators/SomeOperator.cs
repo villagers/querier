@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Operators
 {
-    public class SomeOperator<TQuery> : AbstractLogicalOperator where TQuery : IQuery<TQuery>, new()
+    public class SomeOperator<TQuery> : AbstractLogicalOperator where TQuery : IBaseQuery<TQuery>, new()
     {
         public required string Column { get; set; }
         public required string Operator { get; set; }

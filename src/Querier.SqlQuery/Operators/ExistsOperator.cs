@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Operators
 {
-    public class ExistsOperator<TQuery> : AbstractLogicalOperator where TQuery : IQuery<TQuery>, new()
+    public class ExistsOperator<TQuery> : AbstractLogicalOperator where TQuery : IBaseQuery<TQuery>, new()
     {
         public required TQuery Query { get; set; }
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Querier.SqlQuery.Tests.Sql
+namespace Querier.SqlQuery.Tests.Unit.Sql
 {
     public class SqlSelectTests
     {

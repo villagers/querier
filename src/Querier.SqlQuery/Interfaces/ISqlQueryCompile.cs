@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface ISqlCompile<TResult> where TResult : class
+    public interface ISqlQueryCompile<TResult> where TResult : class
     {
         TResult Compile();
     }

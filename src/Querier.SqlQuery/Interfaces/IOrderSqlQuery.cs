@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface IGroupQuery<TQuery> where TQuery : IQuery<TQuery>, new()
+    public interface IOrderSqlQuery<TQuery> where TQuery : IBaseQuery<TQuery>, new()
     {
-        TQuery GroupBy(string column);
+        TQuery OrderBy(string column, string? order = "asc");
     }
 }

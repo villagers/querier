@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlSelect : ISqlCompile<SqlQueryResult>
+    public class SqlSelect : ISqlQueryCompile<SqlQueryResult>
     {
         public string? Column { get; set; }
         public string? ColumnAs { get; set; }

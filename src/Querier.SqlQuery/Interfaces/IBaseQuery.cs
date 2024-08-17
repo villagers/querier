@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface IQuery<TQuery> : IFromQuery<TQuery>, ISelectQuery<TQuery>, IWhereQuery<TQuery>, IGroupQuery<TQuery>, IOrderQuery<TQuery> where TQuery : IQuery<TQuery>, new()
+    public interface IBaseQuery<TQuery> : IFromSqlQuery<TQuery>, ISelectSqlQuery<TQuery>, IWhereSqlQuery<TQuery>, IGroupSqlQuery<TQuery>, IOrderSqlQuery<TQuery> where TQuery : IBaseQuery<TQuery>, new()
     {
         TQuery New();
-        TQuery Parent(TQuery parentQuery);
         SqlQueryResult Compile();
+        TQuery Limit(int limit);
     }
 
 }

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface IParameterQuery<TQuery> where TQuery : IQuery<TQuery>, new()
+    public interface IGroupSqlQuery<TQuery> where TQuery : IBaseQuery<TQuery>, new()
     {
-        string AddNameParameter(string value);
+        TQuery GroupBy(string column);
     }
 }

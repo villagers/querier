@@ -13,7 +13,7 @@ namespace Querier
     {
         public static void AddQuery<TContext>(this IServiceCollection services) where TContext : DbContext
         {
-            services.AddScoped(typeof(IQuery), typeof(Query));
+            services.AddScoped(typeof(IQuery<>), typeof(Query<>));
             //services.AddScoped<IQueryContext<TContext>, QueryContext<TContext>>();
         }
     }

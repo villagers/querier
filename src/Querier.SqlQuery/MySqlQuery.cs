@@ -9,77 +9,22 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery
 {
-    public class MySqlQuery : Query<MySqlQuery>, IQuery<MySqlQuery>, IMySqlQuery
+    public class MySqlQuery : BaseQuery<MySqlQuery>, IBaseQuery<MySqlQuery>, IMySqlQuery
     {
-        private int? _limit;
-
+        protected override string NameParameterOpening => "`";
+        protected override string NameParameterClosing => "`";
         public MySqlQuery()
         {
         }
 
-        public IMySqlQuery Limit(int limit)
+        public override SqlTokenizer CompileTokens(SqlQueryResult result)
         {
-            _limit = limit;
-            return this;
-        }
-
-        public override SqlQueryResult Compile()
-        {
-            var result = new SqlQueryResult();
-            var queryTz = new SqlTokenizer();
-
-            var selectQuery = CreateSelect();
+            var tokens = base.CompileTokens(result);
             if (_limit.HasValue)
             {
-                selectQuery.SqlTokenizer.AddAfter("select", $"top({_limit})");
-                selectQuery.Sql = selectQuery.SqlTokenizer.Build();
+                tokens.AddToken("limit").AddToken($"{_limit}");
             }
-            var tableQuery = CreateTable();
-            var whereQuery = CreateWhere();
-            var groupByQuery = CreateGroupBy();
-            var orderByQuery = CreateOrderBy();
-
-            queryTz.AddToken(selectQuery.Sql);
-            foreach (var param in selectQuery.SqlParameters)
-            {
-                result.SqlParameters.Add(param.Key, param.Value);
-            }
-            foreach (var param in selectQuery.NameParameters)
-            {
-                result.NameParameters.Add(param.Key, param.Value);
-            }
-
-            queryTz.AddToken(tableQuery.Sql);
-            foreach (var param in tableQuery.SqlParameters)
-            {
-                result.SqlParameters.Add(param.Key, param.Value);
-            }
-            foreach (var param in tableQuery.NameParameters)
-            {
-                result.NameParameters.Add(param.Key, param.Value);
-            }
-
-            queryTz.AddToken(whereQuery.Sql);
-            foreach (var param in whereQuery.SqlParameters)
-            {
-                result.SqlParameters.Add(param.Key, param.Value);
-            }
-
-            queryTz.AddToken(groupByQuery.Sql);
-            foreach (var param in groupByQuery.SqlParameters)
-            {
-                result.SqlParameters.Add(param.Key, param.Value);
-            }
-
-            queryTz.AddToken(orderByQuery.Sql);
-            foreach (var param in orderByQuery.SqlParameters)
-            {
-                result.SqlParameters.Add(param.Key, param.Value);
-            }
-
-            result.Sql = queryTz.Build(" ");
-
-            return result;
+            return tokens;
         }
     }
 }

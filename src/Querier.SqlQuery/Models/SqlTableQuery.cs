@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlTableQuery<TQuery> :  SqlTable<TQuery> where TQuery : IQuery<TQuery>, new()
+    public class SqlTableQuery<TQuery> :  SqlTable<TQuery> where TQuery : IBaseQuery<TQuery>, new()
     {
         public override SqlQueryResult Compile()
         {
