@@ -8,11 +8,11 @@ namespace Querier.SqlQuery.Tests.Unit.MySql
 {
     public class OrderByTests
     {
-        private ISqlQuery _query;
+        private IMySqlQuery _query;
 
         public OrderByTests()
         {
-            _query = new SqlQuery();
+            _query = new MySqlQuery();
         }
 
         [Fact]
