@@ -505,10 +505,6 @@ namespace Querier.SqlQuery
             {
                 result.CompiledSql = result.CompiledSql.Replace(param.Key, $"{NameParameterOpening}{param.Value}{NameParameterClosing}");
             }
-            foreach (var param in SqlParameters)
-            {
-                result.CompiledSql = result.CompiledSql.Replace(param.Key, param.Value.ToString());
-            }
 
             return result;
         }
