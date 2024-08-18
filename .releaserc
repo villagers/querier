@@ -16,6 +16,10 @@
         "@semantic-release/release-notes-generator",
         "@semantic-release/github",
         [
+			"@semantic-release/exec",
+            {
+                "prepareCmd": "chmod +x script.sh ../release.sh"
+            },
             "@semantic-release/exec",
             {
                 "prepareCmd": "../release.sh '${nextRelease.version}' 'Querier.csproj'"
