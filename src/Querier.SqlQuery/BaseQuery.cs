@@ -295,53 +295,53 @@ namespace Querier.SqlQuery
         }
         public TQuery WhereLike(string column, object value)
         {
-            return Where(column, new LikeOperator() { Column = column, Value = value });
+            return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "%" });
         }
         public TQuery Like(object value)
         {
-            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value });
+            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "%" });
         }
         public TQuery WhereNotLike(string column, object value)
         {
-            return Where(column, new LikeOperator() { Column = column, Value = value }.Not());
+            return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "%" }.Not());
         }
         public TQuery NotLike(object value)
         {
-            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value }.Not());
+            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "%" }.Not());
         }
 
         public TQuery WhereStarts(string column, object value)
         {
-            return Where(column, new LikeOperator() { Column = column, Value = value, Pattern = "{0}%" });
+            return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "", LikeEnds = "%" });
         }
         public TQuery WhereNotStarts(string column, object value)
         {
-            return Where(column, new LikeOperator() { Column = column, Value = value, Pattern = "{0}%" }.Not());
+            return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "", LikeEnds = "%" }.Not());
         }
         public TQuery Starts(object value)
         {
-            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, Pattern = "{0}%" });
+            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "", LikeEnds = "%" });
         }
         public TQuery NotStarts(object value)
         {
-            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, Pattern = "{0}%" }.Not());
+            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "", LikeEnds = "%" }.Not());
         }
 
         public TQuery WhereEnds(string column, object value)
         {
-            return Where(column, new LikeOperator() { Column = column, Value = value, Pattern = "%{0}" });
+            return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "" });
         }
         public TQuery WhereNotEnds(string column, object value)
         {
-            return Where(column, new LikeOperator() { Column = column, Value = value, Pattern = "%{0}" }.Not());
+            return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "" }.Not());
         }
         public TQuery Ends(object value)
         {
-            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, Pattern = "%{0}" });
+            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "" });
         }
         public TQuery NotEnds(object value)
         {
-            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, Pattern = "%{0}" }.Not());
+            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "" }.Not());
         }
 
         public TQuery WhereAll(string column, string @operator, Func<TQuery, TQuery> query)

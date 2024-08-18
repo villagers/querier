@@ -1,6 +1,7 @@
 ﻿using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,8 @@ namespace Querier.SqlQuery.Operators
     {
         public required string Column { get; set; }
         public required object Value { get; set; }
-        public string Pattern { get; set; } = "%{0}%";
+        public required string LikeStarts { get; set; } = "%";
+        public required string LikeEnds { get; set; } = "%";
         public override SqlOperatorResult Compile()
         {
             var sqlTz = new SqlTokenizer()
@@ -20,17 +22,15 @@ namespace Querier.SqlQuery.Operators
                 .AddToken("@column")
                 .AddToken(NotOperator)
                 .AddToken("like")
-                .AddToken("@value")
+                .AddToken(e => e.AddToken(LikeStarts).AddToken("@value").AddToken(LikeEnds), "")
                 .Build();
+
 
             var result = new SqlOperatorResult()
             {
                 Sql = sqlTz,
                 NameParameters = new Dictionary<string, string>() { { "@column", Column } },
-                SqlParameters = new Dictionary<string, object>()
-                {
-                    { "@value", string.Format(Pattern, Value) }
-                }
+                SqlParameters = new Dictionary<string, object>() { { "@value",Value } }
             };
             result.NameParameters = result.NameParameters.Select((e, i) =>
             {
