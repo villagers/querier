@@ -49,7 +49,7 @@ namespace Querier.SqlQuery
             NameParameters = new Dictionary<string, string>();
         }
 
-        public TQuery New()
+        public IBaseQuery<TQuery> New()
         {
             return new TQuery();
         }

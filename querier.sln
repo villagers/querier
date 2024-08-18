@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{53C424E2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Querier.SqlQuery.Tests", "tests\Querier.SqlQuery.Tests\Querier.SqlQuery.Tests.csproj", "{C0875DF6-AD25-468B-9DED-890295AF35A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Querier.Tests", "tests\Querier.Tests\Querier.Tests.csproj", "{F4D17EF3-829D-4BEE-A23D-98D6599348AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Querier.Tests", "tests\Querier.Tests\Querier.Tests.csproj", "{F4D17EF3-829D-4BEE-A23D-98D6599348AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

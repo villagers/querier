@@ -9,7 +9,7 @@ namespace Querier.SqlQuery.Interfaces
 {
     public interface IBaseQuery<TQuery> : IFromSqlQuery<TQuery>, ISelectSqlQuery<TQuery>, IWhereSqlQuery<TQuery>, IGroupSqlQuery<TQuery>, IOrderSqlQuery<TQuery> where TQuery : IBaseQuery<TQuery>, new()
     {
-        TQuery New();
+        IBaseQuery<TQuery> New();
         SqlQueryResult Compile();
         TQuery Limit(int limit);
     }
