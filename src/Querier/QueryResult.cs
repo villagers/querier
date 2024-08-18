@@ -9,9 +9,9 @@ namespace Querier
     public class QueryResult
     {
         public object? Data { get; set; }
-        public required List<QueryFilter> Filters { get; set; }
-        public required List<QueryProperty> Measures { get; set; }
-        public required List<QueryProperty> Dimensions { get; set; }
-        public required List<QueryProperty> TimeDimensions { get; set; }
+        public List<QueryFilter>? Filters { get; set; }
+        public List<QueryProperty>? Measures { get; set; }
+        public List<QueryProperty>? Dimensions { get; set; }
+        public List<QueryProperty>? TimeDimensions { get; set; }
     }
 }

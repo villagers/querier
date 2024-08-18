@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Tls;
+using Querier.SqlQuery.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +9,27 @@ using System.Threading.Tasks;
 
 namespace Querier
 {
-    public interface IQuery<TContext> where TContext : DbContext
+    public interface IQuery
     {
-        IQuery<TType, TContext> Create<TType>() where TType : class;
+        IQuery Create(string table);
+        IQuery Filter(string property, string op, object? args);
+        IQuery AndFilter(string property, string op, object? args);
+        IQuery OrFilter(string property, string op, object? args);
 
+        IQuery Measure(string aggregation, string property, string? orderBy = null);
+        IQuery MeasureCount(string property, string? orderBy = null);
+        IQuery MeasureSum(string property, string? orderBy = null);
+        IQuery MeasureAvg(string property, string? orderBy = null);
+        IQuery MeasureMin(string property, string? orderBy = null);
+        IQuery MeasureMax(string property, string? orderBy = null);
+
+        IQuery Dimension(string property);
+
+        IQuery TimeDimension(string property);
+        IQuery TimeDimension(string property, TimeDimensionPart timeDimensionPart);
+
+        IQuery OrderBy(string property, string direction);
+        IQuery Limit(int limit);
 
         List<QueryProperty> ListMeasures<TType>();
         List<QueryProperty> ListMeasures(Type type);
@@ -25,16 +44,7 @@ namespace Querier
         List<QueryProperty> ListTimeDimensions<TType>();
         List<QueryProperty> ListTimeDimensions(Type type);
         List<QueryProperty> ListTimeDimensions(string queryKey);
-    }
-    public interface IQuery<TType, TContext> where TContext : DbContext where TType : class
-    {
-        IQuery<TType, TContext> Filter(string property, string op, object? args);
-        IQuery<TType, TContext> Measure(string property, string? orderBy = null);
-        IQuery<TType, TContext> Dimension(string property);
-        IQuery<TType, TContext> TimeDimension(string property);
-        IQuery<TType, TContext> TimeDimension(string property, TimeDimensionPart timeDimensionPart);
-        IQuery<TType, TContext> OrderBy(string property, string direction);
-        IQuery<TType, TContext> Limit(int limit);
+
         QueryResult Execute();
 
     }
