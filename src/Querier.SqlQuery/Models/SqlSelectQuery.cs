@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlSelectQuery<TQuery> : SqlSelect where TQuery : IBaseQuery<TQuery>, new()
+    public class SqlSelectQuery<TQuery> : SqlSelect where TQuery : IBaseQuery<TQuery>
     {
         public required TQuery Query { get; set; }
         public string? QueryAs { get; set; }

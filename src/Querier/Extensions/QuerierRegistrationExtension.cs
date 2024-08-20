@@ -14,19 +14,19 @@ namespace Querier.Extensions
     public class QuerierRegistrationOption
     {
         public IDbConnection DbConnection;
-        private readonly IServiceCollection _services;
+        public readonly IServiceCollection Services;
 
         public QuerierRegistrationOption(IServiceCollection services)
         {
-            _services = services;
+            Services = services;
         }
 
         public void UseMySql(string connectionString)
         {
             DbConnection = new MySqlConnection(connectionString);
 
-            _services.AddScoped<IMySqlQuery, MySqlQuery>();
-            _services.AddScoped<IQuery, Query<MySqlQuery>>();
+            Services.AddScoped<IMySqlQuery, MySqlQuery>();
+            Services.AddScoped<IQuery, Query<IMySqlQuery>>();
         }
     }
     public static class QuerierRegistrationExtension

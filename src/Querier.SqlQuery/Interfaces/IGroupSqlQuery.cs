@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface IGroupSqlQuery<TQuery> where TQuery : IBaseQuery<TQuery>, new()
+    public interface IGroupSqlQuery<TQuery>
     {
         TQuery GroupBy(string column);
     }

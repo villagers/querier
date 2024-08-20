@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface ISelectSqlQuery<TQuery> where TQuery : IBaseQuery<TQuery>, new()
+    public interface ISelectSqlQuery<TQuery>
     {
         TQuery Select();
         TQuery Select(string column, string? columnAs = null);

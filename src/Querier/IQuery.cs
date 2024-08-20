@@ -11,10 +11,8 @@ namespace Querier
 {
     public interface IQuery
     {
-        IQuery Create(string table);
-        IQuery Filter(string property, string op, object? args);
-        IQuery AndFilter(string property, string op, object? args);
-        IQuery OrFilter(string property, string op, object? args);
+        IQuery New();
+        IQuery From(string table);
 
         IQuery Measure(string aggregation, string property, string? orderBy = null);
         IQuery MeasureCount(string property, string? orderBy = null);

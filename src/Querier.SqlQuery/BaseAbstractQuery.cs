@@ -10,6 +10,7 @@ namespace Querier.SqlQuery
 {
     public abstract class BaseAbstractQuery
     {
+        public BaseAbstractQuery() { }
         public abstract SqlQueryResult CompileSql(SqlQueryResult result);
         public abstract SqlTokenizer CompileTokens(SqlQueryResult result);
         public abstract Dictionary<string, object> CompileSqlParameters(SqlQueryResult result);

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlTable<TQuery> : ISqlQueryCompile<SqlQueryResult> where TQuery : IBaseQuery<TQuery>, new()
+    public class SqlTable<TQuery> : ISqlQueryCompile<SqlQueryResult>
     {
         public string? Table { get; set; }
         public string? TableAs { get; set; }

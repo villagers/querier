@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery
 {
-    public class BaseQuery<TQuery> : BaseAbstractQuery, IBaseQuery<TQuery> where TQuery : IBaseQuery<TQuery>, new()
+    public class BaseQuery<TQuery, TQueryFactory> : BaseAbstractQuery, IBaseQuery<TQuery> where TQuery : IBaseQuery<TQuery> where TQueryFactory : TQuery, new()
     {
         public SqlTable<TQuery> _table;
         protected readonly List<SqlSelect> _select;
@@ -49,9 +49,9 @@ namespace Querier.SqlQuery
             NameParameters = new Dictionary<string, string>();
         }
 
-        public IBaseQuery<TQuery> New()
+        public TQuery New()
         {
-            return new TQuery();
+            return new TQueryFactory();
         }
 
         public virtual TQuery Limit(int limit)
@@ -72,7 +72,7 @@ namespace Querier.SqlQuery
         }
         public TQuery From(Func<TQuery, TQuery> query, string? tableAs = null)
         {
-            var newQuery = query.Invoke(new TQuery());
+            var newQuery = query.Invoke(New());
             _table = new SqlTableQuery<TQuery>()
             {
                 Query = newQuery,
@@ -138,7 +138,7 @@ namespace Querier.SqlQuery
         }
         public TQuery Select(Func<TQuery, TQuery> query, string? queryAs = null)
         {
-            var newQuery = query.Invoke(new TQuery());
+            var newQuery = query.Invoke(New());
             _select.Add(new SqlSelectQuery<TQuery>()
             {
                 Query = newQuery,
@@ -346,32 +346,32 @@ namespace Querier.SqlQuery
 
         public TQuery WhereAll(string column, string @operator, Func<TQuery, TQuery> query)
         {
-            var newQuery = query.Invoke(new TQuery());
+            var newQuery = query.Invoke(New());
             return Where(column, new AllOperator<TQuery>() { Column = column, Query = newQuery, Operator = @operator });
         }
         public TQuery All(string @operator, Func<TQuery, TQuery> query)
         {
-            var newQuery = query.Invoke(new TQuery());
+            var newQuery = query.Invoke(New());
             return Where(_whereColumn, new AllOperator<TQuery>() { Column = _whereColumn, Query = newQuery, Operator = @operator });
         }
         public TQuery WhereAny(string column, string @operator, Func<TQuery, TQuery> query)
         {
-            var newQuery = query.Invoke(new TQuery());
+            var newQuery = query.Invoke(New());
             return Where(column, new AnyOperator<TQuery>() { Column = column, Query = newQuery, Operator = @operator });
         }
         public TQuery Any(string @operator, Func<TQuery, TQuery> query)
         {
-            var newQuery = query.Invoke(new TQuery());
+            var newQuery = query.Invoke(New());
             return Where(_whereColumn, new AnyOperator<TQuery>() { Column = _whereColumn, Query = newQuery, Operator = @operator });
         }
         public TQuery WhereExists(Func<TQuery, TQuery> query)
         {
-            var newQuery = query.Invoke(new TQuery());
+            var newQuery = query.Invoke(New());
             return Where("", new ExistsOperator<TQuery>() { Query = newQuery });
         }
         public TQuery WhereNotExists(Func<TQuery, TQuery> query)
         {
-            var newQuery = query.Invoke(new TQuery());
+            var newQuery = query.Invoke(New());
             return Where("", new ExistsOperator<TQuery>() { Query = newQuery }.Not());
         }
         public TQuery WhereNull(string column)

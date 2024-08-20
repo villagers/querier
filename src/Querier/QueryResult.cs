@@ -8,7 +8,7 @@ namespace Querier
 {
     public class QueryResult
     {
-        public object? Data { get; set; }
+        public IEnumerable<Dictionary<string, object>>? Data { get; set; }
         public List<QueryFilter>? Filters { get; set; }
         public List<QueryProperty>? Measures { get; set; }
         public List<QueryProperty>? Dimensions { get; set; }

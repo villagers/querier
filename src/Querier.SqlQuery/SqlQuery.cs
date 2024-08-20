@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery
 {
-    public class SqlQuery : BaseQuery<SqlQuery>, IBaseQuery<SqlQuery>, ISqlQuery
+    public class SqlQuery : BaseQuery<SqlQuery, SqlQuery>, IBaseQuery<SqlQuery>, ISqlQuery
     {
         public override SqlQueryResult Compile()
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface IOrderSqlQuery<TQuery> where TQuery : IBaseQuery<TQuery>, new()
+    public interface IOrderSqlQuery<TQuery>
     {
         TQuery OrderBy(string column, string? order = "asc");
     }

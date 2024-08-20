@@ -15,7 +15,7 @@ using Dapper;
 
 namespace Querier
 {
-    public class Query<TQuery> : IQuery where TQuery : IBaseQuery<TQuery>, new()
+    public class Query<TQuery> : IQuery where TQuery : IBaseQuery<TQuery>
     {
         private readonly List<QueryMeasure> _queryMeasures;
         private readonly List<QueryDimension> _queryDimension;
@@ -36,41 +36,13 @@ namespace Querier
             _connection = connection;
         }
 
-        public IQuery Create(string table)
+        public IQuery New()
         {
             return new Query<TQuery>(_query, _connection);
         }
-        public IQuery Filter(string property, string op, object? args)
+        public IQuery From(string table)
         {
-            _query.WhereEqual(property, args);
-            _queryFilters.Add(new QueryFilter()
-            {
-                Property = property,
-                Operator = op,
-                Args = args
-            });
-            return this;
-        }
-        public IQuery AndFilter(string property, string op, object? args)
-        {
-            _query.WhereEqual(property, args);
-            _queryFilters.Add(new QueryFilter()
-            {
-                Property = property,
-                Operator = op,
-                Args = args
-            });
-            return this;
-        }
-        public IQuery OrFilter(string property, string op, object? args)
-        {
-            _query.WhereEqual(property, args);
-            _queryFilters.Add(new QueryFilter()
-            {
-                Property = property,
-                Operator = op,
-                Args = args
-            });
+            _query.From(table);
             return this;
         }
         public IQuery Measure(string aggregation, string property, string? orderBy = null)
@@ -244,116 +216,24 @@ namespace Querier
 
         public QueryResult Execute()
         {
-
-            
-            var complie = _query.Compile();
-            
-
-            using (var connection = _connection.Connection)
+            var result = new QueryResult()
             {
-                var product = connection.Query(complie.Sql, new[] { complie.NameParameters });
+                Measures = _queryMeasures.Select(e => new QueryProperty() { Key = e.Property, DisplayName = e.Property }).ToList(),
+                Dimensions = _queryDimension.Select(e => new QueryProperty() { Key = e.Property, DisplayName = e.Property }).ToList(),
+            };
+            if (_queryTimeDimension != null)
+            {
+                result.TimeDimensions = new List<QueryProperty>() { new QueryProperty() { Key = _queryTimeDimension.Property, DisplayName = _queryTimeDimension.Property } };
             }
-            return new QueryResult();
 
-            //var selectors = new List<string>();
-            //selectors.AddRange(_queryMeasures.Select(e => e.Property));
-            //selectors.AddRange(_queryDimension.Select(e => e.Property));
-            //if (_queryTimeDimension != null)
-            //{
-            //    selectors.Add(_queryTimeDimension.Property);
-            //    if (_queryTimeDimension.TimeDimensionPart.HasValue)
-            //    {
-            //        var part = _queryTimeDimension.TimeDimensionPart.ToString();
-            //        selectors.Add($"{_queryTimeDimension.Property}.{part} as {_queryTimeDimension.Property}{part}");
-            //    }
-            //}
-            //var selectExpression = "new {" + string.Join(",", selectors) + "}";
+            var complie = _query.Compile();
 
-            //var groupSelectors = new List<string>();
-            //groupSelectors.AddRange(_queryDimension.Select(e => e.Property));
-            //if (_queryTimeDimension != null)
-            //{
-            //    groupSelectors.Add($"{_queryTimeDimension.Property} as {_queryTimeDimension.Property}");
-            //    if (_queryTimeDimension.TimeDimensionPart.HasValue)
-            //    {
-            //        var part = _queryTimeDimension.TimeDimensionPart.ToString();
-            //        groupSelectors.Add($"{_queryTimeDimension.Property}.{part} as {_queryTimeDimension.Property}{part}");
-            //    }
-            //}
-            //var groupExpression = $"GROUP BY {groupSelectors.Count}";
-            //if (groupSelectors.Count > 0)
-            //{
-            //    groupExpression = $"new ({string.Join(",", groupSelectors)})";
-            //}
+            result.Data = _connection.Connection
+                .Query(complie.CompiledSql, complie.SqlParameters)
+                .Cast<IDictionary<string, object>>()
+                .Select(e => e.ToDictionary(k => k.Key, v => v.Value));
 
-            //var orderByExpression = $"";
-            //var orderSelectors = new List<string>();
-            //orderSelectors.AddRange(_queryMeasures.Where(e => !string.IsNullOrWhiteSpace(e.OrderBy)).Select(e => $"{e.Property} {e.OrderBy}"));
-            //orderSelectors.AddRange(_queryDimension.Where(e => !string.IsNullOrWhiteSpace(e.OrderBy)).Select(e => $"{e.Property} {e.OrderBy}"));
-            //if (_queryTimeDimension != null && !string.IsNullOrWhiteSpace(_queryTimeDimension.OrderBy))
-            //{
-            //    orderSelectors.Add(_queryTimeDimension.OrderBy);
-            //}
-            //if (orderSelectors.Count != 0)
-            //{
-            //    orderByExpression = $"{string.Join(",", orderSelectors)}";
-            //}
-
-
-            //var newSelectors = new List<string>();
-            //newSelectors.AddRange(_queryMeasures.Select(e => $"SUM({e.Property}) as {e.Property}"));
-            //newSelectors.AddRange(_queryDimension.Select(m => $"Key.{m.Property}"));
-            //if (_queryTimeDimension != null)
-            //{
-            //    newSelectors.Add($"Key.{_queryTimeDimension.Property} as {_queryTimeDimension.Property}");
-            //    if (_queryTimeDimension.TimeDimensionPart.HasValue)
-            //    {
-            //        var part = _queryTimeDimension.TimeDimensionPart.ToString();
-            //        newSelectors.Add($"Key.{_queryTimeDimension.Property}{part} as {_queryTimeDimension.Property}{part}");
-            //    }
-            //}
-            //var newSelectExpression = "new (" + string.Join(",", newSelectors) + ")";
-
-            //var queryBuilder = _queryContext.GetContext().Set<TType>().AsNoTracking().Select(selectExpression);
-            //queryBuilder = queryBuilder.GroupBy(groupExpression, "it");
-            //queryBuilder = queryBuilder.Select(newSelectExpression);
-
-            //foreach (var filter in _queryFilters)
-            //{
-            //    switch (filter.Operator)
-            //    {
-            //        case "=":
-            //        case ">=":
-            //        case "<=":
-            //            queryBuilder = queryBuilder.Where($"{filter.Property} {filter.Operator} @0", filter.Args);
-            //            break;
-            //        case "in":
-            //            queryBuilder = queryBuilder.Where($"@0.Contains({filter.Property})", filter.Args);
-            //            break;
-            //    }
-
-            //}
-
-            //if (!string.IsNullOrWhiteSpace(orderByExpression))
-            //{
-            //    queryBuilder = queryBuilder.OrderBy(orderByExpression);
-            //}
-            //queryBuilder.Take(_limit);
-
-            //var data = queryBuilder.ToDynamicList();
-
-            //var result = new QueryResult()
-            //{
-            //    Data = data,
-            //    Filters = _queryFilters,
-            //    Measures = _queryMeasures.Select(e => QueryHelper.GetMeasureProperty<TType>(e.Property)).ToList(),
-            //    Dimensions = _queryDimension.Select(e => QueryHelper.GetDimensionProperty<TType>(e.Property)).ToList(),
-            //    TimeDimensions = [QueryHelper.GetTimeDimensionProperty<TType>(_queryTimeDimension.Property)],
-            //};
-
-
-
-            //return result;
+            return result;
         }
     }
 }

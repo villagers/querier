@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery
 {
-    public class MySqlQuery : BaseQuery<MySqlQuery>, IBaseQuery<MySqlQuery>, IMySqlQuery
+    public class MySqlQuery : BaseQuery<IMySqlQuery, MySqlQuery>, IMySqlQuery
     {
         protected override string NameParameterOpening => "`";
         protected override string NameParameterClosing => "`";
@@ -25,6 +25,11 @@ namespace Querier.SqlQuery
                 tokens.AddToken("limit").AddToken($"{_limit}");
             }
             return tokens;
+        }
+
+        public IMySqlQuery TestMethod()
+        {
+            return this;
         }
     }
 }
