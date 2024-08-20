@@ -22,7 +22,7 @@ jobs:
       run: |
         sudo /etc/init.d/mysql start
         mysql -u root -p'root' -e "create database querier"; 
-        mysql -u root -p'root' querier < ./scripts/mysql_tables.sql
+        mysql -u root -p'root' querier < scripts/mysql_tables.sql
         mysql -u root -p'root' -e 'SHOW TABLES;' querier
           
     - name: Test
