@@ -86,7 +86,7 @@ CREATE TABLE EmployeeTerritory (
   entityId INT AUTO_INCREMENT NOT NULL,
   employeeId INT NOT NULL,
   territoryId INT NOT NULL,
-  -- territoryCode VARCHAR(20) NOT NULL,
+  territoryCode VARCHAR(20) NOT NULL,
   PRIMARY KEY (entityId),
   FOREIGN KEY (employeeId)
   	REFERENCES Employee(entityId),
