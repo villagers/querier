@@ -175,3 +175,15 @@ CREATE TABLE OrderDetail (
    FOREIGN KEY (orderId) REFERENCES SalesOrder(entityId),
    FOREIGN KEY (productId) REFERENCES Product(entityId) 
   ) ENGINE=INNODB;
+  
+  ALTER TABLE Territory ADD UNIQUE INDEX IDX_TerrytoryCode (territoryCode);
+
+ALTER TABLE Territory ADD UNIQUE INDEX IDX_TerritoryCode_RegionId (territoryCode, regionId);
+
+ALTER TABLE CustomerCustomerDemographics ADD UNIQUE INDEX IDX_CustomerId_CustomerTypeId (customerId, customerTypeId);
+
+ALTER TABLE EmployeeTerritory ADD FOREIGN KEY (territoryCode) REFERENCES Territory(territoryCode);
+
+ALTER TABLE EmployeeTerritory ADD UNIQUE INDEX IDX_EmployeeId_TerritoryCode (employeeId, territoryCode);
+
+ALTER TABLE OrderDetail ADD UNIQUE INDEX IDX_OrderId_ProductId (orderId, productId);
