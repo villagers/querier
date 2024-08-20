@@ -17,5 +17,12 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+        
+    - name: Setup MySQL
+      run: |
+        sudo /etc/init.d/mysql start
+        mysql -u root -p'root' -e "create database querier"; 
+        mysql -u root -p'root' querier < scripts/mysql_tables.sql
+          
     - name: Test
       run: dotnet test --verbosity normal
