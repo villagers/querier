@@ -47,7 +47,7 @@ jobs:
         with:
           node-version: "lts/*"
       - name: Install dependencies
-        run: npm clean-install
+        run: npm install
       - name: Semantic Release
         run: npx semantic-release --branches ${{ github.head_ref }} --dry-run --no-ci --debug
         
