@@ -42,22 +42,29 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
-      - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          ci: false
-          dry_run: true
-          branches: |
-            ['${{ github.ref }}', '${{ github.head_ref }}']
-          working_directory: ./src
-          extra_plugins: |
-            @semantic-release/commit-analyzer
-            @semantic-release/release-notes-generator
-            @semantic-release/github
-            @semantic-release/git
-            @semantic-release/exec
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          node-version: "lts/*" 
+      - name: Semantic Release
+        run: npx semantic-release --branches ${{ github.head_ref }} --dry-run --no-ci --debug
+        
+        
+#        uses: cycjimmy/semantic-release-action@v4
+#        with:
+#          ci: false
+#          dry_run: true
+#          branches: |
+#            ['${{ github.ref }}', '${{ github.head_ref }}']
+#          working_directory: ./src
+#          extra_plugins: |
+#            @semantic-release/commit-analyzer
+#            @semantic-release/release-notes-generator
+#            @semantic-release/github
+#            @semantic-release/git
+#            @semantic-release/exec
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
 #      - name: 'Pack & Publish project'
 #        if: ${{ steps.release.outputs.new_release_version }}
