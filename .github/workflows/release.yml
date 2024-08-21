@@ -1,6 +1,7 @@
 name: .NET
 
 on:
+  permissions: write-all
   workflow_dispatch:
   push:
     branches:

@@ -1,8 +1,6 @@
 name: .NET
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -34,4 +32,4 @@ jobs:
         mysql -u root -p'root' -e 'SHOW TABLES;' Chinook
           
     - name: Test
-      run: dotnet test --filter "FullyQualifiedName~MySql" --verbosity normal
+      run: dotnet test --verbosity normal
