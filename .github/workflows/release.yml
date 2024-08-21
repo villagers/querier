@@ -6,7 +6,7 @@ on:
     branches:
       - main
       
-env:
+#env:
 #  PROJECT_PATH: 'Gpanga.Example.SDK/Gpanga.Example.SDK.csproj'
 #  PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}/output
 #  NUGET_PUSH_URL: ${{ secrets.NUGET_PUSH_URL }}
