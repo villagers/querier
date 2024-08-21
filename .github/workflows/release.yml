@@ -1,0 +1,44 @@
+name: .NET
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      
+env:
+#  PROJECT_PATH: 'Gpanga.Example.SDK/Gpanga.Example.SDK.csproj'
+#  PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}/output
+#  NUGET_PUSH_URL: ${{ secrets.NUGET_PUSH_URL }}
+#  NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+  
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup .NET ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Semantic Release
+        id: release
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          working_directory: ./src
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/release-notes-generator
+            @semantic-release/github
+            @semantic-release/git
+            @semantic-release/exec
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+#      - name: 'Pack & Publish project'
+#        if: ${{ steps.release.outputs.new_release_version }}
+#        run: |
+#          dotnet clean
+#          dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --include-symbols --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+#          dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg -k ${{ secrets.NUGET_TOKEN }} -s ${{ env.NUGET_PUSH_URL }}
