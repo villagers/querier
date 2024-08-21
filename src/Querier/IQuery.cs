@@ -14,12 +14,11 @@ namespace Querier
         IQuery New();
         IQuery From(string table);
 
-        IQuery Measure(string aggregation, string property, string? orderBy = null);
-        IQuery MeasureCount(string property, string? orderBy = null);
-        IQuery MeasureSum(string property, string? orderBy = null);
-        IQuery MeasureAvg(string property, string? orderBy = null);
-        IQuery MeasureMin(string property, string? orderBy = null);
-        IQuery MeasureMax(string property, string? orderBy = null);
+        IQuery MeasureCount(string property, string? propertyAs = null, string? orderBy = null);
+        IQuery MeasureSum(string property, string? propertyAs = null, string? orderBy = null);
+        IQuery MeasureAvg(string property, string? propertyAs = null, string? orderBy = null);
+        IQuery MeasureMin(string property, string? propertyAs = null, string? orderBy = null);
+        IQuery MeasureMax(string property, string? propertyAs = null, string? orderBy = null);
 
         IQuery Dimension(string property);
 

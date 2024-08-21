@@ -45,9 +45,10 @@ namespace Querier
             _query.From(table);
             return this;
         }
-        public IQuery Measure(string aggregation, string property, string? orderBy = null)
+
+        public IQuery MeasureCount(string property, string? propertyAs = null, string? orderBy = null)
         {
-            _query.Select(aggregation, property);
+            _query.SelectCount(property, propertyAs);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
@@ -60,9 +61,9 @@ namespace Querier
             return this;
         }
 
-        public IQuery MeasureCount(string property, string? orderBy = null)
+        public IQuery MeasureSum(string property, string? propertyAs = null, string? orderBy = null)
         {
-            _query.SelectCount(property);
+            _query.SelectSum(property, propertyAs);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
@@ -75,9 +76,9 @@ namespace Querier
             return this;
         }
 
-        public IQuery MeasureSum(string property, string? orderBy = null)
+        public IQuery MeasureAvg(string property, string? propertyAs = null, string? orderBy = null)
         {
-            _query.SelectSum(property);
+            _query.SelectAvg(property, propertyAs);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
@@ -90,9 +91,9 @@ namespace Querier
             return this;
         }
 
-        public IQuery MeasureAvg(string property, string? orderBy = null)
+        public IQuery MeasureMin(string property, string? propertyAs = null, string? orderBy = null)
         {
-            _query.SelectAvg(property);
+            _query.SelectMin(property, propertyAs);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
@@ -105,24 +106,9 @@ namespace Querier
             return this;
         }
 
-        public IQuery MeasureMin(string property, string? orderBy = null)
+        public IQuery MeasureMax(string property, string? propertyAs = null, string? orderBy = null)
         {
-            _query.SelectMin(property);
-
-            if (!string.IsNullOrWhiteSpace(orderBy))
-            {
-                _query.OrderBy(property, orderBy);
-            }
-
-            var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
-            _queryMeasures.Add(measure);
-
-            return this;
-        }
-
-        public IQuery MeasureMax(string property, string? orderBy = null)
-        {
-            _query.SelectMax(property);
+            _query.SelectMax(property, propertyAs);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {

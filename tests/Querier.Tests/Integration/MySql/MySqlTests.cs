@@ -21,5 +21,37 @@ namespace Querier.Tests.Integration.MySql
             var scope = _application.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             _query = scope.ServiceProvider.GetRequiredService<IQuery>();
         }
+
+        [Fact]
+        public void MeasureAvg()
+        {
+            var result = _query.New().From("Invoice").MeasureAvg("Total").Execute();
+
+            Assert.Empty(result.Dimensions);
+            Assert.Empty(result.TimeDimensions);
+
+            Assert.Single(result.Measures);
+            Assert.Equal("Total", result.Measures.First().Key);
+            Assert.Equal("Total", result.Measures.First().DisplayName);
+
+            Assert.Single(result.Data);
+            Assert.Equal(5.651942, Convert.ToDouble(result.Data.First()["avg(`Total`)"]));
+        }
+
+        [Fact]
+        public void MeasureCount()
+        {
+            var result = _query.New().From("Invoice").MeasureCount("Total").Execute();
+
+            Assert.Empty(result.Dimensions);
+            Assert.Empty(result.TimeDimensions);
+
+            Assert.Single(result.Measures);
+            Assert.Equal("Total", result.Measures.First().Key);
+            Assert.Equal("Total", result.Measures.First().DisplayName);
+
+            Assert.Single(result.Data);
+            Assert.Equal(412, Convert.ToDouble(result.Data.First()["count(`Total`)"]));
+        }
     }
 }
