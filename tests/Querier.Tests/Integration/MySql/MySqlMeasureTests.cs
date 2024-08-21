@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace Querier.Tests.Integration.MySql
 {
-    public class MySqlTests : IClassFixture<MySqlWebApplicationFactory<Program>>
+    public class MySqlMeasureTests : IClassFixture<MySqlWebApplicationFactory<Program>>
     {
         private readonly MySqlWebApplicationFactory<Program> _application;
         private readonly IQuery _query;
 
-        public MySqlTests(MySqlWebApplicationFactory<Program> application)
+        public MySqlMeasureTests(MySqlWebApplicationFactory<Program> application)
         {
             _application = application;
 
@@ -101,6 +101,25 @@ namespace Querier.Tests.Integration.MySql
 
             Assert.Single(result.Data);
             Assert.Equal(0.99, Convert.ToDouble(result.Data.First()["min(`Total`)"]));
+        }
+
+        [Fact]
+        public void MeasureMixed()
+        {
+            var result = _query.New().From("Invoice")
+                .MeasureSum("Total")
+                .MeasureAvg("Total")
+                .MeasureCount("Total")
+                .MeasureMax("Total")
+                .MeasureMin("Total")
+                .Execute();
+
+            Assert.Empty(result.Dimensions);
+            Assert.Empty(result.TimeDimensions);
+
+            Assert.Equal(5, result.Measures.Count());
+
+            Assert.Equal(5, result.Data.First().Count());
         }
     }
 }

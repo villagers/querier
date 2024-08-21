@@ -14,20 +14,14 @@ using System.Threading.Tasks;
 
 namespace Querier.Tests.Integration.MySql
 {
-    public class MySqlWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
+    public class MySqlWebApplicationFactory<TProgram> : BaseWebApplicationFactory<TProgram> where TProgram : class
     {
-        private IConfiguration Configuration { set; get; }
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            builder.UseEnvironment("mysql");
-            builder.ConfigureAppConfiguration((context, builder) =>
-            {
-                Configuration = builder.Build();
-            });
-
+            base.ConfigureWebHost(builder);
             builder.ConfigureServices(services =>
             {
-                var connectionString = Configuration.GetConnectionString("Default");
+                var connectionString = Configuration.GetConnectionString("MySQL");
                 services.AddQuerier(o => o.UseMySql(connectionString));
             });
         }
