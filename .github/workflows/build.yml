@@ -42,6 +42,16 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+      - name: Create dry branch
+        uses: peterjgrainger/action-create-branch@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: 'dry'
+      - name: Checkout dry branch
+        uses: actions/checkout@v4
+        with:
+          ref: dry
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -50,8 +60,13 @@ jobs:
         run: npm clean-install
       - name: Semantic Release
         run: npx semantic-release --branches ${{ github.ref }} ${{ github.head_ref }} --dry-run --no-ci --debug
-        
-        
+      - name: Back to code
+        uses: actions/checkout@v2
+      - name: Clear dry branch
+        uses: dawidd6/action-delete-branch@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branches: dry
 #        uses: cycjimmy/semantic-release-action@v4
 #        with:
 #          ci: false
