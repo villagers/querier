@@ -46,7 +46,7 @@ jobs:
         with:
           ci: false
           dry_run: true
-          branch: ${{ github.head_ref }}
+          branch: ${{ github.ref }}
           working_directory: ./src
           extra_plugins: |
             @semantic-release/commit-analyzer
