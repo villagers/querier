@@ -49,7 +49,7 @@ jobs:
       - name: Install dependencies
         run: npm clean-install
       - name: Semantic Release
-        run: npx semantic-release --branches ${{ github.head_ref }} --dry-run --no-ci --debug
+        run: npx semantic-release --branches ${{ github.ref }} --dry-run --no-ci --debug
         
         
 #        uses: cycjimmy/semantic-release-action@v4
