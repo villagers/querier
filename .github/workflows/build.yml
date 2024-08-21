@@ -44,6 +44,7 @@ jobs:
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         with:
+          ci: false
           dry_run: true
           branch: ${{ github.head_ref }}
           working_directory: ./src
