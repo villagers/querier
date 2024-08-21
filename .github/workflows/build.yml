@@ -45,7 +45,7 @@ jobs:
         uses: cycjimmy/semantic-release-action@v4
         with:
           dry_run: true
-          branch: ${{ github.ref }}
+          branch: ${{ github.head_ref }}
           working_directory: ./src
           extra_plugins: |
             @semantic-release/commit-analyzer
