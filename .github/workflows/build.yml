@@ -48,9 +48,7 @@ jobs:
           ci: false
           dry_run: true
           branches: |
-            [
-                'refs/pull/9/merge'
-            ]
+            ['${{ github.ref }}', '${{ github.head_ref }}']
           working_directory: ./src
           extra_plugins: |
             @semantic-release/commit-analyzer
