@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Querier.Extensions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,22 @@ namespace Querier.Tests.Integration.MySql
 
             var scope = _application.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             _query = scope.ServiceProvider.GetRequiredService<IQuery>();
+        }
+
+        [Fact]
+        public void MeasureSum()
+        {
+            var result = _query.New().From("Invoice").MeasureSum("Total").Execute();
+
+            Assert.Empty(result.Dimensions);
+            Assert.Empty(result.TimeDimensions);
+
+            Assert.Single(result.Measures);
+            Assert.Equal("Total", result.Measures.First().Key);
+            Assert.Equal("Total", result.Measures.First().DisplayName);
+
+            Assert.Single(result.Data);
+            Assert.Equal(2328.60, Convert.ToDouble(result.Data.First()["sum(`Total`)"]));
         }
 
         [Fact]
@@ -52,6 +69,38 @@ namespace Querier.Tests.Integration.MySql
 
             Assert.Single(result.Data);
             Assert.Equal(412, Convert.ToDouble(result.Data.First()["count(`Total`)"]));
+        }
+
+        [Fact]
+        public void MeasureMax()
+        {
+            var result = _query.New().From("Invoice").MeasureMax("Total").Execute();
+
+            Assert.Empty(result.Dimensions);
+            Assert.Empty(result.TimeDimensions);
+
+            Assert.Single(result.Measures);
+            Assert.Equal("Total", result.Measures.First().Key);
+            Assert.Equal("Total", result.Measures.First().DisplayName);
+
+            Assert.Single(result.Data);
+            Assert.Equal(25.86, Convert.ToDouble(result.Data.First()["max(`Total`)"]));
+        }
+
+        [Fact]
+        public void MeasureMin()
+        {
+            var result = _query.New().From("Invoice").MeasureMin("Total").Execute();
+
+            Assert.Empty(result.Dimensions);
+            Assert.Empty(result.TimeDimensions);
+
+            Assert.Single(result.Measures);
+            Assert.Equal("Total", result.Measures.First().Key);
+            Assert.Equal("Total", result.Measures.First().DisplayName);
+
+            Assert.Single(result.Data);
+            Assert.Equal(0.99, Convert.ToDouble(result.Data.First()["min(`Total`)"]));
         }
     }
 }
