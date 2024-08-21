@@ -35,4 +35,3 @@ jobs:
           
     - name: Test
       run: dotnet test --filter "FullyQualifiedName~MySql" --verbosity normal
-
