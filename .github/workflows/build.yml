@@ -48,7 +48,7 @@ jobs:
           dry_run: true
           branches: |
             [
-                '${{ github.ref }}'
+                'chore/test-release-job'
             ]
           working_directory: ./src
           extra_plugins: |
