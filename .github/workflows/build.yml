@@ -45,21 +45,11 @@ jobs:
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         with:
+          ci: false
           dry_run: true
           branches: |
             [
-              '${{ github.head_ref }}',
-              'master',
-              'next',
-              'next-major',
-              {
-                name: 'beta',
-                prerelease: true
-              },
-              {
-                name: 'alpha',
-                prerelease: true
-              }
+                'refs/pull/9/merge'
             ]
           working_directory: ./src
           extra_plugins: |
