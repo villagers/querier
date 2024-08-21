@@ -48,7 +48,7 @@ jobs:
           dry_run: true
           branches: |
             [
-                'chore/test-release-job'
+                'refs/pull/9/merge'
             ]
           working_directory: ./src
           extra_plugins: |
