@@ -22,7 +22,7 @@ jobs:
       run: |
         sudo /etc/init.d/mysql start
         mysql -u root -p'root' < scripts/Chinook_MySql.sql
-        mysql -u root -p'root' -e 'SHOW TABLES;' querier
+        mysql -u root -p'root' -e 'SHOW TABLES;' Chinook
           
     - name: Test
       run: dotnet test --verbosity normal
