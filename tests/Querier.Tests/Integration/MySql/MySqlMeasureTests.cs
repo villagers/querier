@@ -118,7 +118,6 @@ namespace Querier.Tests.Integration.MySql
             Assert.Empty(result.TimeDimensions);
 
             Assert.Equal(5, result.Measures.Count());
-
             Assert.Equal(5, result.Data.First().Count());
         }
     }
