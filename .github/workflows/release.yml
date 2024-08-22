@@ -36,10 +36,6 @@ jobs:
             @semantic-release/exec
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  publish:
-    needs: release
-    runs-on: ubuntu-latest
-    steps:
       - name: 'Pack & Publish project'
         if: ${{ steps.release.outputs.new_release_version }}
         run: |
