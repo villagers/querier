@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 using Querier.SqlQuery;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,7 @@ namespace Querier.Extensions
         {
             DbConnection = new MySqlConnection(connectionString);
 
+            Services.AddScoped<IFunction, MySqlFunction>();
             Services.AddScoped<IMySqlQuery, MySqlQuery>();
             Services.AddScoped<IQuery, Query<IMySqlQuery>>();
         }

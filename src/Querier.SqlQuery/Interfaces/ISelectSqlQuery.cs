@@ -18,6 +18,13 @@ namespace Querier.SqlQuery.Interfaces
         TQuery SelectMin(string column, string? columnAs = null);
         TQuery SelectSum(string column, string? columnAs = null);
 
+        TQuery SelectSecond(string column);
+        TQuery SelectMinute(string column);
+        TQuery SelectHour(string column);
+        TQuery SelectDay(string column);
+        TQuery SelectMonth(string column);
+        TQuery SelectYear(string column);
+
         TQuery Distinct();
     }
 }

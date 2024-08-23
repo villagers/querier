@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Querier.SqlQuery.Functions;
+using Querier.SqlQuery.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +8,102 @@ using System.Threading.Tasks;
 
 namespace Querier
 {
-    public class QueryFilter
+    public class QueryFilter<TQuery> : IQueryFilter where TQuery : IBaseQuery<TQuery>
     {
-        public required string Property { get; set; }
-        public required string Operator { get; set; }
-        public required object? Args { get; set; }
+
+        private readonly TQuery _query;
+
+        public QueryFilter(TQuery query)
+        {
+            _query = query;
+        }
+
+        public IQueryFilter New()
+        {
+            return new QueryFilter<TQuery>(_query);
+        }
+
+        public IQueryFilter In<T>(string column, IEnumerable<T> value)
+        {
+            _query.WhereIn(column, value);
+            return this;
+        }
+
+        public IQueryFilter Equal<T>(string column, T value)
+        {
+            _query.WhereEqual(column, value);
+            return this;
+        }
+        public IQueryFilter Equal(Func<IFunction, IFunction> function)
+        {
+            _query.Where(function);
+            return this;
+        }
+
+        public IQueryFilter Contains<T>(string column, T value)
+        {
+            _query.WhereLike(column, value);
+            return this;
+        }
+
+        public IQueryFilter StartsWith<T>(string column, T value)
+        {
+            _query.WhereStarts(column, value);
+            return this;
+        }
+
+        public IQueryFilter EndsWith<T>(string column, T value)
+        {
+            _query.WhereEnds(column, value);
+            return this;
+        }
+
+        public IQueryFilter Greater<T>(string column, T value)
+        {
+            _query.WhereGreater(column, value);
+            return this;
+        }
+
+        public IQueryFilter GreaterOrEqual<T>(string column, T value)
+        {
+            _query.WhereGreaterOrEqual(column, value);
+            return this;
+        }
+
+        public IQueryFilter Less<T>(string column, T value)
+        {
+            _query.WhereLess(column, value);
+            return this;
+        }
+
+        public IQueryFilter LessOrEqual<T>(string column, T value)
+        {
+            _query.WhereLessOrEqual(column, value);
+            return this;
+        }
+
+        public IQueryFilter And()
+        {
+            _query.And();
+            return this;
+        }
+
+        public IQueryFilter And<T>(T value)
+        {
+            _query.And(value);
+            return this;
+        }
+
+        public IQueryFilter Or()
+        {
+            _query.Or();
+            return this;
+        }
+
+        public IQueryFilter Or<T>(T value)
+        {
+            _query.Or(value);
+            return this;
+        }
     }
 }

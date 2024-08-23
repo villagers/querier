@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Tls;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -23,24 +24,26 @@ namespace Querier
         IQuery Dimension(string property);
 
         IQuery TimeDimension(string property);
-        IQuery TimeDimension(string property, TimeDimensionPart timeDimensionPart);
+        IQuery TimeDimension(string property, string timeDimensionPart);
 
         IQuery OrderBy(string property, string direction);
         IQuery Limit(int limit);
 
-        List<QueryProperty> ListMeasures<TType>();
-        List<QueryProperty> ListMeasures(Type type);
-        List<QueryProperty> ListMeasures(string queryKey);
+        IQuery Filter(Func<IQueryFilter, IQueryFilter> filter);
+
+        List<QueryProperty> GetMeasures<TType>();
+        List<QueryProperty> GetMeasures(Type type);
+        List<QueryProperty> GetMeasures(string queryKey);
 
 
-        List<QueryProperty> ListDimensions<TType>();
-        List<QueryProperty> ListDimensions(Type type);
-        List<QueryProperty> ListDimensions(string queryKey);
+        List<QueryProperty> GetDimensions<TType>();
+        List<QueryProperty> GetDimensions(Type type);
+        List<QueryProperty> GetDimensions(string queryKey);
 
 
-        List<QueryProperty> ListTimeDimensions<TType>();
-        List<QueryProperty> ListTimeDimensions(Type type);
-        List<QueryProperty> ListTimeDimensions(string queryKey);
+        List<QueryProperty> GetTimeDimensions<TType>();
+        List<QueryProperty> GetTimeDimensions(Type type);
+        List<QueryProperty> GetTimeDimensions(string queryKey);
 
         QueryResult Execute();
 

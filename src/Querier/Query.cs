@@ -21,8 +21,6 @@ namespace Querier
         private readonly List<QueryDimension> _queryDimension;
         private QueryTimeDimension _queryTimeDimension;
 
-        private List<QueryFilter> _queryFilters;
-
 
         private readonly TQuery _query;
         private readonly IQueryDbConnection _connection;
@@ -32,7 +30,6 @@ namespace Querier
             _query = query;
             _queryMeasures = new List<QueryMeasure>();
             _queryDimension = new List<QueryDimension>();
-            _queryFilters = new List<QueryFilter>();
             _connection = connection;
         }
 
@@ -138,9 +135,42 @@ namespace Querier
 
             return this;
         }
-        public IQuery TimeDimension(string property, TimeDimensionPart timeDimensionPart)
+        public IQuery Filter(Func<IQueryFilter, IQueryFilter> filter)
         {
-            _query.Select(property).GroupBy(property);
+            var queryFilter = new QueryFilter<TQuery>(_query);
+            filter.Invoke(queryFilter);
+
+            return this;
+        }
+        public IQuery TimeDimension(string property, string timeDimensionPart)
+        {
+            switch (timeDimensionPart)
+            {
+                case "date":
+                    _query.SelectSecond(property).GroupBy(e => e.Date(property));
+                    break;
+                case "second":
+                    _query.SelectSecond(property).GroupBy(e => e.Second(property));
+                    break;
+                case "minute":
+                    _query.SelectMinute(property).GroupBy(e => e.Minute(property));
+                    break;
+                case "hour":
+                    _query.SelectHour(property).GroupBy(e => e.Hour(property));
+                    break;
+                case "day":
+                    _query.SelectDay(property).GroupBy(e => e.Day(property));
+                    break;
+                case "month":
+                    _query.SelectMonth(property).GroupBy(e => e.Month(property));
+                    break;
+                case "year":
+                    _query.SelectYear(property).GroupBy(e => e.Year(property));
+                    break;
+                default:
+                    _query.Select(property).GroupBy(property);
+                    break;
+            }
             _queryTimeDimension = new QueryTimeDimension() { Property = property, TimeDimensionPart = timeDimensionPart };
 
             return this;
@@ -161,44 +191,17 @@ namespace Querier
 
 
 
-        public List<QueryProperty> ListMeasures<TType>()
-        {
-            return QueryHelper.ListMeasureProperties<TType>();
-        }
-        public List<QueryProperty> ListMeasures(Type type)
-        {
-            return QueryHelper.ListMeasureProperties(type);
-        }
-        public List<QueryProperty> ListMeasures(string queryKey)
-        {
-            return QueryHelper.ListMeasureProperties(queryKey);
-        }
+        public List<QueryProperty> GetMeasures<TType>() => QueryHelper.GetMeasureProperties<TType>();
+        public List<QueryProperty> GetMeasures(System.Type type) => QueryHelper.GetMeasureProperties(type);
+        public List<QueryProperty> GetMeasures(string queryKey) => QueryHelper.GetMeasureProperties(queryKey);
 
-        public List<QueryProperty> ListDimensions<TType>()
-        {
-            return QueryHelper.ListDimensionProperties<TType>();
-        }
-        public List<QueryProperty> ListDimensions(Type type)
-        {
-            return QueryHelper.ListDimensionProperties(type);
-        }
-        public List<QueryProperty> ListDimensions(string queryKey)
-        {
-            return QueryHelper.ListDimensionProperties(queryKey);
-        }
+        public List<QueryProperty> GetDimensions<TType>() => QueryHelper.GetDimensionProperties<TType>();
+        public List<QueryProperty> GetDimensions(System.Type type) => QueryHelper.GetDimensionProperties(type);
+        public List<QueryProperty> GetDimensions(string queryKey) => QueryHelper.GetDimensionProperties(queryKey);
 
-        public List<QueryProperty> ListTimeDimensions<TType>()
-        {
-            return QueryHelper.ListTimeDimensionProperties<TType>();
-        }
-        public List<QueryProperty> ListTimeDimensions(Type type)
-        {
-            return QueryHelper.ListTimeDimensionProperties(type);
-        }
-        public List<QueryProperty> ListTimeDimensions(string queryKey)
-        {
-            return QueryHelper.ListTimeDimensionProperties(queryKey);
-        }
+        public List<QueryProperty> GetTimeDimensions<TType>() => QueryHelper.GetTimeDimensionProperties<TType>();
+        public List<QueryProperty> GetTimeDimensions(System.Type type) => QueryHelper.GetTimeDimensionProperties(type);
+        public List<QueryProperty> GetTimeDimensions(string queryKey) => QueryHelper.GetTimeDimensionProperties(queryKey);
 
         public QueryResult Execute()
         {

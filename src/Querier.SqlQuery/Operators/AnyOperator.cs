@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Interfaces;
+﻿using Querier.SqlQuery.Functions;
+using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
 using System;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Querier.SqlQuery.Operators
 {

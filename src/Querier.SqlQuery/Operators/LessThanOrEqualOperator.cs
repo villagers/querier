@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Operators
 {
-    public class LessThanOrEqualOperator : AbstractComparisonOperator
+    public class LessThanOrEqualOperator<T> : AbstractComparisonOperator<T>
     {
         public override SqlOperatorResult Compile()
         {

@@ -10,24 +10,6 @@ namespace Querier
     {
         public required string Property { get; set; }
         public string? OrderBy { get; set; }
-        public TimeDimensionPart? TimeDimensionPart { get; set; }
-    }
-
-    public enum TimeDimensionPart
-    {
-        Hour,
-        Minute,
-        Second,
-        Microsecond,
-        Millisecond,
-        Nanosecond,
-        Ticks,
-        Day,
-        DayOfYear,
-        TimeOfDay,
-        DayOfWeek,
-        Month,
-        Year,
-        Date
+        public string? TimeDimensionPart { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Interfaces;
+﻿using Querier.SqlQuery.Functions;
+using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Tokenizers;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlTableQuery<TQuery> :  SqlTable<TQuery> where TQuery : IBaseQuery<TQuery>
+    public class SqlTableQuery<TQuery> : SqlTable<TQuery> where TQuery : IBaseQuery<TQuery>
     {
         public override SqlQueryResult Compile()
         {

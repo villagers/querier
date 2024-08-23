@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Models;
+﻿using Querier.SqlQuery.Functions;
+using Querier.SqlQuery.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace Querier.SqlQuery.Tests.Unit.MySql
 
         public SqlSelectTests()
         {
-            _query = new MySqlQuery();
+            _query = new MySqlQuery(new MySqlFunction());
         }
 
         [Fact]
