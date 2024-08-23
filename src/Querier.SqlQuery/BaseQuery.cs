@@ -1,4 +1,5 @@
 ﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Operators;
@@ -15,43 +16,14 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery
 {
-    public class BaseQuery<TQuery, TQueryFactory> : BaseAbstractQuery, IBaseQuery<TQuery> where TQuery : IBaseQuery<TQuery> where TQueryFactory : TQuery, new()
+    public class BaseQuery<TQuery> : BaseAbstractQuery<TQuery>, IBaseQuery<TQuery>
+        where TQuery : IBaseQuery<TQuery>
     {
-        public SqlTable<TQuery> _table;
-        protected readonly List<SqlSelect> _select;
-        protected readonly List<SqlWhere> _where;
-        protected readonly List<SqlGroupBy> _groupBy;
-        protected readonly List<SqlOrderBy> _orderBy;
+        public BaseQuery(IFunction functionFactory) : base(functionFactory) { }
 
-        public Dictionary<string, object> SqlParameters;
-        public Dictionary<string, string> NameParameters;
-
-        protected bool _whereAnd = false;
-        protected bool _whereOr = false;
-        protected string _whereColumn = string.Empty;
-
-        protected bool _distinct = false;
-        protected int? _limit;
-        protected virtual string NameParameterOpening { get; set; } = "";
-        protected virtual string NameParameterClosing { get; set; } = "";
-        protected virtual string NameParameterPlaceholder { get; set; } = "@n";
-        protected virtual string SqlParameterPlaceholder { get; set; } = "@p";
-
-        public BaseQuery()
+        public virtual TQuery New()
         {
-            _table = new SqlTable<TQuery>();
-            _select = new List<SqlSelect>();
-            _where = new List<SqlWhere>();
-            _groupBy = new List<SqlGroupBy>();
-            _orderBy = new List<SqlOrderBy>();
-
-            SqlParameters = new Dictionary<string, object>();
-            NameParameters = new Dictionary<string, string>();
-        }
-
-        public TQuery New()
-        {
-            return new TQueryFactory();
+            return (TQuery)(object) new BaseQuery<TQuery>(_functionFactory);
         }
 
         public virtual TQuery Limit(int limit)
@@ -146,6 +118,40 @@ namespace Querier.SqlQuery
             });
             return (TQuery)(object)this;
         }
+
+        public TQuery SelectDateFunction(IFunction function)
+        {
+            _select.Add(new SqlSelectFunction()
+            {
+                Function = function
+            });
+            return (TQuery)(object)this;
+        }
+        public TQuery SelectSecond(string column)
+        {
+            return SelectDateFunction(_functionFactory.New().Second(column));
+        }
+        public TQuery SelectMinute(string column)
+        {
+            return SelectDateFunction(_functionFactory.New().Minute(column));
+        }
+        public TQuery SelectHour(string column)
+        {
+            return SelectDateFunction(_functionFactory.New().Hour(column));
+        }
+        public TQuery SelectDay(string column)
+        {
+            return SelectDateFunction(_functionFactory.New().Day(column));
+        }
+        public TQuery SelectMonth(string column)
+        {
+            return SelectDateFunction(_functionFactory.New().Month(column));
+        }
+        public TQuery SelectYear(string column)
+        {
+            return SelectDateFunction(_functionFactory.New().Year(column));
+        }
+
         public TQuery Distinct()
         {
             _distinct = true;
@@ -172,174 +178,185 @@ namespace Querier.SqlQuery
             _whereOr = false;
             return (TQuery)(object)this;
         }
+
+        public TQuery Where(Func<IFunction, IFunction> function)
+        {
+            var newFunction = _functionFactory.New();
+
+            _where.Add(new SqlWhereFunction() { Function = function.Invoke(newFunction) });
+
+            _whereAnd = true;
+            _whereOr = false;
+            return (TQuery)(object)this;
+        }
         public TQuery Where(string column)
         {
             _whereColumn = column;
             return (TQuery)(object)this;
         }
-        public TQuery Where(string column, object value)
+        public TQuery Where<T>(string column, T value)
         {
-            return Where(column, new EqualOperator() { Column = column, Value = value });
+            return Where(column, new EqualOperator<T>() { Column = column, Value = value });
         }
-        public TQuery WhereEqual(string column, object value)
+        public TQuery WhereEqual<T>(string column, T value)
         {
-            return Where(column, new EqualOperator() { Column = column, Value = value });
+            return Where(column, new EqualOperator<T>() { Column = column, Value = value });
         }
-        public TQuery Equal(object value)
+        public TQuery Equal<T>(T value)
         {
-            return Where(_whereColumn, new EqualOperator() { Column = _whereColumn, Value = value });
+            return Where(_whereColumn, new EqualOperator<T>() { Column = _whereColumn, Value = value });
         }
-        public TQuery WhereNotEqual(string column, object value)
+        public TQuery WhereNotEqual<T>(string column, T value)
         {
-            return Where(column, new NotEqualOperator() { Column = column, Value = value });
+            return Where(column, new NotEqualOperator<T>() { Column = column, Value = value });
         }
-        public TQuery NotEqual(object value)
+        public TQuery NotEqual<T>(T value)
         {
-            return Where(_whereColumn, new NotEqualOperator() { Column = _whereColumn, Value = value });
+            return Where(_whereColumn, new NotEqualOperator<T>() { Column = _whereColumn, Value = value });
         }
-        public TQuery WhereGreater(string column, object value)
+        public TQuery WhereGreater<T>(string column, T value)
         {
-            return Where(column, new GreaterThanOperator() { Column = column, Value = value });
+            return Where(column, new GreaterThanOperator<T>() { Column = column, Value = value });
         }
-        public TQuery Greater(object value)
+        public TQuery Greater<T>(T value)
         {
-            return Where(_whereColumn, new GreaterThanOperator() { Column = _whereColumn, Value = value });
+            return Where(_whereColumn, new GreaterThanOperator<T>() { Column = _whereColumn, Value = value });
         }
-        public TQuery WhereNotGreater(string column, object value)
+        public TQuery WhereNotGreater<T>(string column, T value)
         {
-            return Where(column, new GreaterThanOperator() { Column = column, Value = value }.Not());
+            return Where(column, new GreaterThanOperator<T>() { Column = column, Value = value }.Not());
         }
-        public TQuery NotGreater(object value)
+        public TQuery NotGreater<T>(T value)
         {
-            return Where(_whereColumn, new GreaterThanOperator() { Column = _whereColumn, Value = value }.Not());
+            return Where(_whereColumn, new GreaterThanOperator<T>() { Column = _whereColumn, Value = value }.Not());
         }
-        public TQuery WhereLess(string column, object value)
+        public TQuery WhereLess<T>(string column, T value)
         {
-            return Where(column, new LessThanOperator() { Column = column, Value = value });
+            return Where(column, new LessThanOperator<T>() { Column = column, Value = value });
         }
-        public TQuery Less(object value)
+        public TQuery Less<T>(T value)
         {
-            return Where(_whereColumn, new LessThanOperator() { Column = _whereColumn, Value = value });
+            return Where(_whereColumn, new LessThanOperator<T>() { Column = _whereColumn, Value = value });
         }
-        public TQuery WhereNotLess(string column, object value)
+        public TQuery WhereNotLess<T>(string column, T value)
         {
-            return Where(column, new LessThanOperator() { Column = column, Value = value }.Not());
+            return Where(column, new LessThanOperator<T>() { Column = column, Value = value }.Not());
         }
-        public TQuery NotLess(object value)
+        public TQuery NotLess<T>(T value)
         {
-            return Where(_whereColumn, new LessThanOperator() { Column = _whereColumn, Value = value }.Not());
+            return Where(_whereColumn, new LessThanOperator<T>() { Column = _whereColumn, Value = value }.Not());
         }
-        public TQuery WhereGreaterOrEqual(string column, object value)
+        public TQuery WhereGreaterOrEqual<T>(string column, T value)
         {
-            return Where(column, new GreaterThanOrEqualOperator() { Column = column, Value = value });
+            return Where(column, new GreaterThanOrEqualOperator<T>() { Column = column, Value = value });
         }
-        public TQuery GreaterOrEqual(object value)
+        public TQuery GreaterOrEqual<T>(T value)
         {
-            return Where(_whereColumn, new GreaterThanOrEqualOperator() { Column = _whereColumn, Value = value });
+            return Where(_whereColumn, new GreaterThanOrEqualOperator<T>() { Column = _whereColumn, Value = value });
         }
-        public TQuery WhereNotGreaterOrEqual(string column, object value)
+        public TQuery WhereNotGreaterOrEqual<T>(string column, T value)
         {
-            return Where(column, new GreaterThanOrEqualOperator() { Column = column, Value = value }.Not());
+            return Where(column, new GreaterThanOrEqualOperator<T>() { Column = column, Value = value }.Not());
         }
-        public TQuery NotGreaterOrEqual(object value)
+        public TQuery NotGreaterOrEqual<T>(T value)
         {
-            return Where(_whereColumn, new GreaterThanOrEqualOperator() { Column = _whereColumn, Value = value }.Not());
+            return Where(_whereColumn, new GreaterThanOrEqualOperator<T>() { Column = _whereColumn, Value = value }.Not());
         }
-        public TQuery WhereLessOrEqual(string column, object value)
+        public TQuery WhereLessOrEqual<T>(string column, T value)
         {
-            return Where(column, new LessThanOrEqualOperator() { Column = column, Value = value });
+            return Where(column, new LessThanOrEqualOperator<T>() { Column = column, Value = value });
         }
-        public TQuery LessOrEqual(object value)
+        public TQuery LessOrEqual<T>(T value)
         {
-            return Where(_whereColumn, new LessThanOrEqualOperator() { Column = _whereColumn, Value = value });
+            return Where(_whereColumn, new LessThanOrEqualOperator<T>() { Column = _whereColumn, Value = value });
         }
-        public TQuery WhereNotLessOrEqual(string column, object value)
+        public TQuery WhereNotLessOrEqual<T>(string column, T value)
         {
-            return Where(column, new LessThanOrEqualOperator() { Column = column, Value = value }.Not());
+            return Where(column, new LessThanOrEqualOperator<T>() { Column = column, Value = value }.Not());
         }
-        public TQuery NotLessOrEqual(object value)
+        public TQuery NotLessOrEqual<T>(T value)
         {
-            return Where(_whereColumn, new LessThanOrEqualOperator() { Column = _whereColumn, Value = value }.Not());
+            return Where(_whereColumn, new LessThanOrEqualOperator<T>() { Column = _whereColumn, Value = value }.Not());
         }
-        public TQuery WhereBetween(string column, object value, object secondValue)
+        public TQuery WhereBetween<T>(string column, T value, T secondValue)
         {
             return Where(column, new BetweenOperator() { Column = column, Value = value, SecondValue = secondValue });
         }
-        public TQuery Between(object value, object secondValue)
+        public TQuery Between<T>(T value, T secondValue)
         {
             return Where(_whereColumn, new BetweenOperator() { Column = _whereColumn, Value = value, SecondValue = secondValue });
         }
-        public TQuery WhereNotBetween(string column, object value, object secondValue)
+        public TQuery WhereNotBetween<T>(string column, T value, T secondValue)
         {
             return Where(column, new BetweenOperator() { Column = column, Value = value, SecondValue = secondValue }.Not());
         }
-        public TQuery NotBetween(object value, object secondValue)
+        public TQuery NotBetween<T>(T value, T secondValue)
         {
             return Where(_whereColumn, new BetweenOperator() { Column = _whereColumn, Value = value, SecondValue = secondValue }.Not());
         }
-        public TQuery WhereIn(string column, object value)
+        public TQuery WhereIn<T>(string column, IEnumerable<T> value)
         {
             return Where(column, new InOperator() { Column = column, Value = value });
         }
-        public TQuery In(object value)
+        public TQuery In<T>(IEnumerable<T> value)
         {
             return Where(_whereColumn, new InOperator() { Column = _whereColumn, Value = value });
         }
-        public TQuery WhereNotIn(string column, object value)
+        public TQuery WhereNotIn<T>(string column, IEnumerable<T> value)
         {
             return Where(column, new InOperator() { Column = column, Value = value }.Not());
         }
-        public TQuery NotIn(object value)
+        public TQuery NotIn<T>(IEnumerable<T> value)
         {
             return Where(_whereColumn, new InOperator() { Column = _whereColumn, Value = value }.Not());
         }
-        public TQuery WhereLike(string column, object value)
+        public TQuery WhereLike<T>(string column, T value)
         {
             return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "%" });
         }
-        public TQuery Like(object value)
+        public TQuery Like<T>(T value)
         {
             return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "%" });
         }
-        public TQuery WhereNotLike(string column, object value)
+        public TQuery WhereNotLike<T>(string column, T value)
         {
             return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "%" }.Not());
         }
-        public TQuery NotLike(object value)
+        public TQuery NotLike<T>(T value)
         {
             return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "%" }.Not());
         }
 
-        public TQuery WhereStarts(string column, object value)
+        public TQuery WhereStarts<T>(string column, T value)
         {
             return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "", LikeEnds = "%" });
         }
-        public TQuery WhereNotStarts(string column, object value)
+        public TQuery WhereNotStarts<T>(string column, T value)
         {
             return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "", LikeEnds = "%" }.Not());
         }
-        public TQuery Starts(object value)
+        public TQuery Starts<T>(T value)
         {
             return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "", LikeEnds = "%" });
         }
-        public TQuery NotStarts(object value)
+        public TQuery NotStarts<T>(T value)
         {
             return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "", LikeEnds = "%" }.Not());
         }
 
-        public TQuery WhereEnds(string column, object value)
+        public TQuery WhereEnds<T>(string column, T value)
         {
             return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "" });
         }
-        public TQuery WhereNotEnds(string column, object value)
+        public TQuery WhereNotEnds<T>(string column, T value)
         {
             return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "" }.Not());
         }
-        public TQuery Ends(object value)
+        public TQuery Ends<T>(T value)
         {
             return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "" });
         }
-        public TQuery NotEnds(object value)
+        public TQuery NotEnds<T>(T value)
         {
             return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "" }.Not());
         }
@@ -392,20 +409,31 @@ namespace Querier.SqlQuery
         }
 
 
-
         public TQuery And()
         {
             _whereAnd = true;
             _whereOr = false;
             return (TQuery)(object)this;
         }
-        public TQuery And(object value, object? secondValue = null)
+
+        public TQuery And<T>(T value)
         {
-            var comparison = _where.Where(e => e.Operator.IsOperatorType<AbstractComparisonOperator>()).LastOrDefault();
+            var comparison = _where.Where(e => e.Operator.IsOperatorType<AbstractComparisonOperator<T>>()).LastOrDefault();
             if (comparison == null) return (TQuery)(object)this;
 
             var clonedComparison = comparison.Clone();
-            var clonedComparisonOperator = clonedComparison.Operator.And() as AbstractComparisonOperator;
+            var clonedComparisonOperator = clonedComparison.Operator.And() as AbstractComparisonOperator<T>;
+            clonedComparisonOperator.Value = value;
+
+            return Where(clonedComparisonOperator.Column, clonedComparisonOperator);
+        }
+        public TQuery And<T>(T value, T? secondValue)
+        {
+            var comparison = _where.Where(e => e.Operator.IsOperatorType<AbstractComparisonOperator<T>>()).LastOrDefault();
+            if (comparison == null) return (TQuery)(object)this;
+
+            var clonedComparison = comparison.Clone();
+            var clonedComparisonOperator = clonedComparison.Operator.And() as AbstractComparisonOperator<T>;
             clonedComparisonOperator.Value = value;
 
             return Where(clonedComparisonOperator.Column, clonedComparisonOperator);
@@ -417,13 +445,24 @@ namespace Querier.SqlQuery
             _whereOr = true;
             return (TQuery)(object)this;
         }
-        public TQuery Or(object value, object? secondValue = null)
+        public TQuery Or<T>(T value)
         {
-            var comparison = _where.Where(e => e.Operator.IsOperatorType<AbstractComparisonOperator>()).LastOrDefault();
+            var comparison = _where.Where(e => e.Operator.IsOperatorType<AbstractComparisonOperator<T>>()).LastOrDefault();
             if (comparison == null) return (TQuery)(object)this;
 
             var clonedComparison = comparison.Clone();
-            var clonedComparisonOperator = clonedComparison.Operator.Or() as AbstractComparisonOperator;
+            var clonedComparisonOperator = clonedComparison.Operator.Or() as AbstractComparisonOperator<T>;
+            clonedComparisonOperator.Value = value;
+
+            return Where(clonedComparisonOperator.Column, clonedComparisonOperator);
+        }
+        public TQuery Or<T>(T value, T? secondValue)
+        {
+            var comparison = _where.Where(e => e.Operator.IsOperatorType<AbstractComparisonOperator<T>>()).LastOrDefault();
+            if (comparison == null) return (TQuery)(object)this;
+
+            var clonedComparison = comparison.Clone();
+            var clonedComparisonOperator = clonedComparison.Operator.Or() as AbstractComparisonOperator<T>;
             clonedComparisonOperator.Value = value;
 
             return Where(clonedComparisonOperator.Column, clonedComparisonOperator);
@@ -438,6 +477,15 @@ namespace Querier.SqlQuery
 
             return (TQuery)(object)this;
         }
+        public TQuery GroupBy(Func<IFunction, IFunction> function)
+        {
+            _groupBy.Add(new SqlGroupByFunction()
+            {
+                Column = string.Empty,
+                Function = function.Invoke(_functionFactory.New())
+            });
+            return (TQuery)(object)this;
+        }
 
         public TQuery OrderBy(string column, string? order = "asc")
         {
@@ -450,37 +498,9 @@ namespace Querier.SqlQuery
             return (TQuery)(object)this;
         }
 
-        public override SqlTokenizer CompileTokens(SqlQueryResult result)
-        {
-            var queryTz = new SqlTokenizer();
 
-            var selectQuery = CreateSelect();
-            var tableQuery = CreateTable();
-            var whereQuery = CreateWhere();
-            var groupByQuery = CreateGroupBy();
-            var orderByQuery = CreateOrderBy();
 
-            queryTz.AddToken(selectQuery.Sql);
-            queryTz.AddToken(tableQuery.Sql);
-            queryTz.AddToken(whereQuery.Sql);
-            queryTz.AddToken(groupByQuery.Sql);
-            queryTz.AddToken(orderByQuery.Sql);
 
-            return queryTz;
-        }
-        public override Dictionary<string, string> CompileNameParameters(SqlQueryResult result)
-        {
-            return NameParameters
-                .Select((e, i) =>
-                {
-                    result.Sql = result.Sql.Replace(e.Key, $"{NameParameterPlaceholder}{i}");
-                    return new KeyValuePair<string, string>($"{NameParameterPlaceholder}{i}", e.Value);
-                }).ToDictionary();
-        }
-        public override Dictionary<string, object> CompileSqlParameters(SqlQueryResult result)
-        {
-            return SqlParameters.Select((e, i) => new KeyValuePair<string, object>($"{SqlParameterPlaceholder}{i}", e.Value)).ToDictionary();
-        }
 
         public virtual SqlQueryResult Compile()
         {
@@ -499,192 +519,8 @@ namespace Querier.SqlQuery
 
             return result;
         }
-        public override SqlQueryResult CompileSql(SqlQueryResult result)
-        {
-            foreach (var param in result.NameParameters)
-            {
-                result.CompiledSql = result.CompiledSql.Replace(param.Key, $"{NameParameterOpening}{param.Value}{NameParameterClosing}");
-            }
 
-            return result;
-        }
-
-        public virtual SqlQueryResult CreateTable()
-        {
-            var result = new SqlQueryResult();
-
-            var tableTz = new SqlTokenizer().AddToken("from");
-
-            var tableCompiled = _table.Compile();
-            var tableCompiledSql = tableCompiled.Sql;
-
-            foreach (var parameter in tableCompiled.NameParameters.Reverse())
-            {
-                var nameCount = NameParameters.Count;
-                var newPlaceholder = $"{NameParameterPlaceholder}{nameCount}";
-
-                tableCompiledSql = tableCompiledSql.Replace(parameter.Key, newPlaceholder);
-
-                NameParameters.Add(newPlaceholder, parameter.Value);
-                result.NameParameters.Add(newPlaceholder, parameter.Value);
-            }
-
-            tableTz.AddToken(tableCompiledSql);
-            result.Sql = tableTz.Build(" ");
-            return result;
-        }
-        public virtual SqlQueryResult CreateSelect()
-        {
-            var result = new SqlQueryResult();
-
-            var selectTz = new SqlTokenizer().AddToken("select");
-            if (_select.Count <= 0)
-            {
-                result.Sql = selectTz.AddToken("*").Build(" ");
-                return result;
-            }
-
-            if (_distinct)
-            {
-                selectTz.AddToken("distinct");
-            }
-
-            selectTz.AddToken(tz =>
-            {
-                foreach (var select in _select)
-                {
-                    var selectCompiled = select.Compile();
-                    var selectCompiledSql = selectCompiled.Sql;
-                    foreach (var parameter in selectCompiled.SqlParameters)
-                    {
-                        var count = SqlParameters.Count;
-
-                        var name = parameter.Key;
-                        var newName = $"{SqlParameterPlaceholder}{count}";
-
-                        selectCompiledSql = selectCompiledSql.Replace(name, newName);
-
-                        SqlParameters.Add(newName, parameter.Value);
-                        result.SqlParameters.Add(newName, parameter.Value);
-                    }
-
-                    foreach (var parameter in selectCompiled.NameParameters.Reverse())
-                    {
-                        var nameCount = NameParameters.Count;
-                        var newPlaceholder = $"{NameParameterPlaceholder}{nameCount}";
-
-                        selectCompiledSql = selectCompiledSql.Replace(parameter.Key, newPlaceholder);
-
-                        NameParameters.Add(newPlaceholder, parameter.Value);
-                        result.NameParameters.Add(newPlaceholder, parameter.Value);
-                    }
-
-                    tz.AddToken(selectCompiledSql);
-                }
-
-                return tz;
-            }, ", ");
-
-
-            result.SqlTokenizer = selectTz;
-            result.Sql = selectTz.Build(" ");
-            return result;
-        }
-        public virtual SqlQueryResult CreateWhere()
-        {
-            var result = new SqlQueryResult();
-
-            if (_where.Count <= 0) return result;
-
-            var whereTz = new SqlTokenizer().AddToken("where");
-
-            foreach (var where in _where)
-            {
-                var whereCompiled = where.Operator.Compile();
-                var whereCompiledSql = whereCompiled.Sql;
-
-
-                foreach (var parameter in whereCompiled.SqlParameters)
-                {
-                    var count = SqlParameters.Count;
-
-                    var name = parameter.Key;
-                    var newName = $"{SqlParameterPlaceholder}{count}";
-
-                    whereCompiledSql = whereCompiledSql.Replace(name, newName);
-
-                    SqlParameters.Add(newName, parameter.Value);
-                    result.SqlParameters.Add(newName, parameter.Value);
-                }
-
-                foreach (var parameter in whereCompiled.NameParameters.Reverse())
-                {
-                    var nameCount = NameParameters.Count;
-                    var newPlaceholder = $"{NameParameterPlaceholder}{nameCount}";
-
-                    whereCompiledSql = whereCompiledSql.Replace(parameter.Key, newPlaceholder);
-
-                    NameParameters.Add(newPlaceholder, parameter.Value);
-                    result.NameParameters.Add(newPlaceholder, parameter.Value);
-                }
-
-                whereTz.AddToken(whereCompiledSql);
-            }
-            result.Sql = whereTz.Build();
-            return result;
-        }
-        public virtual SqlQueryResult CreateGroupBy()
-        {
-            var result = new SqlQueryResult();
-
-            if (_groupBy.Count <= 0) return result;
-
-            var groupTz = new SqlTokenizer().AddToken("group").AddToken("by");
-
-            groupTz.AddToken(e =>
-            {
-                foreach (var group in _groupBy)
-                {
-                    var count = NameParameters.Count;
-                    var newName = $"{NameParameterPlaceholder}{count}";
-
-                    NameParameters.Add(newName, group.Column);
-                    result.NameParameters.Add(newName, group.Column);
-
-                    e.AddToken(newName);
-                }
-                return e;
-            }, ", ");
-
-            result.Sql = groupTz.Build();
-            return result;
-        }
-        public virtual SqlQueryResult CreateOrderBy()
-        {
-            var result = new SqlQueryResult();
-
-            if (_orderBy.Count <= 0) return result;
-
-            var orderTz = new SqlTokenizer().AddToken("order").AddToken("by");
-
-            orderTz.AddToken(e =>
-            {
-                foreach (var order in _orderBy)
-                {
-                    var count = NameParameters.Count;
-                    var newName = $"{NameParameterPlaceholder}{count}";
-
-                    NameParameters.Add(newName, order.Column);
-                    result.NameParameters.Add(newName, order.Column);
-                    e.AddToken(e => e.AddToken(s => s.AddToken(newName).AddToken(order.Order), " "));
-                }
-                return e;
-            }, ", ");
-
-            result.Sql = orderTz.Build();
-            return result;
-        }
-
+        
 
     }
 }

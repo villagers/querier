@@ -64,20 +64,20 @@ namespace Querier
             return result;
         }
 
-        internal static List<QueryProperty> ListMeasureProperties<T>()
+        internal static List<QueryProperty> GetMeasureProperties<T>()
         {
-            return ListMeasureProperties(typeof(T));
+            return GetMeasureProperties(typeof(T));
         }
-        internal static List<QueryProperty> ListMeasureProperties(string queryKey)
+        internal static List<QueryProperty> GetMeasureProperties(string queryKey)
         {
             var type = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(e => e.GetTypes())
                 .Where(e => e.IsDefined(typeof(QueryAttribute), true))
                 .FirstOrDefault(e => e.GetCustomAttribute<QueryAttribute>()?.Key == queryKey);
 
-            return ListMeasureProperties(type);
+            return GetMeasureProperties(type);
         }
-        internal static List<QueryProperty> ListMeasureProperties(Type type)
+        internal static List<QueryProperty> GetMeasureProperties(Type type)
         {
             var flags = BindingFlags.Public | BindingFlags.Instance;
 
@@ -110,20 +110,20 @@ namespace Querier
         }
 
 
-        internal static List<QueryProperty> ListDimensionProperties<T>()
+        internal static List<QueryProperty> GetDimensionProperties<T>()
         {
-            return ListDimensionProperties(typeof(T));
+            return GetDimensionProperties(typeof(T));
         }
-        internal static List<QueryProperty> ListDimensionProperties(string queryKey)
+        internal static List<QueryProperty> GetDimensionProperties(string queryKey)
         {
             var type = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(e => e.GetTypes())
                 .Where(e => e.IsDefined(typeof(QueryAttribute), true))
                 .FirstOrDefault(e => e.GetCustomAttribute<QueryAttribute>()?.Key == queryKey);
 
-            return ListDimensionProperties(type);
+            return GetDimensionProperties(type);
         }
-        internal static List<QueryProperty> ListDimensionProperties(Type type)
+        internal static List<QueryProperty> GetDimensionProperties(Type type)
         {
             var flags = BindingFlags.Public | BindingFlags.Instance;
 
@@ -154,20 +154,20 @@ namespace Querier
         }
 
 
-        internal static List<QueryProperty> ListTimeDimensionProperties<T>()
+        internal static List<QueryProperty> GetTimeDimensionProperties<T>()
         {
-            return ListTimeDimensionProperties(typeof(T));
+            return GetTimeDimensionProperties(typeof(T));
         }
-        internal static List<QueryProperty> ListTimeDimensionProperties(string queryKey)
+        internal static List<QueryProperty> GetTimeDimensionProperties(string queryKey)
         {
             var type = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(e => e.GetTypes())
                 .Where(e => e.IsDefined(typeof(QueryAttribute), true))
                 .FirstOrDefault(e => e.GetCustomAttribute<QueryAttribute>()?.Key == queryKey);
 
-            return ListTimeDimensionProperties(type);
+            return GetTimeDimensionProperties(type);
         }
-        internal static List<QueryProperty> ListTimeDimensionProperties(Type type)
+        internal static List<QueryProperty> GetTimeDimensionProperties(Type type)
         {
             var flags = BindingFlags.Public | BindingFlags.Instance;
 

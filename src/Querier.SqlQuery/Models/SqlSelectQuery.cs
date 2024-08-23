@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Interfaces;
+﻿using Querier.SqlQuery.Functions;
+using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Tokenizers;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Interfaces;
+﻿using Querier.SqlQuery.Functions;
+using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
 using System;
@@ -9,12 +10,18 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery
 {
-    public class MySqlQuery : BaseQuery<IMySqlQuery, MySqlQuery>, IMySqlQuery
+    public class MySqlQuery : BaseQuery<IMySqlQuery>, IMySqlQuery
     {
         protected override string NameParameterOpening => "`";
         protected override string NameParameterClosing => "`";
-        public MySqlQuery()
+
+        public MySqlQuery(IFunction function) : base(function)
         {
+        }
+
+        public override IMySqlQuery New()
+        {
+            return new MySqlQuery(_functionFactory);
         }
 
         public override SqlTokenizer CompileTokens(SqlQueryResult result)

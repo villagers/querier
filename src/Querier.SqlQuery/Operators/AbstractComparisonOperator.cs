@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Operators
 {
-    public abstract class AbstractComparisonOperator : AbstractOperator
+    public abstract class AbstractComparisonOperator<T> : AbstractOperator
     {
         public required string Column { get; set; }
-        public required object Value { get; set; }
+        public required T Value { get; set; }
 
     }
 }

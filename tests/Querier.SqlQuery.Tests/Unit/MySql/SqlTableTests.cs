@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Querier.SqlQuery.Functions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace Querier.SqlQuery.Tests.Unit.MySql
 
         public SqlTableTests()
         {
-            _query = new MySqlQuery();
+            _query = new MySqlQuery(new MySqlFunction());
         }
 
         [Fact]
