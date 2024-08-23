@@ -169,7 +169,7 @@ namespace Querier.SqlQuery
                 _select.Remove(select);
             }
         }
-        public TQuery Where(string column, AbstractOperator @operator)
+        public TQuery WhereOperator(string column, AbstractOperator @operator)
         {
             _whereColumn = column;
             _where.Add(new SqlWhere(column, @operator.And(_whereAnd).Or(_whereOr)));
@@ -196,216 +196,216 @@ namespace Querier.SqlQuery
         }
         public TQuery Where<T>(string column, T value)
         {
-            return Where(column, new EqualOperator<T>() { Column = column, Value = value });
+            return WhereOperator(column, new EqualOperator<T>() { Column = column, Value = value });
         }
         public TQuery WhereEqual<T>(string column, T value)
         {
-            return Where(column, new EqualOperator<T>() { Column = column, Value = value });
+            return WhereOperator(column, new EqualOperator<T>() { Column = column, Value = value });
         }
         public TQuery Equal<T>(T value)
         {
-            return Where(_whereColumn, new EqualOperator<T>() { Column = _whereColumn, Value = value });
+            return WhereOperator(_whereColumn, new EqualOperator<T>() { Column = _whereColumn, Value = value });
         }
         public TQuery WhereNotEqual<T>(string column, T value)
         {
-            return Where(column, new NotEqualOperator<T>() { Column = column, Value = value });
+            return WhereOperator(column, new NotEqualOperator<T>() { Column = column, Value = value });
         }
         public TQuery NotEqual<T>(T value)
         {
-            return Where(_whereColumn, new NotEqualOperator<T>() { Column = _whereColumn, Value = value });
+            return WhereOperator(_whereColumn, new NotEqualOperator<T>() { Column = _whereColumn, Value = value });
         }
         public TQuery WhereGreater<T>(string column, T value)
         {
-            return Where(column, new GreaterThanOperator<T>() { Column = column, Value = value });
+            return WhereOperator(column, new GreaterThanOperator<T>() { Column = column, Value = value });
         }
         public TQuery Greater<T>(T value)
         {
-            return Where(_whereColumn, new GreaterThanOperator<T>() { Column = _whereColumn, Value = value });
+            return WhereOperator(_whereColumn, new GreaterThanOperator<T>() { Column = _whereColumn, Value = value });
         }
         public TQuery WhereNotGreater<T>(string column, T value)
         {
-            return Where(column, new GreaterThanOperator<T>() { Column = column, Value = value }.Not());
+            return WhereOperator(column, new GreaterThanOperator<T>() { Column = column, Value = value }.Not());
         }
         public TQuery NotGreater<T>(T value)
         {
-            return Where(_whereColumn, new GreaterThanOperator<T>() { Column = _whereColumn, Value = value }.Not());
+            return WhereOperator(_whereColumn, new GreaterThanOperator<T>() { Column = _whereColumn, Value = value }.Not());
         }
         public TQuery WhereLess<T>(string column, T value)
         {
-            return Where(column, new LessThanOperator<T>() { Column = column, Value = value });
+            return WhereOperator(column, new LessThanOperator<T>() { Column = column, Value = value });
         }
         public TQuery Less<T>(T value)
         {
-            return Where(_whereColumn, new LessThanOperator<T>() { Column = _whereColumn, Value = value });
+            return WhereOperator(_whereColumn, new LessThanOperator<T>() { Column = _whereColumn, Value = value });
         }
         public TQuery WhereNotLess<T>(string column, T value)
         {
-            return Where(column, new LessThanOperator<T>() { Column = column, Value = value }.Not());
+            return WhereOperator(column, new LessThanOperator<T>() { Column = column, Value = value }.Not());
         }
         public TQuery NotLess<T>(T value)
         {
-            return Where(_whereColumn, new LessThanOperator<T>() { Column = _whereColumn, Value = value }.Not());
+            return WhereOperator(_whereColumn, new LessThanOperator<T>() { Column = _whereColumn, Value = value }.Not());
         }
         public TQuery WhereGreaterOrEqual<T>(string column, T value)
         {
-            return Where(column, new GreaterThanOrEqualOperator<T>() { Column = column, Value = value });
+            return WhereOperator(column, new GreaterThanOrEqualOperator<T>() { Column = column, Value = value });
         }
         public TQuery GreaterOrEqual<T>(T value)
         {
-            return Where(_whereColumn, new GreaterThanOrEqualOperator<T>() { Column = _whereColumn, Value = value });
+            return WhereOperator(_whereColumn, new GreaterThanOrEqualOperator<T>() { Column = _whereColumn, Value = value });
         }
         public TQuery WhereNotGreaterOrEqual<T>(string column, T value)
         {
-            return Where(column, new GreaterThanOrEqualOperator<T>() { Column = column, Value = value }.Not());
+            return WhereOperator(column, new GreaterThanOrEqualOperator<T>() { Column = column, Value = value }.Not());
         }
         public TQuery NotGreaterOrEqual<T>(T value)
         {
-            return Where(_whereColumn, new GreaterThanOrEqualOperator<T>() { Column = _whereColumn, Value = value }.Not());
+            return WhereOperator(_whereColumn, new GreaterThanOrEqualOperator<T>() { Column = _whereColumn, Value = value }.Not());
         }
         public TQuery WhereLessOrEqual<T>(string column, T value)
         {
-            return Where(column, new LessThanOrEqualOperator<T>() { Column = column, Value = value });
+            return WhereOperator(column, new LessThanOrEqualOperator<T>() { Column = column, Value = value });
         }
         public TQuery LessOrEqual<T>(T value)
         {
-            return Where(_whereColumn, new LessThanOrEqualOperator<T>() { Column = _whereColumn, Value = value });
+            return WhereOperator(_whereColumn, new LessThanOrEqualOperator<T>() { Column = _whereColumn, Value = value });
         }
         public TQuery WhereNotLessOrEqual<T>(string column, T value)
         {
-            return Where(column, new LessThanOrEqualOperator<T>() { Column = column, Value = value }.Not());
+            return WhereOperator(column, new LessThanOrEqualOperator<T>() { Column = column, Value = value }.Not());
         }
         public TQuery NotLessOrEqual<T>(T value)
         {
-            return Where(_whereColumn, new LessThanOrEqualOperator<T>() { Column = _whereColumn, Value = value }.Not());
+            return WhereOperator(_whereColumn, new LessThanOrEqualOperator<T>() { Column = _whereColumn, Value = value }.Not());
         }
         public TQuery WhereBetween<T>(string column, T value, T secondValue)
         {
-            return Where(column, new BetweenOperator() { Column = column, Value = value, SecondValue = secondValue });
+            return WhereOperator(column, new BetweenOperator() { Column = column, Value = value, SecondValue = secondValue });
         }
         public TQuery Between<T>(T value, T secondValue)
         {
-            return Where(_whereColumn, new BetweenOperator() { Column = _whereColumn, Value = value, SecondValue = secondValue });
+            return WhereOperator(_whereColumn, new BetweenOperator() { Column = _whereColumn, Value = value, SecondValue = secondValue });
         }
         public TQuery WhereNotBetween<T>(string column, T value, T secondValue)
         {
-            return Where(column, new BetweenOperator() { Column = column, Value = value, SecondValue = secondValue }.Not());
+            return WhereOperator(column, new BetweenOperator() { Column = column, Value = value, SecondValue = secondValue }.Not());
         }
         public TQuery NotBetween<T>(T value, T secondValue)
         {
-            return Where(_whereColumn, new BetweenOperator() { Column = _whereColumn, Value = value, SecondValue = secondValue }.Not());
+            return WhereOperator(_whereColumn, new BetweenOperator() { Column = _whereColumn, Value = value, SecondValue = secondValue }.Not());
         }
         public TQuery WhereIn<T>(string column, IEnumerable<T> value)
         {
-            return Where(column, new InOperator() { Column = column, Value = value });
+            return WhereOperator(column, new InOperator() { Column = column, Value = value });
         }
         public TQuery In<T>(IEnumerable<T> value)
         {
-            return Where(_whereColumn, new InOperator() { Column = _whereColumn, Value = value });
+            return WhereOperator(_whereColumn, new InOperator() { Column = _whereColumn, Value = value });
         }
         public TQuery WhereNotIn<T>(string column, IEnumerable<T> value)
         {
-            return Where(column, new InOperator() { Column = column, Value = value }.Not());
+            return WhereOperator(column, new InOperator() { Column = column, Value = value }.Not());
         }
         public TQuery NotIn<T>(IEnumerable<T> value)
         {
-            return Where(_whereColumn, new InOperator() { Column = _whereColumn, Value = value }.Not());
+            return WhereOperator(_whereColumn, new InOperator() { Column = _whereColumn, Value = value }.Not());
         }
         public TQuery WhereLike<T>(string column, T value)
         {
-            return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "%" });
+            return WhereOperator(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "%" });
         }
         public TQuery Like<T>(T value)
         {
-            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "%" });
+            return WhereOperator(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "%" });
         }
         public TQuery WhereNotLike<T>(string column, T value)
         {
-            return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "%" }.Not());
+            return WhereOperator(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "%" }.Not());
         }
         public TQuery NotLike<T>(T value)
         {
-            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "%" }.Not());
+            return WhereOperator(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "%" }.Not());
         }
 
         public TQuery WhereStarts<T>(string column, T value)
         {
-            return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "", LikeEnds = "%" });
+            return WhereOperator(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "", LikeEnds = "%" });
         }
         public TQuery WhereNotStarts<T>(string column, T value)
         {
-            return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "", LikeEnds = "%" }.Not());
+            return WhereOperator(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "", LikeEnds = "%" }.Not());
         }
         public TQuery Starts<T>(T value)
         {
-            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "", LikeEnds = "%" });
+            return WhereOperator(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "", LikeEnds = "%" });
         }
         public TQuery NotStarts<T>(T value)
         {
-            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "", LikeEnds = "%" }.Not());
+            return WhereOperator(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "", LikeEnds = "%" }.Not());
         }
 
         public TQuery WhereEnds<T>(string column, T value)
         {
-            return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "" });
+            return WhereOperator(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "" });
         }
         public TQuery WhereNotEnds<T>(string column, T value)
         {
-            return Where(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "" }.Not());
+            return WhereOperator(column, new LikeOperator() { Column = column, Value = value, LikeStarts = "%", LikeEnds = "" }.Not());
         }
         public TQuery Ends<T>(T value)
         {
-            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "" });
+            return WhereOperator(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "" });
         }
         public TQuery NotEnds<T>(T value)
         {
-            return Where(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "" }.Not());
+            return WhereOperator(_whereColumn, new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "" }.Not());
         }
 
         public TQuery WhereAll(string column, string @operator, Func<TQuery, TQuery> query)
         {
             var newQuery = query.Invoke(New());
-            return Where(column, new AllOperator<TQuery>() { Column = column, Query = newQuery, Operator = @operator });
+            return WhereOperator(column, new AllOperator<TQuery>() { Column = column, Query = newQuery, Operator = @operator });
         }
         public TQuery All(string @operator, Func<TQuery, TQuery> query)
         {
             var newQuery = query.Invoke(New());
-            return Where(_whereColumn, new AllOperator<TQuery>() { Column = _whereColumn, Query = newQuery, Operator = @operator });
+            return WhereOperator(_whereColumn, new AllOperator<TQuery>() { Column = _whereColumn, Query = newQuery, Operator = @operator });
         }
         public TQuery WhereAny(string column, string @operator, Func<TQuery, TQuery> query)
         {
             var newQuery = query.Invoke(New());
-            return Where(column, new AnyOperator<TQuery>() { Column = column, Query = newQuery, Operator = @operator });
+            return WhereOperator(column, new AnyOperator<TQuery>() { Column = column, Query = newQuery, Operator = @operator });
         }
         public TQuery Any(string @operator, Func<TQuery, TQuery> query)
         {
             var newQuery = query.Invoke(New());
-            return Where(_whereColumn, new AnyOperator<TQuery>() { Column = _whereColumn, Query = newQuery, Operator = @operator });
+            return WhereOperator(_whereColumn, new AnyOperator<TQuery>() { Column = _whereColumn, Query = newQuery, Operator = @operator });
         }
         public TQuery WhereExists(Func<TQuery, TQuery> query)
         {
             var newQuery = query.Invoke(New());
-            return Where("", new ExistsOperator<TQuery>() { Query = newQuery });
+            return WhereOperator("", new ExistsOperator<TQuery>() { Query = newQuery });
         }
         public TQuery WhereNotExists(Func<TQuery, TQuery> query)
         {
             var newQuery = query.Invoke(New());
-            return Where("", new ExistsOperator<TQuery>() { Query = newQuery }.Not());
+            return WhereOperator("", new ExistsOperator<TQuery>() { Query = newQuery }.Not());
         }
         public TQuery WhereNull(string column)
         {
-            return Where(column, new IsNullOperator() { Column = column });
+            return WhereOperator(column, new IsNullOperator() { Column = column });
         }
         public TQuery Null()
         {
-            return Where(_whereColumn, new IsNullOperator() { Column = _whereColumn });
+            return WhereOperator(_whereColumn, new IsNullOperator() { Column = _whereColumn });
         }
         public TQuery WhereNotNull(string column)
         {
-            return Where(column, new IsNullOperator() { Column = column }.Not());
+            return WhereOperator(column, new IsNullOperator() { Column = column }.Not());
         }
         public TQuery NotNull()
         {
-            return Where(_whereColumn, new IsNullOperator() { Column = _whereColumn }.Not());
+            return WhereOperator(_whereColumn, new IsNullOperator() { Column = _whereColumn }.Not());
         }
 
 
