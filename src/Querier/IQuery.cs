@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Tls;
+﻿using Org.BouncyCastle.Tls;
 using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using System;
