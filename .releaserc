@@ -18,14 +18,15 @@
         [
             "@semantic-release/exec",
             {
-                "prepareCmd": "chmod +x ../release.sh && ../release.sh '${nextRelease.version}' 'Querier/Querier.csproj'"
-            },
+                "prepareCmd": "chmod +x ../release.sh && ../release.sh '${nextRelease.version}' 'Querier/Querier.csproj' && ../release.sh '${nextRelease.version}' 'Querier.SqlQuery/Querier.SqlQuery.csproj'"
+            }
         ],
         [
             "@semantic-release/git",
             {
                 "assets": [
-                    "Querier/Querier.csproj"
+                    "Querier/Querier.csproj",
+                    "Querier.SqlQuery/Querier.SqlQuery.csproj"
                 ],
                 "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
             }

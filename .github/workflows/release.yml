@@ -6,13 +6,14 @@ on:
   push:
     branches:
       - main
-      
+
 env:
-  PROJECT_PATH: 'src/Querier/Querier.csproj'
+  PROJECT_PATH: "src/Querier/Querier.csproj"
+  PROJECT_PATH_2: "src/Querier.SqlQuery/Querier.SqlQuery.csproj"
   PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}/nuget
   NUGET_PUSH_URL: ${{ secrets.NUGET_PUSH_URL }}
   NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
-  
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -36,9 +37,10 @@ jobs:
             @semantic-release/exec
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: 'Pack & Publish project'
+      - name: "Pack & Publish project"
         if: ${{ steps.release.outputs.new_release_version }}
         run: |
           dotnet clean
           dotnet pack ${{ env.PROJECT_PATH }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+          dotnet pack ${{ env.PROJECT_PATH_2 }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
           dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg -k ${{ secrets.NUGET_TOKEN }} -s ${{ env.NUGET_PUSH_URL }}
