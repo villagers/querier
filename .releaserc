@@ -18,7 +18,7 @@
         [
             "@semantic-release/exec",
             {
-                "prepareCmd": "chmod +x ../release.sh && ../release.sh '${nextRelease.version}' 'Querier/Querier.csproj' && ../release.sh '${nextRelease.version}' 'Querier.SqlQuery/Querier.SqlQuery.csproj'"
+                "prepareCmd": "cd ../release.sh &&  chmod +x release.sh && release.sh '${nextRelease.version}'"
             }
         ],
         [
