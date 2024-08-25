@@ -24,6 +24,7 @@ namespace Querier
                 {
                     Key = queryKey,
                     DisplayName = e.DisplayName,
+                    Format = string.IsNullOrWhiteSpace(e.Format) ? "number" : e.Format
                 })
                 .FirstOrDefault();
 
