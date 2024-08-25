@@ -39,12 +39,18 @@ namespace Querier.SqlQuery.Operators
             };
 
 
-            result.NameParameters = result.NameParameters.Merge("@name", column.NameParameters);
+            column.NameParameters = column.NameParameters.Select((e, i) =>
+            {
+                result.Sql = result.Sql.Replace(e.Key, $"@name{i}");
+                return new KeyValuePair<string, string>($"@name{i}", e.Value);
+            }).ToDictionary();
             result.NameParameters = result.NameParameters.Select((e, i) =>
             {
                 result.Sql = result.Sql.Replace(e.Key, $"@name{i}");
                 return new KeyValuePair<string, string>($"@name{i}", e.Value);
             }).ToDictionary();
+            result.NameParameters = result.NameParameters.Merge("@name", column.NameParameters);
+
             return result;
         }
     }

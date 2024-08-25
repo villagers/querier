@@ -11,7 +11,7 @@ namespace Querier.SqlQuery.Extensions
 
         public static Dictionary<string, string> Merge(this Dictionary<string, string> dictionary, string suffix, Dictionary<string, string> dictionaryToMerge)
         {
-            var index = -1;
+            var index = 0;
 
             var result = new Dictionary<string, string>();
 

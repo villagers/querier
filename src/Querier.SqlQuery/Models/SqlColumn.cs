@@ -15,7 +15,7 @@ namespace Querier.SqlQuery.Models
 
         public SqlFunctionResult Compile()
         {
-            return Function?.Compile() ?? new SqlFunctionResult() { Sql = Column, NameParameters = new Dictionary<string, string>() { { "@column", Column } } };
+            return Function?.Compile() ?? new SqlFunctionResult() { Sql = "@column", NameParameters = new Dictionary<string, string>() { { "@column", Column } } };
         }
     }
 }
