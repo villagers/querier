@@ -8,17 +8,25 @@ namespace Querier.SqlQuery.Extensions
 {
     public static class DictionaryExtensions
     {
-        public static Dictionary<TKey, TValue> Merge<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, Dictionary<TKey, TValue> dictionaryToMerge)
+
+        public static Dictionary<string, string> Merge(this Dictionary<string, string> dictionary, string suffix, Dictionary<string, string> dictionaryToMerge)
         {
-            foreach (var kvp in dictionaryToMerge)
+            var index = 0;
+
+            var result = new Dictionary<string, string>();
+
+            foreach (var item in dictionary)
             {
-                if (!dictionary.ContainsKey(kvp.Key))
-                {
-                    dictionary[kvp.Key] = kvp.Value;
-                }
+                result.Add($"{suffix}{index++}", item.Value);
             }
 
-            return dictionary;
+            foreach (var item in dictionaryToMerge)
+            {
+                result.Add($"{suffix}{index++}", item.Value);
+            }
+
+
+            return result;
         }
     }
 }

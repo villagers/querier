@@ -31,18 +31,8 @@ namespace Querier
         IQuery Filter(Func<IQueryFilter, IQueryFilter> filter);
 
         List<QueryProperty> GetMeasures<TType>();
-        List<QueryProperty> GetMeasures(Type type);
-        List<QueryProperty> GetMeasures(string queryKey);
-
-
         List<QueryProperty> GetDimensions<TType>();
-        List<QueryProperty> GetDimensions(Type type);
-        List<QueryProperty> GetDimensions(string queryKey);
-
-
         List<QueryProperty> GetTimeDimensions<TType>();
-        List<QueryProperty> GetTimeDimensions(Type type);
-        List<QueryProperty> GetTimeDimensions(string queryKey);
 
         QueryResult Execute();
 

@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Models;
+﻿using Querier.SqlQuery.Functions;
+using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
 using System;
 using System.Collections.Generic;
@@ -10,14 +11,15 @@ namespace Querier.SqlQuery.Operators
 {
     public class InOperator : AbstractLogicalOperator
     {
-        public required string Column { get; set; }
         public required object Value { get; set; }
 
         public override SqlOperatorResult Compile()
         {
+            var column = Column.Compile();
+
             var sqlTz = new SqlTokenizer()
                 .AddToken(AndOrOperator)
-                .AddToken("@column")
+                .AddToken(column.Sql)
                 .AddToken(NotOperator)
                 .AddToken("in")
                 .AddToken("@value")
@@ -26,7 +28,7 @@ namespace Querier.SqlQuery.Operators
             var result = new SqlOperatorResult()
             {
                 Sql = sqlTz,
-                NameParameters = new Dictionary<string, string>() { { "@column", Column } },
+                NameParameters = column.NameParameters,
                 SqlParameters = new Dictionary<string, object>()
                 {
                     { "@value", Value }

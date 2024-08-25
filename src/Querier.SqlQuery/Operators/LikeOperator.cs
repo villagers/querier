@@ -11,15 +11,16 @@ namespace Querier.SqlQuery.Operators
 {
     public class LikeOperator : AbstractLogicalOperator
     {
-        public required string Column { get; set; }
         public required object Value { get; set; }
         public required string LikeStarts { get; set; } = "%";
         public required string LikeEnds { get; set; } = "%";
         public override SqlOperatorResult Compile()
         {
+            var column = Column.Compile();
+
             var sqlTz = new SqlTokenizer()
                 .AddToken(AndOrOperator)
-                .AddToken("@column")
+                .AddToken(column.Sql)
                 .AddToken(NotOperator)
                 .AddToken("like")
                 .AddToken(e => e.AddToken(LikeStarts).AddToken("@value").AddToken(LikeEnds), "")
@@ -29,7 +30,7 @@ namespace Querier.SqlQuery.Operators
             var result = new SqlOperatorResult()
             {
                 Sql = sqlTz,
-                NameParameters = new Dictionary<string, string>() { { "@column", Column } },
+                NameParameters = column.NameParameters,
                 SqlParameters = new Dictionary<string, object>() { { "@value",Value } }
             };
             result.NameParameters = result.NameParameters.Select((e, i) =>

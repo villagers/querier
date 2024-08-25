@@ -9,8 +9,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//builder.Services.AddQuerier(o => o.UseMySql("server=192.168.1.100;port=3306;user=root;password=2sMTFqG7heT8X7u;database=kolytics-staging"));
-
+var connectionString = builder.Configuration.GetConnectionString("MySQL");
+builder.Services.AddQuerier(o => o.UseMySql(connectionString));
 
 var app = builder.Build();
 

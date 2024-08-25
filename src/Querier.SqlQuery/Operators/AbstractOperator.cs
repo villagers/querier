@@ -10,6 +10,8 @@ namespace Querier.SqlQuery.Operators
 {
     public abstract class AbstractOperator : ICloneable
     {
+        public SqlColumn? Column { get; set; }
+
         protected bool HasAnd = false;
         protected bool HasOr = false;
         protected bool HasNot = false;

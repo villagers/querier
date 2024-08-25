@@ -12,10 +12,12 @@ namespace Querier.SqlQuery.Operators
     {
         public override SqlOperatorResult Compile()
         {
+            var column = Column.Compile();
+
             var sqlTz = new SqlTokenizer()
                 .AddToken(AndOrOperator)
                 .AddToken(NotOperator)
-                .AddToken("@column")
+                .AddToken(column.Sql)
                 .AddToken(">=")
                 .AddToken("@value")
                 .Build();
@@ -23,7 +25,7 @@ namespace Querier.SqlQuery.Operators
             var result = new SqlOperatorResult()
             {
                 Sql = sqlTz,
-                NameParameters = new Dictionary<string, string>() { { "@column", Column } },
+                NameParameters = column.NameParameters,
                 SqlParameters = new Dictionary<string, object>()
                 {
                     { "@value", Value }

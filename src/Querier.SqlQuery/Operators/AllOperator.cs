@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Functions;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
@@ -12,15 +13,17 @@ namespace Querier.SqlQuery.Operators
 {
     public class AllOperator<TQuery> : AbstractLogicalOperator where TQuery : IBaseQuery<TQuery>
     {
-        public required string Column { get; set; }
         public required string Operator { get; set; }
         public required TQuery Query { get; set; }
 
         public override SqlOperatorResult Compile()
         {
+
+            var column = Column.Compile();
+
             var sqlTz = new SqlTokenizer()
                 .AddToken(AndOrOperator)
-                .AddToken("@column")
+                .AddToken(column.Sql)
                 .AddToken(Operator)
                 .AddToken("all")
                 .Build();
@@ -34,12 +37,20 @@ namespace Querier.SqlQuery.Operators
                 NameParameters = compiled.NameParameters ?? new Dictionary<string, string>(),
                 SqlParameters = compiled?.SqlParameters ?? new Dictionary<string, object>()
             };
-            result.NameParameters.Add("@column", Column);
+
+
+            column.NameParameters = column.NameParameters.Select((e, i) =>
+            {
+                result.Sql = result.Sql.Replace(e.Key, $"@name{i}");
+                return new KeyValuePair<string, string>($"@name{i}", e.Value);
+            }).ToDictionary();
             result.NameParameters = result.NameParameters.Select((e, i) =>
             {
                 result.Sql = result.Sql.Replace(e.Key, $"@name{i}");
                 return new KeyValuePair<string, string>($"@name{i}", e.Value);
             }).ToDictionary();
+            result.NameParameters = result.NameParameters.Merge("@name", column.NameParameters);
+
             return result;
         }
     }
