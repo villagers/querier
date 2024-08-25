@@ -20,7 +20,7 @@ namespace Querier.Web.Tests.Controllers
         [Route("measures")]
         public IActionResult GetMeasures()
         {
-            var measures = _query.GetMeasures<InvoiceEntity>();
+            var measures = _query.GetMeasures("InvoiceEntity");
             return Ok(measures);
         }
 
@@ -28,7 +28,7 @@ namespace Querier.Web.Tests.Controllers
         [Route("dimensions")]
         public IActionResult GetDimensions()
         {
-            var measures = _query.GetDimensions<InvoiceEntity>();
+            var measures = _query.GetDimensions("InvoiceEntity");
             return Ok(measures);
         }
 
@@ -36,7 +36,7 @@ namespace Querier.Web.Tests.Controllers
         [Route("time-dimensions")]
         public IActionResult GetTimeDimensions()
         {
-            var measures = _query.GetTimeDimensions<InvoiceEntity>();
+            var measures = _query.GetTimeDimensions("InvoiceEntity");
             return Ok(measures);
         }
 
