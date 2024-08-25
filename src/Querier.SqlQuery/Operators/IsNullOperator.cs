@@ -10,13 +10,13 @@ namespace Querier.SqlQuery.Operators
 {
     public class IsNullOperator : AbstractOperator
     {
-        public required string Column { get; set; }
-
         public override SqlOperatorResult Compile()
         {
+            var column = Column.Compile();
+
             var sqlTz = new SqlTokenizer()
                 .AddToken(AndOrOperator)
-                .AddToken("@column")
+                .AddToken(column.Sql)
                 .AddToken("is")
                 .AddToken(NotOperator)
                 .AddToken("null")
@@ -25,7 +25,7 @@ namespace Querier.SqlQuery.Operators
             var result = new SqlOperatorResult()
             {
                 Sql = sqlTz,
-                NameParameters = new Dictionary<string, string>() { { "@column", Column } },
+                NameParameters = column.NameParameters,
             };
             result.NameParameters = result.NameParameters.Select((e, i) =>
             {

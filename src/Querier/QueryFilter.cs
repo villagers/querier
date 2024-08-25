@@ -28,15 +28,20 @@ namespace Querier
             _query.WhereIn(column, value);
             return this;
         }
+        public IQueryFilter In<T>(Func<IFunction, IFunction> function, IEnumerable<T> value)
+        {
+            _query.WhereIn(function, value);
+            return this;
+        }
 
         public IQueryFilter Equal<T>(string column, T value)
         {
             _query.WhereEqual(column, value);
             return this;
         }
-        public IQueryFilter Equal(Func<IFunction, IFunction> function)
+        public IQueryFilter Equal<T>(Func<IFunction, IFunction> function, T value)
         {
-            _query.Where(function);
+            _query.WhereEqual(function, value);
             return this;
         }
 
@@ -45,10 +50,20 @@ namespace Querier
             _query.WhereLike(column, value);
             return this;
         }
+        public IQueryFilter Contains<T>(Func<IFunction, IFunction> function, T value)
+        {
+            _query.WhereLike(function, value);
+            return this;
+        }
 
         public IQueryFilter StartsWith<T>(string column, T value)
         {
             _query.WhereStarts(column, value);
+            return this;
+        }
+        public IQueryFilter StartsWith<T>(Func<IFunction, IFunction> function, T value)
+        {
+            _query.WhereStarts(function, value);
             return this;
         }
 
@@ -57,10 +72,20 @@ namespace Querier
             _query.WhereEnds(column, value);
             return this;
         }
+        public IQueryFilter EndsWith<T>(Func<IFunction, IFunction> function, T value)
+        {
+            _query.WhereEnds(function, value);
+            return this;
+        }
 
         public IQueryFilter Greater<T>(string column, T value)
         {
             _query.WhereGreater(column, value);
+            return this;
+        }
+        public IQueryFilter Greater<T>(Func<IFunction, IFunction> function, T value)
+        {
+            _query.WhereGreater(function, value);
             return this;
         }
 
@@ -69,16 +94,31 @@ namespace Querier
             _query.WhereGreaterOrEqual(column, value);
             return this;
         }
+        public IQueryFilter GreaterOrEqual<T>(Func<IFunction, IFunction> function, T value)
+        {
+            _query.WhereGreaterOrEqual(function, value);
+            return this;
+        }
 
         public IQueryFilter Less<T>(string column, T value)
         {
             _query.WhereLess(column, value);
             return this;
         }
+        public IQueryFilter Less<T>(Func<IFunction, IFunction> function, T value)
+        {
+            _query.WhereLess(function, value);
+            return this;
+        }
 
         public IQueryFilter LessOrEqual<T>(string column, T value)
         {
             _query.WhereLessOrEqual(column, value);
+            return this;
+        }
+        public IQueryFilter LessOrEqual<T>(Func<IFunction, IFunction> function, T value)
+        {
+            _query.WhereLessOrEqual(function, value);
             return this;
         }
 

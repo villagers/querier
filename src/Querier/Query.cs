@@ -190,16 +190,8 @@ namespace Querier
 
 
         public List<QueryProperty> GetMeasures<TType>() => QueryHelper.GetMeasureProperties<TType>();
-        public List<QueryProperty> GetMeasures(System.Type type) => QueryHelper.GetMeasureProperties(type);
-        public List<QueryProperty> GetMeasures(string queryKey) => QueryHelper.GetMeasureProperties(queryKey);
-
         public List<QueryProperty> GetDimensions<TType>() => QueryHelper.GetDimensionProperties<TType>();
-        public List<QueryProperty> GetDimensions(System.Type type) => QueryHelper.GetDimensionProperties(type);
-        public List<QueryProperty> GetDimensions(string queryKey) => QueryHelper.GetDimensionProperties(queryKey);
-
         public List<QueryProperty> GetTimeDimensions<TType>() => QueryHelper.GetTimeDimensionProperties<TType>();
-        public List<QueryProperty> GetTimeDimensions(System.Type type) => QueryHelper.GetTimeDimensionProperties(type);
-        public List<QueryProperty> GetTimeDimensions(string queryKey) => QueryHelper.GetTimeDimensionProperties(queryKey);
 
         public QueryResult Execute()
         {

@@ -25,7 +25,7 @@ namespace Querier.SqlQuery
 
         protected bool _whereAnd = false;
         protected bool _whereOr = false;
-        protected string _whereColumn = string.Empty;
+        protected SqlColumn _whereColumn;
 
         protected bool _distinct = false;
         protected int? _limit;

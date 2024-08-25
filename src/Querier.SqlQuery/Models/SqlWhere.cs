@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Interfaces;
+﻿using Querier.SqlQuery.Functions;
+using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Operators;
 using System;
@@ -11,18 +12,17 @@ namespace Querier.SqlQuery
 {
     public class SqlWhere : ISqlQueryCompile<SqlOperatorResult>
     {
-        protected string Column;
         public AbstractOperator Operator;
+        
 
         public SqlWhere() { }
-        public SqlWhere(string column, AbstractOperator @operator)
+        public SqlWhere(AbstractOperator @operator)
         {
-            Column = column;
             Operator = @operator;
         }
         public SqlWhere Clone()
         {
-            return new SqlWhere(Column, (AbstractOperator)Operator.Clone());
+            return new SqlWhere((AbstractOperator)Operator.Clone());
         }
 
         public virtual SqlOperatorResult Compile()

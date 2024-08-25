@@ -7,7 +7,5 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Operators
 {
-    public abstract class AbstractLogicalOperator : AbstractOperator
-    {
-    }
+    public abstract class AbstractLogicalOperator : AbstractOperator { }
 }

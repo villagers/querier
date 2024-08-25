@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Functions;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
@@ -15,19 +16,21 @@ namespace Querier.SqlQuery.Operators
 {
     public class AnyOperator<TQuery> : AbstractLogicalOperator where TQuery : IBaseQuery<TQuery>
     {
-        public required string Column { get; set; }
         public required string Operator { get; set; }
         public required TQuery Query { get; set; }
 
         public override SqlOperatorResult Compile()
         {
+            var column = Column.Compile();
+            
             var sqlTz = new SqlTokenizer()
                 .AddToken(AndOrOperator)
-                .AddToken("@column")
+                .AddToken(column.Sql)
                 .AddToken(Operator)
                 .AddToken("any")
                 .Build();
 
+            
             var compiled = Query.Compile();
             var queryTz = new SqlTokenizer().AddToken(sqlTz).AddToken($"({compiled.Sql})").Build();
 
@@ -37,7 +40,7 @@ namespace Querier.SqlQuery.Operators
                 NameParameters = compiled.NameParameters ?? new Dictionary<string, string>(),
                 SqlParameters = compiled?.SqlParameters ?? new Dictionary<string, object>()
             };
-            result.NameParameters.Add("@column", Column);
+            result.NameParameters = result.NameParameters.Merge("@name", column.NameParameters);
             result.NameParameters = result.NameParameters.Select((e, i) =>
             {
                 result.Sql = result.Sql.Replace(e.Key, $"@name{i}");
