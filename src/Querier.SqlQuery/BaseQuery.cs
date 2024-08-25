@@ -143,6 +143,10 @@ namespace Querier.SqlQuery
         {
             return SelectDateFunction(_functionFactory.New().Day(column));
         }
+        public TQuery SelectDate(string column)
+        {
+            return SelectDateFunction(_functionFactory.New().Date(column));
+        }
         public TQuery SelectMonth(string column)
         {
             return SelectDateFunction(_functionFactory.New().Month(column));

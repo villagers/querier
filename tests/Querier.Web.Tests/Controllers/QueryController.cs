@@ -49,7 +49,10 @@ namespace Querier.Web.Tests.Controllers
             {
                 var invoiceIds = new int[] { 1, 3, 5, 6 };
                 var query = _query.From("Invoice");
-                query.Filter(e => e.In("InvoiceId", invoiceIds).Equal(e => e.Date("InvoiceDate"), "2021-01-11"));
+                query.Filter(e => e.In("InvoiceId", invoiceIds));
+                query.Filter(e => e.GreaterOrEqual(e => e.Date("InvoiceDate"), "2021-01-11"));
+
+
                 query.MeasureSum("Total").Dimension("BillingCountry").TimeDimension("InvoiceDate");
 
                 var result = query.Execute();

@@ -22,6 +22,7 @@ namespace Querier.SqlQuery.Interfaces
         TQuery SelectMinute(string column);
         TQuery SelectHour(string column);
         TQuery SelectDay(string column);
+        TQuery SelectDate(string column);
         TQuery SelectMonth(string column);
         TQuery SelectYear(string column);
 
