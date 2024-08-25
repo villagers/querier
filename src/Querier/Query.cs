@@ -19,6 +19,7 @@ namespace Querier
         private readonly List<QueryDimension> _queryDimension;
         private QueryTimeDimension _queryTimeDimension;
 
+        private readonly IQueryFilter _queryFilter;
 
         private readonly TQuery _query;
         private readonly IQueryDbConnection _connection;
@@ -29,6 +30,8 @@ namespace Querier
             _queryMeasures = new List<QueryMeasure>();
             _queryDimension = new List<QueryDimension>();
             _connection = connection;
+
+            _queryFilter = new QueryFilter<TQuery>(query);
         }
 
         public IQuery New()
@@ -135,9 +138,7 @@ namespace Querier
         }
         public IQuery Filter(Func<IQueryFilter, IQueryFilter> filter)
         {
-            var queryFilter = new QueryFilter<TQuery>(_query);
-            filter.Invoke(queryFilter);
-
+            filter.Invoke(_queryFilter);
             return this;
         }
         public IQuery TimeDimension(string property, string timeDimensionPart)
@@ -145,7 +146,7 @@ namespace Querier
             switch (timeDimensionPart)
             {
                 case "date":
-                    _query.SelectSecond(property).GroupBy(e => e.Date(property));
+                    _query.SelectDate(property).GroupBy(e => e.Date(property));
                     break;
                 case "second":
                     _query.SelectSecond(property).GroupBy(e => e.Second(property));
