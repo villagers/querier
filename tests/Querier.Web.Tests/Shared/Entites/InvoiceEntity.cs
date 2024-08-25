@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Querier.Web.Tests.Shared.Entites
 {
-    [Query("InvoiceEntity")]
+    [Query("invoices")]
     public class InvoiceEntity
     {
         public int InvoiceId { get; set; }

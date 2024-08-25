@@ -20,7 +20,7 @@ namespace Querier.Web.Tests.Controllers
         [Route("measures")]
         public IActionResult GetMeasures()
         {
-            var measures = _query.GetMeasures("InvoiceEntity");
+            var measures = _query.GetMeasures("invoices");
             return Ok(measures);
         }
 

@@ -11,5 +11,6 @@ namespace Querier.Attributes
     {
         public string? Key { get; set; }
         public string? DisplayName { get; set; }
+        public string? Format { get; set; } = "number";
     }
 }
