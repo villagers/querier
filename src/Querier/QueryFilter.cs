@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Functions;
+﻿using Querier.Interfaces;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using System;
 using System.Collections.Generic;

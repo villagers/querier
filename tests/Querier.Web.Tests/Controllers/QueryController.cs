@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Querier.Helpers;
+using Querier.Interfaces;
 using Querier.Web.Tests.Shared.Entites;
 
 namespace Querier.Web.Tests.Controllers
@@ -15,12 +17,19 @@ namespace Querier.Web.Tests.Controllers
             _query = query;
         }
 
+        [HttpGet]
+        [Route("test")]
+        public IActionResult Test()
+        {
+            var result = _query.From("invoices");
+            return Ok();
+        }
 
         [HttpGet]
         [Route("measures")]
         public IActionResult GetMeasures()
         {
-            var measures = _query.GetMeasures("invoices");
+            var measures = _query.GetMeasures<CustomerEntity>();
             return Ok(measures);
         }
 
@@ -28,7 +37,7 @@ namespace Querier.Web.Tests.Controllers
         [Route("dimensions")]
         public IActionResult GetDimensions()
         {
-            var measures = _query.GetDimensions("InvoiceEntity");
+            var measures = _query.GetDimensions("invoices");
             return Ok(measures);
         }
 
@@ -36,7 +45,7 @@ namespace Querier.Web.Tests.Controllers
         [Route("time-dimensions")]
         public IActionResult GetTimeDimensions()
         {
-            var measures = _query.GetTimeDimensions("InvoiceEntity");
+            var measures = _query.GetTimeDimensions("invoices");
             return Ok(measures);
         }
 

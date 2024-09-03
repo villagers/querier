@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Querier.Extensions;
+using Querier.Web.Tests.Shared.Entites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,10 @@ namespace Querier.Tests.Integration.MySql
             builder.ConfigureServices(services =>
             {
                 var connectionString = Configuration.GetConnectionString("MySQL");
-                services.AddQuerier(o => o.UseMySql(connectionString));
+                services.AddQuerier(o =>
+                {
+                    o.UseMySql(connectionString);
+                });
             });
         }
     }

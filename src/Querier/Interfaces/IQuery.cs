@@ -1,4 +1,5 @@
 ﻿using Org.BouncyCastle.Tls;
+using Querier.Attributes;
 using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using System;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Querier
+namespace Querier.Interfaces
 {
     public interface IQuery
     {
@@ -30,12 +31,12 @@ namespace Querier
 
         IQuery Filter(Func<IQueryFilter, IQueryFilter> filter);
 
-        List<QueryProperty> GetMeasures<TType>();
-        List<QueryProperty> GetMeasures(string queryKey);
-        List<QueryProperty> GetDimensions<TType>();
-        List<QueryProperty> GetDimensions(string queryKey);
-        List<QueryProperty> GetTimeDimensions<TType>();
-        List<QueryProperty> GetTimeDimensions(string queryKey);
+        List<Dictionary<string, string>> GetMeasures<TType>();
+        List<Dictionary<string, string>> GetMeasures(string queryKey);
+        List<Dictionary<string, string>> GetDimensions<TType>();
+        List<Dictionary<string, string>> GetDimensions(string queryKey);
+        List<Dictionary<string, string>> GetTimeDimensions<TType>();
+        List<Dictionary<string, string>> GetTimeDimensions(string queryKey);
 
         QueryResult Execute();
 
