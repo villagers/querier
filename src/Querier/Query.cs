@@ -10,6 +10,9 @@ using MySql.Data.MySqlClient;
 using Querier.SqlQuery.Interfaces;
 using System.Data.SqlClient;
 using Dapper;
+using Querier.Interfaces;
+using Querier.Attributes;
+using Querier.Helpers;
 
 namespace Querier
 {
@@ -24,7 +27,10 @@ namespace Querier
         private readonly TQuery _query;
         private readonly IQueryDbConnection _connection;
 
-        public Query(TQuery query, IQueryDbConnection connection)
+        private readonly IPropertyMapper _propertyKeyMapper;
+
+        private string _from;
+        public Query(TQuery query, IQueryDbConnection connection, IPropertyMapper propertyKeyMapper)
         {
             _query = query;
             _queryMeasures = new List<QueryMeasure>();
@@ -32,25 +38,28 @@ namespace Querier
             _connection = connection;
 
             _queryFilter = new QueryFilter<TQuery>(query);
+            _propertyKeyMapper = propertyKeyMapper;
         }
 
         public IQuery New()
         {
-            return new Query<TQuery>(_query, _connection);
+            return new Query<TQuery>(_query, _connection, _propertyKeyMapper);
         }
         public IQuery From(string table)
         {
-            _query.From(table);
+            _from = table;
+            _query.From(_propertyKeyMapper.GetTypeName(table) ?? table);
             return this;
         }
 
         public IQuery MeasureCount(string property, string? propertyAs = null, string? orderBy = null)
         {
-            _query.SelectCount(property, propertyAs);
+            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
+            _query.SelectCount(propertyName, propertyAs);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                _query.OrderBy(property, orderBy);
+                _query.OrderBy(propertyName, orderBy);
             }
 
             var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
@@ -61,11 +70,12 @@ namespace Querier
 
         public IQuery MeasureSum(string property, string? propertyAs = null, string? orderBy = null)
         {
-            _query.SelectSum(property, propertyAs);
+            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
+            _query.SelectSum(propertyName, propertyAs);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                _query.OrderBy(property, orderBy);
+                _query.OrderBy(propertyName, orderBy);
             }
 
             var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
@@ -76,11 +86,12 @@ namespace Querier
 
         public IQuery MeasureAvg(string property, string? propertyAs = null, string? orderBy = null)
         {
-            _query.SelectAvg(property, propertyAs);
+            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
+            _query.SelectAvg(propertyName, propertyAs);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                _query.OrderBy(property, orderBy);
+                _query.OrderBy(propertyName, orderBy);
             }
 
             var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
@@ -91,11 +102,12 @@ namespace Querier
 
         public IQuery MeasureMin(string property, string? propertyAs = null, string? orderBy = null)
         {
-            _query.SelectMin(property, propertyAs);
+            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
+            _query.SelectMin(propertyName, propertyAs);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                _query.OrderBy(property, orderBy);
+                _query.OrderBy(propertyName, orderBy);
             }
 
             var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
@@ -106,11 +118,12 @@ namespace Querier
 
         public IQuery MeasureMax(string property, string? propertyAs = null, string? orderBy = null)
         {
-            _query.SelectMax(property, propertyAs);
+            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
+            _query.SelectMax(propertyName, propertyAs);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
-                _query.OrderBy(property, orderBy);
+                _query.OrderBy(propertyName, orderBy);
             }
 
             var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
@@ -121,7 +134,8 @@ namespace Querier
 
         public IQuery Dimension(string property)
         {
-            _query.Select(property).GroupBy(property);
+            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
+            _query.Select(propertyName).GroupBy(propertyName);
 
             var dimension = new QueryDimension() { Property = property };
             _queryDimension.Add(dimension);
@@ -130,7 +144,8 @@ namespace Querier
         }
         public IQuery TimeDimension(string property)
         {
-            _query.Select(property).GroupBy(property);
+            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
+            _query.Select(propertyName).GroupBy(propertyName);
 
             _queryTimeDimension = new QueryTimeDimension() { Property = property };
 
@@ -143,31 +158,32 @@ namespace Querier
         }
         public IQuery TimeDimension(string property, string timeDimensionPart)
         {
+            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
             switch (timeDimensionPart)
             {
                 case "date":
-                    _query.SelectDate(property).GroupBy(e => e.Date(property));
+                    _query.SelectDate(propertyName).GroupBy(e => e.Date(propertyName));
                     break;
                 case "second":
-                    _query.SelectSecond(property).GroupBy(e => e.Second(property));
+                    _query.SelectSecond(propertyName).GroupBy(e => e.Second(propertyName));
                     break;
                 case "minute":
-                    _query.SelectMinute(property).GroupBy(e => e.Minute(property));
+                    _query.SelectMinute(propertyName).GroupBy(e => e.Minute(propertyName));
                     break;
                 case "hour":
-                    _query.SelectHour(property).GroupBy(e => e.Hour(property));
+                    _query.SelectHour(propertyName).GroupBy(e => e.Hour(propertyName));
                     break;
                 case "day":
-                    _query.SelectDay(property).GroupBy(e => e.Day(property));
+                    _query.SelectDay(propertyName).GroupBy(e => e.Day(propertyName));
                     break;
                 case "month":
-                    _query.SelectMonth(property).GroupBy(e => e.Month(property));
+                    _query.SelectMonth(propertyName).GroupBy(e => e.Month(propertyName));
                     break;
                 case "year":
-                    _query.SelectYear(property).GroupBy(e => e.Year(property));
+                    _query.SelectYear(propertyName).GroupBy(e => e.Year(propertyName));
                     break;
                 default:
-                    _query.Select(property).GroupBy(property);
+                    _query.Select(propertyName).GroupBy(propertyName);
                     break;
             }
             _queryTimeDimension = new QueryTimeDimension() { Property = property, TimeDimensionPart = timeDimensionPart };
@@ -176,7 +192,8 @@ namespace Querier
         }
         public IQuery OrderBy(string property, string direction)
         {
-            _query.OrderBy(property, direction);
+            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
+            _query.OrderBy(propertyName, direction);
             _queryTimeDimension = new QueryTimeDimension() { Property = property };
 
             return this;
@@ -190,12 +207,12 @@ namespace Querier
 
 
 
-        public List<QueryProperty> GetMeasures<TType>() => QueryHelper.GetMeasureProperties<TType>();
-        public List<QueryProperty> GetMeasures(string queryKey) => QueryHelper.GetMeasureProperties(queryKey);
-        public List<QueryProperty> GetDimensions<TType>() => QueryHelper.GetDimensionProperties<TType>();
-        public List<QueryProperty> GetDimensions(string queryKey) => QueryHelper.GetMeasureProperties(queryKey);
-        public List<QueryProperty> GetTimeDimensions<TType>() => QueryHelper.GetTimeDimensionProperties<TType>();
-        public List<QueryProperty> GetTimeDimensions(string queryKey) => QueryHelper.GetMeasureProperties(queryKey);
+        public List<Dictionary<string, string>> GetMeasures<TType>() => _propertyKeyMapper.GetAttributeProperties<TType, QueryMeasureAttribute>();
+        public List<Dictionary<string, string>> GetMeasures(string queryKey) => _propertyKeyMapper.GetAttributeProperties<QueryMeasureAttribute>(queryKey);
+        public List<Dictionary<string, string>> GetDimensions<TType>() => _propertyKeyMapper.GetAttributeProperties<TType, QueryDimensionAttribute>();
+        public List<Dictionary<string, string>> GetDimensions(string queryKey) => _propertyKeyMapper.GetAttributeProperties<QueryDimensionAttribute>(queryKey);
+        public List<Dictionary<string, string>> GetTimeDimensions<TType>() => _propertyKeyMapper.GetAttributeProperties<TType, QueryTimeDimensionAttribute>();
+        public List<Dictionary<string, string>> GetTimeDimensions(string queryKey) => _propertyKeyMapper.GetAttributeProperties<QueryTimeDimensionAttribute>(queryKey);
 
         public QueryResult Execute()
         {

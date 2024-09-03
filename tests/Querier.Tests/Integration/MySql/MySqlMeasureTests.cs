@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Querier.Extensions;
+using Querier.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

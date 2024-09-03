@@ -7,13 +7,16 @@ using System.Threading.Tasks;
 namespace Querier.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class QueryAttribute : Attribute
+    public class QueryAttribute : BaseAttribute, IKeyAttribute, IDisplayAttribute
     {
-        public string Key;
+        public string Key { get; set; }
+        public string DisplayName { get; set; }
 
-        public QueryAttribute(string key)
+        public QueryAttribute() { }
+        public QueryAttribute(string key, string displayName)
         {
-            this.Key = key;
+            Key = key;
+            DisplayName = displayName;
         }
     }
 }

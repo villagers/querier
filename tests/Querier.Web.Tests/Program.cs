@@ -1,4 +1,5 @@
 using Querier.Extensions;
+using Querier.Web.Tests.Shared.Entites;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var connectionString = builder.Configuration.GetConnectionString("MySQL");
-builder.Services.AddQuerier(o => o.UseMySql(connectionString));
+builder.Services.AddQuerier(o =>
+{
+    o.UseMySql(connectionString);
+});
 
 var app = builder.Build();
 
@@ -28,6 +32,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+//app.UseQuerier(e => e.Types.LoadType(typeof(string)).LoadAssembly(""));
 app.Run();
 
 public partial class Program { }
