@@ -109,8 +109,8 @@ namespace Querier.Tests.Integration
 
             Assert.Single(withType);
             Assert.Single(withTypeName);
-            Assert.Single(withTypeQuery);
-            Assert.Single(withTypeNameQuery);
+            Assert.Equal(2, withTypeQuery.Count());
+            Assert.Equal(2, withTypeNameQuery.Count());
         }
 
         [Fact]
