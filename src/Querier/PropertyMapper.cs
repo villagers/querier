@@ -13,8 +13,8 @@ namespace Querier
 {
     public class PropertyMapper : PropertyMapperBase, IPropertyMapper
     {
-        public PropertyMapper(IMeasurePropertyValidator measurePropertyValidator, IDimensionPropertyValidator dimensionPropertyValidator, ITimeDimensionPropertyValidator timeDimensionPropertyValidator)
-            : base(measurePropertyValidator, dimensionPropertyValidator, timeDimensionPropertyValidator) { }
+        public PropertyMapper(IndexStore indexStore, IMeasurePropertyValidator measurePropertyValidator, IDimensionPropertyValidator dimensionPropertyValidator, ITimeDimensionPropertyValidator timeDimensionPropertyValidator)
+            : base(indexStore, measurePropertyValidator, dimensionPropertyValidator, timeDimensionPropertyValidator) { }
 
         public new IPropertyMapper LoadType(Type type)
         {

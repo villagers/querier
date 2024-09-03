@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Querier.Helpers
 {
@@ -14,7 +15,8 @@ namespace Querier.Helpers
         public static object[] Get<TAttribute>(PropertyInfo propertyInfo) => propertyInfo.GetCustomAttributes(typeof(TAttribute), true);
         public static IEnumerable<TAttribute> GetCast<TAttribute>(Type type) => type.GetCustomAttributes(typeof(TAttribute), true).Cast<TAttribute>();
         public static IEnumerable<TAttribute> GetCast<TAttribute>(PropertyInfo propertyInfo) => propertyInfo.GetCustomAttributes(typeof(TAttribute), true).Cast<TAttribute>();
-
+        public static Type? GetQueryType(string queryKey) =>
+            AppDomain.CurrentDomain.GetAssemblies().SelectMany(e => e.GetTypes()).Where(e => GetCast<IKeyAttribute>(e).Any(p => p.Key == queryKey)).FirstOrDefault();
         public static string? GetQueryKey(Type type) => 
             GetCast<IKeyAttribute>(type).Where(e => !string.IsNullOrEmpty(e.Key)).Select(e => e.Key).FirstOrDefault();
         public static string? GetQueryKey(PropertyInfo propertyInfo) => 

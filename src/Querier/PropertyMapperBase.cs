@@ -15,45 +15,45 @@ namespace Querier
 {
     public class PropertyMapperBase : IPropertyMapperBase
     {
-        public readonly IndexBase Index;
+        public readonly IndexStore _indexStore;
         protected readonly IMeasurePropertyValidator _measurePropertyValidator;
         protected readonly IDimensionPropertyValidator _dimensionPropertyValidator;
         protected readonly ITimeDimensionPropertyValidator _timeDimensionPropertyValidator;
 
-        public PropertyMapperBase(IMeasurePropertyValidator measurePropertyValidator, IDimensionPropertyValidator dimensionPropertyValidator, ITimeDimensionPropertyValidator timeDimensionPropertyValidator)
+        public PropertyMapperBase(IndexStore indexStore, IMeasurePropertyValidator measurePropertyValidator, IDimensionPropertyValidator dimensionPropertyValidator, ITimeDimensionPropertyValidator timeDimensionPropertyValidator)
         {
-            Index = new IndexBase();
+            _indexStore = indexStore;
 
             _measurePropertyValidator = measurePropertyValidator;
             _dimensionPropertyValidator = dimensionPropertyValidator;
             _timeDimensionPropertyValidator = timeDimensionPropertyValidator;
         }
 
-        public string? GetTypeName(string key) => Index.TypeName(key);
-        public string? GetPropertyName(string type, string key) => Index.PropertyName(type, key);
-        public List<Dictionary<string, string>>? GetAttributes(string type) => Index.Attributes(type);
+        public string? GetTypeName(string key) => _indexStore.TypeName(key);
+        public string? GetPropertyName(string type, string key) => _indexStore.PropertyName(type, key);
+        public List<Dictionary<string, string>>? GetAttributes(string type) => _indexStore.Attributes(type);
         public List<Dictionary<string, string>>? GetAttributes<TType>() => GetAttributes(typeof(TType).Name);
 
         public List<Dictionary<string, string>> GetAttributeProperties<TType, TAttribute>() where TAttribute : BaseAttribute
         {
-            var attributes = Index.Attributes<TType, TAttribute>();
+            var attributes = _indexStore.Attributes<TType, TAttribute>();
             if (attributes == null)
             {
                 LoadType<TType>();
-                attributes = Index.Attributes<TType, TAttribute>() ?? [];
+                attributes = _indexStore.Attributes<TType, TAttribute>() ?? [];
             }
             return attributes;
         }
         public List<Dictionary<string, string>> GetAttributeProperties<TAttribute>(string typeKey) where TAttribute : BaseAttribute
         {
-            var type = Index.Type(typeKey);
+            var type = _indexStore.Type(typeKey);
             if (type == null)
             {
-                type = PropertyHelper.GetType(typeKey);
+                type = AttributeHelper.GetQueryType(typeKey) ?? PropertyHelper.GetType(typeKey);
                 if (type == null) return [];
                 LoadType(type);
             }
-            return Index.Attributes<TAttribute>(AttributeHelper.GetQueryKey(type) ?? typeKey);
+            return _indexStore.Attributes<TAttribute>(AttributeHelper.GetQueryKey(type) ?? typeKey);
         }
 
         public IPropertyMapperBase LoadType<TType>() => LoadType(typeof(TType));
@@ -91,9 +91,9 @@ namespace Querier
         {
             var typeKey = AttributeHelper.GetQueryKey(type) ?? type.Name;
 
-            if (!Index.HasTypeKey(typeKey))
+            if (!_indexStore.HasTypeKey(typeKey))
             {
-                Index.AddType(type, typeKey, type.Name);
+                _indexStore.AddType(type, typeKey, type.Name);
             }
 
             var properties = PropertyHelper.GetProperties(type);
@@ -101,47 +101,50 @@ namespace Querier
             foreach (var property in measures)
             {
                 var propertyKey = AttributeHelper.GetQueryKey(property) ?? property.Name;
-                if (Index.HasPropertyKey(typeKey, propertyKey))
+                if (_indexStore.HasPropertyKey(typeKey, propertyKey))
                 {
-                    Index.AddPropertyType(typeKey, propertyKey, typeof(QueryMeasure));
+                    _indexStore.AddPropertyType(typeKey, propertyKey, typeof(QueryMeasure));
                 } else
                 {
-                    Index.AddProperty(typeKey, propertyKey, property.Name, new List<Type>() { typeof(QueryMeasureAttribute) });
+                    _indexStore.AddProperty(typeKey, propertyKey, property.Name, new List<Type>() { typeof(QueryMeasureAttribute) });
                 }
+                _indexStore.AddAttribute(typeKey, propertyKey, AttributeHelper.GetPropertyAttributes(property));
             }
 
             var dimensions = properties.Where(e => e.GetCustomAttributes().Any(p => p.GetType() == typeof(QueryDimensionAttribute)));
             foreach (var property in dimensions)
             {
                 var propertyKey = AttributeHelper.GetQueryKey(property) ?? property.Name;
-                if (Index.HasPropertyKey(typeKey, propertyKey))
+                if (_indexStore.HasPropertyKey(typeKey, propertyKey))
                 {
-                    Index.AddPropertyType(typeKey, propertyKey, typeof(QueryDimensionAttribute));
+                    _indexStore.AddPropertyType(typeKey, propertyKey, typeof(QueryDimensionAttribute));
                 }
                 else
                 {
-                    Index.AddProperty(typeKey, propertyKey, property.Name, new List<Type>() { typeof(QueryDimensionAttribute) });
+                    _indexStore.AddProperty(typeKey, propertyKey, property.Name, new List<Type>() { typeof(QueryDimensionAttribute) });
                 }
+                _indexStore.AddAttribute(typeKey, propertyKey, AttributeHelper.GetPropertyAttributes(property));
             }
 
             var timeDimensions = properties.Where(e => e.GetCustomAttributes().Any(p => p.GetType() == typeof(QueryTimeDimensionAttribute)));
             foreach (var property in timeDimensions)
             {
                 var propertyKey = AttributeHelper.GetQueryKey(property) ?? property.Name;
-                if (Index.HasPropertyKey(typeKey, propertyKey))
+                if (_indexStore.HasPropertyKey(typeKey, propertyKey))
                 {
-                    Index.AddPropertyType(typeKey, propertyKey, typeof(QueryTimeDimensionAttribute));
+                    _indexStore.AddPropertyType(typeKey, propertyKey, typeof(QueryTimeDimensionAttribute));
                 }
                 else
                 {
-                    Index.AddProperty(typeKey, propertyKey, property.Name, new List<Type>() { typeof(QueryTimeDimensionAttribute) });
+                    _indexStore.AddProperty(typeKey, propertyKey, property.Name, new List<Type>() { typeof(QueryTimeDimensionAttribute) });
                 }
+                _indexStore.AddAttribute(typeKey, propertyKey, AttributeHelper.GetPropertyAttributes(property));
             }
 
             foreach (var property in properties)
             {
                 var propertyKey = AttributeHelper.GetQueryKey(property) ?? property.Name;
-                if (Index.HasPropertyKey(typeKey, propertyKey)) continue;
+                if (_indexStore.HasPropertyKey(typeKey, propertyKey)) continue;
 
                 var types = new List<Type>();
 
@@ -171,13 +174,12 @@ namespace Querier
                     }
                 }
 
+                if (!types.Any()) continue;
 
-
-
-                Index.AddProperty(typeKey, propertyKey, property.Name, types);
+                _indexStore.AddProperty(typeKey, propertyKey, property.Name, types);
 
                 var attributes = AttributeHelper.GetPropertyAttributes(property);
-                Index.AddAttribute(typeKey, propertyKey, attributes);
+                _indexStore.AddAttribute(typeKey, propertyKey, attributes);
             }
 
             return this;

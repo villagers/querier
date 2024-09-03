@@ -34,7 +34,8 @@ namespace Querier.Extensions
             services.TryAddScoped<IDimensionPropertyValidator, DimensionPropertyValidator>();
             services.TryAddScoped<ITimeDimensionPropertyValidator, TimeDimensionPropertyValidator>();
 
-            services.AddSingleton<IPropertyMapper, PropertyMapper>();
+            services.AddScoped<IPropertyMapper, PropertyMapper>();
+            services.AddSingleton<IndexStore>();
 
             return services;
         }

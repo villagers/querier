@@ -1,17 +1,18 @@
 ﻿using Querier.Attributes;
+using Querier.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Querier.Models
+namespace Querier
 {
-    public class IndexBase
+    public class IndexStore
     {
         private readonly List<TypeBase> _types;
 
-        public IndexBase()
+        public IndexStore()
         {
             _types = new List<TypeBase>();
         }
