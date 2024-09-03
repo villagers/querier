@@ -97,7 +97,7 @@ namespace Querier
             }
 
             var properties = PropertyHelper.GetProperties(type);
-            var measures = properties.Where(e => e.GetCustomAttributes().Any(p => p.GetType() == typeof(QueryMeasureAttribute)));
+            var measures = properties.Where(e => e.GetCustomAttributes(true).Any(e => e.GetType() == typeof(QueryMeasureAttribute) || e.GetType().IsSubclassOf(typeof(QueryMeasureAttribute))));
             foreach (var property in measures)
             {
                 var propertyKey = AttributeHelper.GetQueryKey(property) ?? property.Name;
@@ -111,7 +111,7 @@ namespace Querier
                 _indexStore.AddAttribute(typeKey, propertyKey, AttributeHelper.GetPropertyAttributes(property));
             }
 
-            var dimensions = properties.Where(e => e.GetCustomAttributes().Any(p => p.GetType() == typeof(QueryDimensionAttribute)));
+            var dimensions = properties.Where(e => e.GetCustomAttributes(true).Any(e => e.GetType() == typeof(QueryDimensionAttribute) || e.GetType().IsSubclassOf(typeof(QueryDimensionAttribute))));
             foreach (var property in dimensions)
             {
                 var propertyKey = AttributeHelper.GetQueryKey(property) ?? property.Name;
@@ -126,7 +126,7 @@ namespace Querier
                 _indexStore.AddAttribute(typeKey, propertyKey, AttributeHelper.GetPropertyAttributes(property));
             }
 
-            var timeDimensions = properties.Where(e => e.GetCustomAttributes().Any(p => p.GetType() == typeof(QueryTimeDimensionAttribute)));
+            var timeDimensions = properties.Where(e => e.GetCustomAttributes(true).Any(e => e.GetType() == typeof(QueryTimeDimensionAttribute) || e.GetType().IsSubclassOf(typeof(QueryTimeDimensionAttribute))));
             foreach (var property in timeDimensions)
             {
                 var propertyKey = AttributeHelper.GetQueryKey(property) ?? property.Name;
