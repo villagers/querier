@@ -1,4 +1,5 @@
 ﻿using Querier.Attributes;
+using Querier.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,16 +36,16 @@ namespace Querier.Helpers
             {
                 return new Dictionary<string, string>()
                 {
-                    { "Key", property.Name },
-                    { "DisplayName", property.Name }
+                    { "key", property.Name },
+                    { "displayName", property.Name }
                 };
             }
 
             var key = GetQueryKey(property);
             var displayName = GetQueryDisplayName(property);
 
-            result.Add("Key", $"{key ?? property.Name}");
-            result.Add("DisplayName", $"{displayName ?? property.Name}");
+            result.Add("key", $"{key ?? property.Name}");
+            result.Add("displayName", $"{displayName ?? property.Name}");
 
             foreach (var attribute in attributes)
             {
@@ -63,7 +64,7 @@ namespace Querier.Helpers
                         case "DisplayName":
                             break;
                         default:
-                            result.Add(attributeProperty.Name, $"{value}");
+                            result.Add(attributeProperty.Name.ToCamelCase(), $"{value}");
                             break;
                     }
                 }

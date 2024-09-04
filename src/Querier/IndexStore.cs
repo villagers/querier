@@ -1,6 +1,7 @@
 ﻿using Querier.Attributes;
 using Querier.Models;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,11 +11,11 @@ namespace Querier
 {
     public class IndexStore
     {
-        private readonly List<TypeBase> _types;
+        private readonly ConcurrentBag<TypeBase> _types;
 
         public IndexStore()
         {
-            _types = new List<TypeBase>();
+            _types = new ConcurrentBag<TypeBase>();
         }
 
         public void AddType(Type type, string key, string name)
