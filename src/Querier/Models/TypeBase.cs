@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,11 @@ namespace Querier.Models
         public required Type Type { get; set; }
         public required string Key { get; set; }
         public required string Name { get; set; }
-        public List<TypePropertyBase> Properties = new List<TypePropertyBase>();
+        public readonly ConcurrentBag<TypePropertyBase> Properties;
+
+        public TypeBase()
+        {
+            Properties = new ConcurrentBag<TypePropertyBase>();
+        }
     }
 }
