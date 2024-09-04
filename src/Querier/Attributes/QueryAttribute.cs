@@ -13,6 +13,10 @@ namespace Querier.Attributes
         public string DisplayName { get; set; }
 
         public QueryAttribute() { }
+        public QueryAttribute(string key)
+        {
+            Key = key;
+        }
         public QueryAttribute(string key, string displayName)
         {
             Key = key;

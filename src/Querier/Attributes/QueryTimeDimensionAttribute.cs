@@ -13,6 +13,10 @@ namespace Querier.Attributes
         public string DisplayName { get; set; }
 
         public QueryTimeDimensionAttribute() { }
+        public QueryTimeDimensionAttribute(string key)
+        {
+            Key = key;
+        }
         public QueryTimeDimensionAttribute(string key, string displayName)
         {
             Key = key;

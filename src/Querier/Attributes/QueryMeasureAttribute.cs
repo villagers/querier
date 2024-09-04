@@ -13,6 +13,10 @@ namespace Querier.Attributes
         public string DisplayName { get; set; }
 
         public QueryMeasureAttribute() { }
+        public QueryMeasureAttribute(string key)
+        {
+            Key = key;
+        }
         public QueryMeasureAttribute(string key, string displayName)
         {
             Key = key;
