@@ -14,6 +14,12 @@
     "plugins": [
         "@semantic-release/commit-analyzer",
         "@semantic-release/release-notes-generator",
+        [
+            "@semantic-release/changelog",
+            {
+                "changelogFile": "CHANGELOG.md"
+            }
+        ],
         "@semantic-release/github",
         [
             "@semantic-release/exec",
@@ -25,6 +31,7 @@
             "@semantic-release/git",
             {
                 "assets": [
+                    "CHANGELOG.md",
                     "Querier/Querier.csproj",
                     "Querier.SqlQuery/Querier.SqlQuery.csproj"
                 ],
