@@ -48,5 +48,30 @@ namespace Querier.SqlQuery.Tests.Unit.MySql
 
             Assert.Equal("select `id`, avg(`total`), sum(`total`) as `sum_total` from `orders`", _query.New().From("orders").Select("id").SelectAvg("total").SelectSum("total", "sum_total").Compile().CompiledSql);
         }
+
+        [Fact]
+        public void SelectDateFunctions()
+        {
+            Assert.Equal("select second(`date_created`) from `orders`", _query.New().From("orders").SelectSecond("date_created").Compile().CompiledSql);
+            Assert.Equal("select second(`date_created`) as `sec` from `orders`", _query.New().From("orders").SelectSecond("date_created", "sec").Compile().CompiledSql);
+
+            Assert.Equal("select minute(`date_created`) from `orders`", _query.New().From("orders").SelectMinute("date_created").Compile().CompiledSql);
+            Assert.Equal("select minute(`date_created`) as `min` from `orders`", _query.New().From("orders").SelectMinute("date_created", "min").Compile().CompiledSql);
+
+            Assert.Equal("select hour(`date_created`) from `orders`", _query.New().From("orders").SelectHour("date_created").Compile().CompiledSql);
+            Assert.Equal("select hour(`date_created`) as `hr` from `orders`", _query.New().From("orders").SelectHour("date_created", "hr").Compile().CompiledSql);
+
+            Assert.Equal("select day(`date_created`) from `orders`", _query.New().From("orders").SelectDay("date_created").Compile().CompiledSql);
+            Assert.Equal("select day(`date_created`) as `d` from `orders`", _query.New().From("orders").SelectDay("date_created", "d").Compile().CompiledSql);
+
+            Assert.Equal("select date(`date_created`) from `orders`", _query.New().From("orders").SelectDate("date_created").Compile().CompiledSql);
+            Assert.Equal("select date(`date_created`) as `dt` from `orders`", _query.New().From("orders").SelectDate("date_created", "dt").Compile().CompiledSql);
+
+            Assert.Equal("select month(`date_created`) from `orders`", _query.New().From("orders").SelectMonth("date_created").Compile().CompiledSql);
+            Assert.Equal("select month(`date_created`) as `m` from `orders`", _query.New().From("orders").SelectMonth("date_created", "m").Compile().CompiledSql);
+
+            Assert.Equal("select year(`date_created`) from `orders`", _query.New().From("orders").SelectYear("date_created").Compile().CompiledSql);
+            Assert.Equal("select year(`date_created`) as `y` from `orders`", _query.New().From("orders").SelectYear("date_created", "y").Compile().CompiledSql);
+        }
     }
 }

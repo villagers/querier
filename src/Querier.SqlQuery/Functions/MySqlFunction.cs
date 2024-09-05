@@ -14,42 +14,77 @@ namespace Querier.SqlQuery.Functions
             return new MySqlFunction();
         }
 
-        public IFunction Date(string column)
+        public IFunction Date(string column, string? columnAs = null)
         {
             AddLast($"date({NameParameter(column)})");
+            if (!string.IsNullOrWhiteSpace(columnAs))
+            {
+                AddLast("as");
+                AddLast(NameParameter(columnAs));
+            }
             return this;
         }
-        public IFunction Year(string column)
+        public IFunction Year(string column, string? columnAs = null)
         {
             AddLast($"year({NameParameter(column)})");
+            if (!string.IsNullOrWhiteSpace(columnAs))
+            {
+                AddLast("as");
+                AddLast(NameParameter(columnAs));
+            }
             return this;
         }
 
-        public IFunction Month(string column)
+        public IFunction Month(string column, string? columnAs = null)
         {
             AddLast($"month({NameParameter(column)})");
+            if (!string.IsNullOrWhiteSpace(columnAs))
+            {
+                AddLast("as");
+                AddLast(NameParameter(columnAs));
+            }
             return this;
         }
-        public IFunction Day(string column)
+        public IFunction Day(string column, string? columnAs = null)
         {
             AddLast($"day({NameParameter(column)})");
+            if (!string.IsNullOrWhiteSpace(columnAs))
+            {
+                AddLast("as");
+                AddLast(NameParameter(columnAs));
+            }
             return this;
         }
-        public IFunction Hour(string column)
+        public IFunction Hour(string column, string? columnAs = null)
         {
             AddLast($"hour({NameParameter(column)})");
+            if (!string.IsNullOrWhiteSpace(columnAs))
+            {
+                AddLast("as");
+                AddLast(NameParameter(columnAs));
+            }
             return this;
         }
 
-        public IFunction Minute(string column)
+        public IFunction Minute(string column, string? columnAs = null)
         {
             AddLast($"minute({NameParameter(column)})");
+            if (!string.IsNullOrWhiteSpace(columnAs))
+            {
+                AddLast("as");
+                AddLast(NameParameter(columnAs));
+            }
             return this;
         }
 
-        public IFunction Second(string column)
+        public IFunction Second(string column, string? columnAs = null)
         {
             AddLast($"second({NameParameter(column)})");
+            if (!string.IsNullOrWhiteSpace(columnAs))
+            {
+                AddLast("as");
+                AddLast(NameParameter(columnAs));
+            }
             return this;
         }
     }
