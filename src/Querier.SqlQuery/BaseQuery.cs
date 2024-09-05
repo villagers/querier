@@ -127,33 +127,33 @@ namespace Querier.SqlQuery
             });
             return (TQuery)(object)this;
         }
-        public TQuery SelectSecond(string column)
+        public TQuery SelectSecond(string column, string? columnAs = null)
         {
-            return SelectDateFunction(_functionFactory.New().Second(column));
+            return SelectDateFunction(_functionFactory.New().Second(column, columnAs));
         }
-        public TQuery SelectMinute(string column)
+        public TQuery SelectMinute(string column, string? columnAs = null)
         {
-            return SelectDateFunction(_functionFactory.New().Minute(column));
+            return SelectDateFunction(_functionFactory.New().Minute(column, columnAs));
         }
-        public TQuery SelectHour(string column)
+        public TQuery SelectHour(string column, string? columnAs = null)
         {
-            return SelectDateFunction(_functionFactory.New().Hour(column));
+            return SelectDateFunction(_functionFactory.New().Hour(column, columnAs));
         }
-        public TQuery SelectDay(string column)
+        public TQuery SelectDay(string column, string? columnAs = null)
         {
-            return SelectDateFunction(_functionFactory.New().Day(column));
+            return SelectDateFunction(_functionFactory.New().Day(column, columnAs));
         }
-        public TQuery SelectDate(string column)
+        public TQuery SelectDate(string column, string? columnAs = null)
         {
-            return SelectDateFunction(_functionFactory.New().Date(column));
+            return SelectDateFunction(_functionFactory.New().Date(column, columnAs));
         }
-        public TQuery SelectMonth(string column)
+        public TQuery SelectMonth(string column, string? columnAs = null)
         {
-            return SelectDateFunction(_functionFactory.New().Month(column));
+            return SelectDateFunction(_functionFactory.New().Month(column, columnAs));
         }
-        public TQuery SelectYear(string column)
+        public TQuery SelectYear(string column, string? columnAs = null)
         {
-            return SelectDateFunction(_functionFactory.New().Year(column));
+            return SelectDateFunction(_functionFactory.New().Year(column, columnAs));
         }
 
         public TQuery Distinct()
