@@ -31,7 +31,7 @@
             "@semantic-release/git",
             {
                 "assets": [
-                    "../CHANGELOG.md",
+                    "CHANGELOG.md",
                     "Querier/Querier.csproj",
                     "Querier.SqlQuery/Querier.SqlQuery.csproj"
                 ],
