@@ -9,32 +9,8 @@ namespace Querier.SqlQuery.Models
 {
     public class SqlSelectAggregation : SqlSelect
     {
-        public required string Aggregation { get; set; }
+        public required SqlColumnAggregation SqlColumnAggregation {  get; set; }
 
-        public override SqlQueryResult Compile()
-        {
-            var result = new SqlQueryResult();
-            result.NameParameters.Add("@column", Column);
-
-            var aggrTz = new SqlTokenizer()
-                .AddToken(Aggregation)
-                .AddToken("(").AddToken("@column").AddToken(")").Build("");
-
-            var selectTz = new SqlTokenizer().AddToken(aggrTz);
-
-            if (!string.IsNullOrEmpty(ColumnAs))
-            {
-                result.NameParameters.Add("@as", ColumnAs);
-                selectTz.AddToken("as").AddToken("@as");
-            }
-
-            result.Sql = selectTz.Build();
-            result.NameParameters = result.NameParameters.Select((e, i) =>
-            {
-                result.Sql = result.Sql.Replace(e.Key, $"@name{i}");
-                return new KeyValuePair<string, string>($"@name{i}", e.Value);
-            }).ToDictionary();
-            return result;
-        }
+        public override SqlQueryResult Compile() => SqlColumnAggregation.Compile();
     }
 }

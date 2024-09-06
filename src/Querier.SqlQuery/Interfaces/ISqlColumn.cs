@@ -5,11 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Querier.SqlQuery.Functions
+namespace Querier.SqlQuery.Interfaces
 {
-    public interface IFunction : IDateFunction
+    public interface ISqlColumn
     {
-        IFunction New();
         SqlQueryResult Compile();
     }
 }

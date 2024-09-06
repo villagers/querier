@@ -13,6 +13,7 @@ using Dapper;
 using Querier.Interfaces;
 using Querier.Attributes;
 using Querier.Helpers;
+using Querier.SqlQuery.Models;
 
 namespace Querier
 {
@@ -43,7 +44,7 @@ namespace Querier
 
         public IQuery New()
         {
-            return new Query<TQuery>(_query, _connection, _propertyKeyMapper);
+            return new Query<TQuery>(_query.New(), _connection, _propertyKeyMapper);
         }
         public IQuery From(string table)
         {
@@ -55,14 +56,14 @@ namespace Querier
         public IQuery MeasureCount(string property, string? propertyAs = null, string? orderBy = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.SelectCount(propertyName, propertyAs);
+            _query.SelectCount(propertyName, propertyAs ?? property);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
                 _query.OrderBy(propertyName, orderBy);
             }
 
-            var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
+            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs, OrderBy = orderBy };
             _queryMeasures.Add(measure);
 
             return this;
@@ -71,14 +72,14 @@ namespace Querier
         public IQuery MeasureSum(string property, string? propertyAs = null, string? orderBy = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.SelectSum(propertyName, propertyAs);
+            _query.SelectSum(propertyName, propertyAs ?? property);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
                 _query.OrderBy(propertyName, orderBy);
             }
 
-            var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
+            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs, OrderBy = orderBy };
             _queryMeasures.Add(measure);
 
             return this;
@@ -87,14 +88,14 @@ namespace Querier
         public IQuery MeasureAvg(string property, string? propertyAs = null, string? orderBy = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.SelectAvg(propertyName, propertyAs);
+            _query.SelectAvg(propertyName, propertyAs ?? property);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
                 _query.OrderBy(propertyName, orderBy);
             }
 
-            var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
+            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs, OrderBy = orderBy };
             _queryMeasures.Add(measure);
 
             return this;
@@ -103,14 +104,14 @@ namespace Querier
         public IQuery MeasureMin(string property, string? propertyAs = null, string? orderBy = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.SelectMin(propertyName, propertyAs);
+            _query.SelectMin(propertyName, propertyAs ?? property);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
                 _query.OrderBy(propertyName, orderBy);
             }
 
-            var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
+            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs, OrderBy = orderBy };
             _queryMeasures.Add(measure);
 
             return this;
@@ -119,33 +120,33 @@ namespace Querier
         public IQuery MeasureMax(string property, string? propertyAs = null, string? orderBy = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.SelectMax(propertyName, propertyAs);
+            _query.SelectMax(propertyName, propertyAs ?? property);
 
             if (!string.IsNullOrWhiteSpace(orderBy))
             {
                 _query.OrderBy(propertyName, orderBy);
             }
 
-            var measure = new QueryMeasure() { Property = property, OrderBy = orderBy };
+            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs, OrderBy = orderBy };
             _queryMeasures.Add(measure);
 
             return this;
         }
 
-        public IQuery Dimension(string property)
+        public IQuery Dimension(string property, string? propertyAs = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.Select(propertyName).GroupBy(propertyName);
+            _query.Select(propertyName, propertyAs ?? property).GroupBy(propertyName);
 
-            var dimension = new QueryDimension() { Property = property };
+            var dimension = new QueryDimension() { Property = property, PropertyAs = propertyAs };
             _queryDimension.Add(dimension);
 
             return this;
         }
-        public IQuery TimeDimension(string property)
+        public IQuery TimeDimension(string property, string? propertyAs = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.Select(propertyName).GroupBy(propertyName);
+            _query.Select(propertyName, propertyAs ?? property).GroupBy(propertyName);
 
             _queryTimeDimension = new QueryTimeDimension() { Property = property };
 
@@ -156,37 +157,40 @@ namespace Querier
             filter.Invoke(_queryFilter);
             return this;
         }
-        public IQuery TimeDimension(string property, string timeDimensionPart)
+        public IQuery TimeDimension(string property, string timeDimensionPart, string? propertyAs = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
+
+            var sqlColumn = propertyAs;
+
             switch (timeDimensionPart)
             {
                 case "date":
-                    _query.SelectDate(propertyName).GroupBy(e => e.Date(propertyName));
+                    _query.SelectDate(propertyName, propertyAs ?? property).GroupBy(e => e.Date(propertyName));
                     break;
                 case "second":
-                    _query.SelectSecond(propertyName).GroupBy(e => e.Second(propertyName));
+                    _query.SelectSecond(propertyName, propertyAs ?? property).GroupBy(e => e.Second(propertyName));
                     break;
                 case "minute":
-                    _query.SelectMinute(propertyName).GroupBy(e => e.Minute(propertyName));
+                    _query.SelectMinute(propertyName, propertyAs ?? property).GroupBy(e => e.Minute(propertyName));
                     break;
                 case "hour":
-                    _query.SelectHour(propertyName).GroupBy(e => e.Hour(propertyName));
+                    _query.SelectHour(propertyName, propertyAs ?? property).GroupBy(e => e.Hour(propertyName));
                     break;
                 case "day":
-                    _query.SelectDay(propertyName).GroupBy(e => e.Day(propertyName));
+                    _query.SelectDay(propertyName, propertyAs ?? property).GroupBy(e => e.Day(propertyName));
                     break;
                 case "month":
-                    _query.SelectMonth(propertyName).GroupBy(e => e.Month(propertyName));
+                    _query.SelectMonth(propertyName, propertyAs ?? property).GroupBy(e => e.Month(propertyName));
                     break;
                 case "year":
-                    _query.SelectYear(propertyName).GroupBy(e => e.Year(propertyName));
+                    _query.SelectYear(propertyName, propertyAs ?? property).GroupBy(e => e.Year(propertyName));
                     break;
                 default:
-                    _query.Select(propertyName).GroupBy(propertyName);
+                    _query.Select(propertyName, propertyAs ?? property).GroupBy(propertyName);
                     break;
             }
-            _queryTimeDimension = new QueryTimeDimension() { Property = property, TimeDimensionPart = timeDimensionPart };
+            _queryTimeDimension = new QueryTimeDimension() { Property = property, PropertyAs = propertyAs, TimeDimensionPart = timeDimensionPart };
 
             return this;
         }
@@ -194,7 +198,7 @@ namespace Querier
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
             _query.OrderBy(propertyName, direction);
-            _queryTimeDimension = new QueryTimeDimension() { Property = property };
+            //_queryTimeDimension = new QueryTimeDimension() { Property = property };
 
             return this;
         }
@@ -234,6 +238,148 @@ namespace Querier
                 .Select(e => e.ToDictionary(k => k.Key, v => v.Value));
 
             return result;
+        }
+
+        public IEnumerable<Dictionary<string, object>>? Get()
+        {
+            var complie = _query.Compile();
+
+            return _connection.Connection
+                .Query(complie.CompiledSql, complie.SqlParameters)
+                .Cast<IDictionary<string, object>>()
+                .Select(e => e.ToDictionary(k => k.Key, v => v.Value));
+        }
+
+        public T? GetScalar<T>()
+        {
+            var complie = _query.Compile();
+            var result = _connection.Connection.ExecuteScalar<T>(complie.CompiledSql, complie.SqlParameters);
+            if (result == null) return default;
+            return result;
+        }
+        public async Task<T?> GetScalarAsync<T>()
+        {
+            var complie = _query.Compile();
+            var result = await _connection.Connection.ExecuteScalarAsync<T>(complie.CompiledSql, complie.SqlParameters);
+            if (result == null) return default;
+            return result;
+        }
+        public object? GetScalar()
+        {
+            var complie = _query.Compile();
+            var result = _connection.Connection.ExecuteScalar(complie.CompiledSql, complie.SqlParameters);
+            if (result == null) return default;
+            return result;
+        }
+        public async Task<object?> GetScalarAsync()
+        {
+            var complie = _query.Compile();
+            var result = await _connection.Connection.ExecuteScalarAsync(complie.CompiledSql, complie.SqlParameters);
+            if (result == null) return default;
+            return result;
+        }
+        public IDictionary<string, object>? GetSingle()
+        {
+            var complie = _query.Compile();
+            return _connection.Connection.QuerySingleOrDefault(complie.CompiledSql, complie.SqlParameters) as IDictionary<string, object>;
+        }
+        public async Task<IDictionary<string, object>?> GetSingleAsync()
+        {
+            var complie = _query.Compile();
+            return await _connection.Connection.QuerySingleOrDefaultAsync(complie.CompiledSql, complie.SqlParameters) as IDictionary<string, object>;
+        }
+
+        public T? GetSingleValue<T>(string? property = null)
+        {
+            var result = GetSingle();
+            if (result == null) return default;
+            if (!string.IsNullOrWhiteSpace(property)) return (T)result[property];
+
+            var key = _queryMeasures.FirstOrDefault()?.Property ?? _queryDimension.FirstOrDefault()?.Property ?? _queryTimeDimension.Property;
+            return (T)result[key];
+        }
+
+        public async Task<T?> GetSingleValueAsync<T>(string? property = null)
+        {
+            var result = await GetSingleAsync();
+            if (result == null) return default;
+            if (!string.IsNullOrWhiteSpace(property)) return (T)result[property];
+
+            var key = _queryMeasures.FirstOrDefault()?.Property ?? _queryDimension.FirstOrDefault()?.Property ?? _queryTimeDimension.Property;
+            return (T)result[key];
+        }
+
+        public object? GetSingleValue(string? property = null)
+        {
+            var result = GetSingle();
+            if (result == null) return default;
+            if (!string.IsNullOrWhiteSpace(property)) return result[property];
+
+            var key = _queryMeasures.FirstOrDefault()?.Property ?? _queryDimension.FirstOrDefault()?.Property ?? _queryTimeDimension.Property;
+            return result[key];
+        }
+
+        public async Task<object?> GetSingleValueAsync(string? property = null)
+        {
+            var result = await GetSingleAsync();
+            if (result == null) return default;
+            if (!string.IsNullOrWhiteSpace(property)) return result[property];
+
+            var key = _queryMeasures.FirstOrDefault()?.Property ?? _queryDimension.FirstOrDefault()?.Property ?? _queryTimeDimension.Property;
+            return result[key];
+        }
+
+        public IDictionary<string, object>? GetFirst()
+        {
+            var complie = _query.Compile();
+            return _connection.Connection.QueryFirstOrDefault(complie.CompiledSql, complie.SqlParameters) as IDictionary<string, object>;
+        }
+
+        public async Task<IDictionary<string, object>?> GetFirstAsync()
+        {
+            var complie = _query.Compile();
+            return await _connection.Connection.QueryFirstOrDefaultAsync(complie.CompiledSql, complie.SqlParameters) as IDictionary<string, object>;
+        }
+
+        public T? GetFirstValue<T>(string? property = null)
+        {
+            var result = GetFirst();
+            if (result == null) return default;
+            if (!string.IsNullOrWhiteSpace(property)) return (T)result[property];
+
+            var key = _queryMeasures.FirstOrDefault()?.SqlColumn ?? _queryDimension.FirstOrDefault()?.SqlColumn ?? _queryTimeDimension.SqlColumn;
+            return (T)result[key];
+        }
+
+        public async Task<T?> GetFirstValueAsync<T>(string? property = null)
+        {
+            var result = await GetFirstAsync();
+            if (result == null) return default;
+            var ttt = result[property].GetType();
+            if (!string.IsNullOrWhiteSpace(property)) return (T)(object)result[property];
+
+            var key = _queryMeasures.FirstOrDefault()?.SqlColumn ?? _queryDimension.FirstOrDefault()?.SqlColumn ?? _queryTimeDimension.SqlColumn;
+            return (T)result[key];
+        }
+
+        public object? GetFirstValue(string? property = null)
+        {
+            var result = GetFirst();
+            if (result == null) return default;
+            if (!string.IsNullOrWhiteSpace(property)) return result[property];
+
+            var key = _queryMeasures.FirstOrDefault()?.SqlColumn ?? _queryDimension.FirstOrDefault()?.SqlColumn ?? _queryTimeDimension.SqlColumn;
+            return result[key];
+        }
+
+        public async Task<object?> GetFirstValueAsync(string? property = null)
+        {
+            var result = await GetFirstAsync();
+            if (result == null) return default;
+            if (!string.IsNullOrWhiteSpace(property)) return result[property];
+
+            var key = _queryMeasures.FirstOrDefault()?.Property ?? _queryDimension.FirstOrDefault()?.Property ?? _queryTimeDimension.Property;
+            return result[key];
         }
     }
 }

@@ -59,7 +59,7 @@ namespace Querier.SqlQuery
 
             _select.Add(new SqlSelect()
             {
-                Column = "*"
+                SqlColumn = new SqlColumn() { Column = "*" }
             });
             return (TQuery)(object)this;
         }
@@ -70,8 +70,7 @@ namespace Querier.SqlQuery
 
             _select.Add(new SqlSelect()
             {
-                Column = column,
-                ColumnAs = columnAs
+                SqlColumn = new SqlColumn() { Column = column, ColumnAs = columnAs }
             });
             return (TQuery)(object)this;
         }
@@ -82,13 +81,11 @@ namespace Querier.SqlQuery
 
             _select.Add(new SqlSelectAggregation()
             {
-                Column = column,
-                ColumnAs = columnAs,
-                Aggregation = aggregation
+                SqlColumnAggregation = new SqlColumnAggregation() { Column = column, ColumnAs = columnAs, Aggregation = aggregation }
             });
             return (TQuery)(object)this;
         }
-        public TQuery SelectCount(string column = "*", string? columnAs = null)
+        public TQuery SelectCount(string column, string? columnAs = null)
         {
             return Select("count", column, columnAs);
         }
@@ -167,7 +164,7 @@ namespace Querier.SqlQuery
             if (_whereColumn == null) return;
             if (_whereColumn.Column != "*") return;
 
-            var select = _select.Where(e => e.Column == "*").FirstOrDefault();
+            var select = _select.Where(e => e.SqlColumn.Column == "*").FirstOrDefault();
             if (select != null)
             {
                 _select.Remove(select);
@@ -211,7 +208,7 @@ namespace Querier.SqlQuery
         }
         public TQuery WhereEqual<T>(Func<IFunction, IFunction> function, T value)
         {
-            return WhereOperator(new EqualOperator<T>() { Column = new SqlColumn() { Function = function.Invoke(_functionFactory.New()) }, Value = value });
+            return WhereOperator(new EqualOperator<T>() { Column = new SqlColumnFunction() { Function = function.Invoke(_functionFactory.New()) }, Value = value });
         }
         public TQuery Equal<T>(T value)
         {
@@ -231,7 +228,7 @@ namespace Querier.SqlQuery
         }
         public TQuery WhereGreater<T>(Func<IFunction, IFunction> function, T value)
         {
-            return WhereOperator(new GreaterThanOperator<T>() { Column = new SqlColumn() { Function = function.Invoke(_functionFactory.New()) }, Value = value });
+            return WhereOperator(new GreaterThanOperator<T>() { Column = new SqlColumnFunction() { Function = function.Invoke(_functionFactory.New()) }, Value = value });
         }
         public TQuery Greater<T>(T value)
         {
@@ -251,7 +248,7 @@ namespace Querier.SqlQuery
         }
         public TQuery WhereLess<T>(Func<IFunction, IFunction> function, T value)
         {
-            return WhereOperator(new LessThanOperator<T>() { Column = new SqlColumn() { Function = function.Invoke(_functionFactory.New()) }, Value = value });
+            return WhereOperator(new LessThanOperator<T>() { Column = new SqlColumnFunction() { Function = function.Invoke(_functionFactory.New()) }, Value = value });
         }
         public TQuery Less<T>(T value)
         {
@@ -271,7 +268,7 @@ namespace Querier.SqlQuery
         }
         public TQuery WhereGreaterOrEqual<T>(Func<IFunction, IFunction> function, T value)
         {
-            return WhereOperator(new GreaterThanOrEqualOperator<T>() { Column = new SqlColumn() { Function = function.Invoke(_functionFactory.New()) }, Value = value });
+            return WhereOperator(new GreaterThanOrEqualOperator<T>() { Column = new SqlColumnFunction() { Function = function.Invoke(_functionFactory.New()) }, Value = value });
         }
         public TQuery GreaterOrEqual<T>(T value)
         {
@@ -291,7 +288,7 @@ namespace Querier.SqlQuery
         }
         public TQuery WhereLessOrEqual<T>(Func<IFunction, IFunction> function, T value)
         {
-            return WhereOperator(new LessThanOrEqualOperator<T>() { Column = new SqlColumn() { Function = function.Invoke(_functionFactory.New()) }, Value = value });
+            return WhereOperator(new LessThanOrEqualOperator<T>() { Column = new SqlColumnFunction() { Function = function.Invoke(_functionFactory.New()) }, Value = value });
         }
         public TQuery LessOrEqual<T>(T value)
         {
@@ -327,7 +324,7 @@ namespace Querier.SqlQuery
         }
         public TQuery WhereIn<T>(Func<IFunction, IFunction> function, IEnumerable<T> value)
         {
-            return WhereOperator(new InOperator() { Column = new SqlColumn() { Function = function.Invoke(_functionFactory.New()) }, Value = value });
+            return WhereOperator(new InOperator() { Column = new SqlColumnFunction() { Function = function.Invoke(_functionFactory.New()) }, Value = value });
         }
         public TQuery In<T>(IEnumerable<T> value)
         {
@@ -347,7 +344,7 @@ namespace Querier.SqlQuery
         }
         public TQuery WhereLike<T>(Func<IFunction, IFunction> function, T value)
         {
-            return WhereOperator(new LikeOperator() { Column = new SqlColumn() { Function = function.Invoke(_functionFactory.New()) }, Value = value, LikeStarts = "%", LikeEnds = "%" });
+            return WhereOperator(new LikeOperator() { Column = new SqlColumnFunction() { Function = function.Invoke(_functionFactory.New()) }, Value = value, LikeStarts = "%", LikeEnds = "%" });
         }
         public TQuery Like<T>(T value)
         {
@@ -368,7 +365,7 @@ namespace Querier.SqlQuery
         }
         public TQuery WhereStarts<T>(Func<IFunction, IFunction> function, T value)
         {
-            return WhereOperator(new LikeOperator() { Column = new SqlColumn() { Function = function.Invoke(_functionFactory.New()) }, Value = value, LikeStarts = "", LikeEnds = "%" });
+            return WhereOperator(new LikeOperator() { Column = new SqlColumnFunction() { Function = function.Invoke(_functionFactory.New()) }, Value = value, LikeStarts = "", LikeEnds = "%" });
         }
         public TQuery WhereNotStarts<T>(string column, T value)
         {
@@ -389,7 +386,7 @@ namespace Querier.SqlQuery
         }
         public TQuery WhereEnds<T>(Func<IFunction, IFunction> function, T value)
         {
-            return WhereOperator(new LikeOperator() { Column = new SqlColumn() { Function = function.Invoke(_functionFactory.New()) }, Value = value, LikeStarts = "%", LikeEnds = "" });
+            return WhereOperator(new LikeOperator() { Column = new SqlColumnFunction() { Function = function.Invoke(_functionFactory.New()) }, Value = value, LikeStarts = "%", LikeEnds = "" });
         }
         public TQuery WhereNotEnds<T>(string column, T value)
         {
@@ -557,7 +554,6 @@ namespace Querier.SqlQuery
             result.NameParameters = CompileNameParameters(result);
 
             result.Sql = queryTz.Build(" ");
-            result.CompiledSql = new string(result.Sql);
             result = CompileSql(result);
 
             return result;

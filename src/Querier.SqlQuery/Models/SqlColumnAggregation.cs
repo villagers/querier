@@ -9,19 +9,28 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlGroupBy : ISqlQueryCompile<SqlQueryResult>
+    public class SqlColumnAggregation : SqlColumn
     {
-        public virtual required string Column { get; set; }
+        public required string Aggregation { get; set; }
 
-        public virtual SqlQueryResult Compile()
+        public override SqlQueryResult Compile()
         {
             var result = new SqlQueryResult();
-            var selectTz = new SqlTokenizer();
-
-            selectTz.AddToken("@column");
             result.NameParameters.Add("@column", Column);
 
-            result.Sql = selectTz.Build(" ");
+            var aggrTz = new SqlTokenizer()
+                .AddToken(Aggregation)
+                .AddToken("(").AddToken("@column").AddToken(")").Build("");
+
+            var selectTz = new SqlTokenizer().AddToken(aggrTz);
+
+            if (!string.IsNullOrEmpty(ColumnAs))
+            {
+                result.NameParameters.Add("@as", ColumnAs);
+                selectTz.AddToken("as").AddToken("@as");
+            }
+
+            result.Sql = selectTz.Build();
             result.NameParameters = result.NameParameters.Select((e, i) =>
             {
                 result.Sql = result.Sql.ReplaceExact(e.Key, $"@name{i}");

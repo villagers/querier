@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Functions;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Tokenizers;
 using System;
@@ -26,7 +27,7 @@ namespace Querier.SqlQuery.Models
             result.Sql = tableTz.Build(" ");
             result.NameParameters = result.NameParameters.Select((e, i) =>
             {
-                result.Sql = result.Sql.Replace(e.Key, $"@name{i}");
+                result.Sql = result.Sql.ReplaceExact(e.Key, $"@name{i}");
                 return new KeyValuePair<string, string>($"@name{i}", e.Value);
             }).ToDictionary();
             return result;
