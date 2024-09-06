@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Models;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace Querier.SqlQuery.Operators
             };
             result.NameParameters = result.NameParameters.Select((e, i) =>
             {
-                result.Sql = result.Sql.Replace(e.Key, $"@name{i}");
+                result.Sql = result.Sql.ReplaceExact(e.Key, $"@name{i}");
                 return new KeyValuePair<string, string>($"@name{i}", e.Value);
             }).ToDictionary();
             return result;

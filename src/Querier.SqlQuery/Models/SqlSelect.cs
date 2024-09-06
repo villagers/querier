@@ -10,40 +10,7 @@ namespace Querier.SqlQuery.Models
 {
     public class SqlSelect : ISqlQueryCompile<SqlQueryResult>
     {
-        public string? Column { get; set; }
-        public string? ColumnAs { get; set; }
-
-        public virtual SqlQueryResult Compile()
-        {
-            var result = new SqlQueryResult();
-            var selectTz = new SqlTokenizer();
-
-            if (Column == "*")
-            {
-                selectTz.AddToken("*");
-                result.Sql = selectTz.Build(" ");
-                return result;
-            }
-
-            result.NameParameters.Add("@column", Column);
-            selectTz.AddToken("@column");
-
-
-
-            if (!string.IsNullOrEmpty(ColumnAs))
-            {
-                result.NameParameters.Add("@as", ColumnAs);
-                selectTz.AddToken("as").AddToken("@as");
-            }
-
-            result.Sql = selectTz.Build(" ");
-            result.NameParameters = result.NameParameters.Select((e, i) =>
-            {
-                result.Sql = result.Sql.Replace(e.Key, $"@name{i}");
-                return new KeyValuePair<string, string>($"@name{i}", e.Value);
-            }).ToDictionary();
-            
-            return result;
-        }
+        public SqlColumn? SqlColumn { get; set; }
+        public virtual SqlQueryResult Compile() => SqlColumn.Compile();
     }
 }

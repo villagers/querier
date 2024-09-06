@@ -25,9 +25,9 @@ namespace Querier.SqlQuery.Functions
             return newParameter;
         }
 
-        public SqlFunctionResult Compile()
+        public SqlQueryResult Compile()
         {
-            var result = new SqlFunctionResult()
+            var result = new SqlQueryResult()
             {
                 Sql = string.Join(" ", this),
                 NameParameters = NameParameters

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Querier.Interfaces
 {
-    public interface IQuery
+    public interface IQuery : IQueryExecute
     {
         IQuery New();
         IQuery From(string table);
@@ -21,10 +21,10 @@ namespace Querier.Interfaces
         IQuery MeasureMin(string property, string? propertyAs = null, string? orderBy = null);
         IQuery MeasureMax(string property, string? propertyAs = null, string? orderBy = null);
 
-        IQuery Dimension(string property);
+        IQuery Dimension(string property, string? propertyAs = null);
 
-        IQuery TimeDimension(string property);
-        IQuery TimeDimension(string property, string timeDimensionPart);
+        IQuery TimeDimension(string property, string? propertyAs = null);
+        IQuery TimeDimension(string property, string timeDimensionPart, string? propertyAs = null);
 
         IQuery OrderBy(string property, string direction);
         IQuery Limit(int limit);
@@ -37,8 +37,5 @@ namespace Querier.Interfaces
         List<Dictionary<string, string>> GetDimensions(string queryKey);
         List<Dictionary<string, string>> GetTimeDimensions<TType>();
         List<Dictionary<string, string>> GetTimeDimensions(string queryKey);
-
-        QueryResult Execute();
-
     }
 }

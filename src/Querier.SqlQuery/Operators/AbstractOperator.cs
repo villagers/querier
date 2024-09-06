@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
 
@@ -10,7 +11,7 @@ namespace Querier.SqlQuery.Operators
 {
     public abstract class AbstractOperator : ICloneable
     {
-        public SqlColumn? Column { get; set; }
+        public ISqlColumn? Column { get; set; }
 
         protected bool HasAnd = false;
         protected bool HasOr = false;

@@ -10,70 +10,34 @@ using Querier.Tests.Integration.MySql;
 using Querier.Tests.Shared;
 using System.Reflection;
 
-namespace Querier.Tests.Integration
+namespace Querier.Tests.Integration.Common
 {
-
-    public class CustomPropertyValidationWebApplicationFactory<TProgram> : BaseWebApplicationFactory<TProgram> where TProgram : class
+    public class PropertyValidationWebApplicationFactory<TProgram> : BaseWebApplicationFactory<TProgram> where TProgram : class
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             base.ConfigureWebHost(builder);
             builder.Configure(app =>
             {
-                app.UseQuerier(e => e.Types.LoadDefaults());
+                app.UseQuerier();
             });
             builder.ConfigureTestServices(services =>
             {
                 var connectionString = Configuration.GetConnectionString("MySQL");
-                services.AddQuerier(o =>
-                {
-                    o.Validation.MeasureValidator<CustomMeasureValidation>();
-                    o.Validation.DimensionValidator<CustomDimensionValidation>();
-                    o.Validation.TimeDimensionValidator<CustomTimeDimensionValidation>();
-                    o.UseMySql(connectionString);
-                });
+                services.AddQuerier(o => o.UseMySql(connectionString));
             });
-            
-        }
-    }
 
-    class CustomMeasureValidation : IMeasurePropertyValidator
-    {
-        public bool Validate(PropertyInfo propertyInfo)
-        {
-            return new[]
-            {
-                typeof(string)
-            }.Contains(propertyInfo.PropertyType);
-        }
-    }
-
-    class CustomDimensionValidation : IDimensionPropertyValidator
-    {
-        public bool Validate(PropertyInfo propertyInfo)
-        {
-            return new[]
-            {
-                typeof(int)
-            }.Contains(propertyInfo.PropertyType);
-        }
-    }
-
-    class CustomTimeDimensionValidation : ITimeDimensionPropertyValidator
-    {
-        public bool Validate(PropertyInfo propertyInfo)
-        {
-            return false;
         }
     }
 
 
-    public class CustomPropertyValidationTests : IClassFixture<CustomPropertyValidationWebApplicationFactory<Program>>
+
+    public class PropertyValidationTests : IClassFixture<PropertyValidationWebApplicationFactory<Program>>
     {
         private readonly IQuery _query;
-        private readonly CustomPropertyValidationWebApplicationFactory<Program> _application;
+        private readonly PropertyValidationWebApplicationFactory<Program> _application;
 
-        public CustomPropertyValidationTests(CustomPropertyValidationWebApplicationFactory<Program> application)
+        public PropertyValidationTests(PropertyValidationWebApplicationFactory<Program> application)
         {
             _application = application;
 
@@ -82,7 +46,7 @@ namespace Querier.Tests.Integration
         }
 
         [Fact]
-        public void CustomMeasureValidationTest()
+        public void MeasureValidationTest()
         {
             var withType = _query.GetMeasures<SampleEntity>();
             var withTypeName = _query.GetMeasures("SampleEntity");
@@ -91,14 +55,14 @@ namespace Querier.Tests.Integration
             var withTypeNameQuery = _query.GetMeasures("SampleEntityQuery");
 
 
-            Assert.Equal(2, withType.Count());
-            Assert.Equal(2, withTypeName.Count());
+            Assert.Equal(5, withType.Count());
+            Assert.Equal(5, withTypeName.Count());
             Assert.Equal(2, withTypeQuery.Count());
             Assert.Equal(2, withTypeNameQuery.Count());
         }
 
         [Fact]
-        public void CustomDimensionValidationTest()
+        public void DimensionValidationTest()
         {
             var withType = _query.GetDimensions<SampleEntity>();
             var withTypeName = _query.GetDimensions("SampleEntity");
@@ -107,14 +71,14 @@ namespace Querier.Tests.Integration
             var withTypeNameQuery = _query.GetDimensions("SampleEntityQuery");
 
 
-            Assert.Single(withType);
-            Assert.Single(withTypeName);
+            Assert.Equal(5, withType.Count());
+            Assert.Equal(5, withTypeName.Count());
             Assert.Equal(2, withTypeQuery.Count());
             Assert.Equal(2, withTypeNameQuery.Count());
         }
 
         [Fact]
-        public void CustomTimeDimensionValidationTest()
+        public void TimeDimensionValidationTest()
         {
             var withType = _query.GetTimeDimensions<SampleEntity>();
             var withTypeName = _query.GetTimeDimensions("SampleEntity");
@@ -123,10 +87,10 @@ namespace Querier.Tests.Integration
             var withTypeNameQuery = _query.GetTimeDimensions("SampleEntityQuery");
 
 
-            Assert.Empty(withType);
-            Assert.Empty(withTypeName);
-            Assert.Empty(withTypeQuery);
-            Assert.Empty(withTypeNameQuery);
+            Assert.Single(withType);
+            Assert.Single(withTypeName);
+            Assert.Single(withTypeQuery);
+            Assert.Single(withTypeNameQuery);
         }
 
     }

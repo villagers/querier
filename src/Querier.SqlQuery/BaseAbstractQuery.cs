@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Functions;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
@@ -53,9 +54,10 @@ namespace Querier.SqlQuery
 
         public virtual SqlQueryResult CompileSql(SqlQueryResult result)
         {
+            result.CompiledSql = new string(result.Sql);
             foreach (var param in result.NameParameters)
             {
-                result.CompiledSql = result.CompiledSql.Replace(param.Key, $"{NameParameterOpening}{param.Value}{NameParameterClosing}");
+                result.CompiledSql = result.CompiledSql.ReplaceExact(param.Key, $"{NameParameterOpening}{param.Value}{NameParameterClosing}");
             }
 
             return result;
@@ -87,7 +89,7 @@ namespace Querier.SqlQuery
             return NameParameters
                 .Select((e, i) =>
                 {
-                    result.Sql = result.Sql.Replace(e.Key, $"{NameParameterPlaceholder}{i}");
+                    result.Sql = result.Sql.ReplaceExact(e.Key, $"{NameParameterPlaceholder}{i}");
                     return new KeyValuePair<string, string>($"{NameParameterPlaceholder}{i}", e.Value);
                 }).ToDictionary();
         }
@@ -105,7 +107,7 @@ namespace Querier.SqlQuery
                 var nameCount = NameParameters.Count;
                 var newPlaceholder = $"{NameParameterPlaceholder}{nameCount}";
 
-                tableCompiledSql = tableCompiledSql.Replace(parameter.Key, newPlaceholder);
+                tableCompiledSql = tableCompiledSql.ReplaceExact(parameter.Key, newPlaceholder);
 
                 NameParameters.Add(newPlaceholder, parameter.Value);
                 result.NameParameters.Add(newPlaceholder, parameter.Value);
@@ -144,7 +146,7 @@ namespace Querier.SqlQuery
                         var name = parameter.Key;
                         var newName = $"{SqlParameterPlaceholder}{count}";
 
-                        selectCompiledSql = selectCompiledSql.Replace(name, newName);
+                        selectCompiledSql = selectCompiledSql.ReplaceExact(name, newName);
 
                         SqlParameters.Add(newName, parameter.Value);
                         result.SqlParameters.Add(newName, parameter.Value);
@@ -155,7 +157,7 @@ namespace Querier.SqlQuery
                         var nameCount = NameParameters.Count;
                         var newPlaceholder = $"{NameParameterPlaceholder}{nameCount}";
 
-                        selectCompiledSql = selectCompiledSql.Replace(parameter.Key, newPlaceholder);
+                        selectCompiledSql = selectCompiledSql.ReplaceExact(parameter.Key, newPlaceholder);
 
                         NameParameters.Add(newPlaceholder, parameter.Value);
                         result.NameParameters.Add(newPlaceholder, parameter.Value);
@@ -193,7 +195,7 @@ namespace Querier.SqlQuery
                     var name = parameter.Key;
                     var newName = $"{SqlParameterPlaceholder}{count}";
 
-                    whereCompiledSql = whereCompiledSql.Replace(name, newName);
+                    whereCompiledSql = whereCompiledSql.ReplaceExact(name, newName);
 
                     SqlParameters.Add(newName, parameter.Value);
                     result.SqlParameters.Add(newName, parameter.Value);
@@ -204,7 +206,7 @@ namespace Querier.SqlQuery
                     var nameCount = NameParameters.Count;
                     var newPlaceholder = $"{NameParameterPlaceholder}{nameCount}";
 
-                    whereCompiledSql = whereCompiledSql.Replace(parameter.Key, newPlaceholder);
+                    whereCompiledSql = whereCompiledSql.ReplaceExact(parameter.Key, newPlaceholder);
 
                     NameParameters.Add(newPlaceholder, parameter.Value);
                     result.NameParameters.Add(newPlaceholder, parameter.Value);
@@ -235,7 +237,7 @@ namespace Querier.SqlQuery
                         var nameCount = NameParameters.Count;
                         var newPlaceholder = $"{NameParameterPlaceholder}{nameCount}";
 
-                        groupByCompiledSql = groupByCompiledSql.Replace(parameter.Key, newPlaceholder);
+                        groupByCompiledSql = groupByCompiledSql.ReplaceExact(parameter.Key, newPlaceholder);
 
                         NameParameters.Add(newPlaceholder, parameter.Value);
                         result.NameParameters.Add(newPlaceholder, parameter.Value);
