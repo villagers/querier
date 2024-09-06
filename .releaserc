@@ -17,14 +17,14 @@
         [
             "@semantic-release/changelog",
             {
-                "changelogFile": "../CHANGELOG.md"
+                "changelogFile": "CHANGELOG.md"
             }
         ],
         "@semantic-release/github",
         [
             "@semantic-release/exec",
             {
-                "prepareCmd": "chmod +x ../release.sh && ../release.sh '${nextRelease.version}'"
+                "prepareCmd": "chmod +x ./release.sh && ./release.sh '${nextRelease.version}'"
             }
         ],
         [
@@ -32,8 +32,8 @@
             {
                 "assets": [
                     "CHANGELOG.md",
-                    "Querier/Querier.csproj",
-                    "Querier.SqlQuery/Querier.SqlQuery.csproj"
+                    "src/Querier/Querier.csproj",
+                    "src/Querier.SqlQuery/Querier.SqlQuery.csproj"
                 ],
                 "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
             }
