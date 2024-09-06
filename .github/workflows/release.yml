@@ -1,4 +1,4 @@
-name: .NET
+name: release
 permissions: write-all
 
 on:
