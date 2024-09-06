@@ -37,7 +37,7 @@ namespace Querier.Tests.Integration.MySql
             Assert.Equal("Total", result.Measures.First().DisplayName);
 
             Assert.Single(result.Data);
-            Assert.Equal(2328.60, Convert.ToDouble(result.Data.First()["sum(`Total`)"]));
+            Assert.Equal(2328.60, Convert.ToDouble(result.Data.First()["Total"]));
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace Querier.Tests.Integration.MySql
             Assert.Equal("Total", result.Measures.First().DisplayName);
 
             Assert.Single(result.Data);
-            Assert.Equal(5.651942, Convert.ToDouble(result.Data.First()["avg(`Total`)"]));
+            Assert.Equal(5.651942, Convert.ToDouble(result.Data.First()["Total"]));
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace Querier.Tests.Integration.MySql
             Assert.Equal("Total", result.Measures.First().DisplayName);
 
             Assert.Single(result.Data);
-            Assert.Equal(412, Convert.ToDouble(result.Data.First()["count(`Total`)"]));
+            Assert.Equal(412, Convert.ToDouble(result.Data.First()["Total"]));
         }
 
         [Fact]
@@ -85,7 +85,7 @@ namespace Querier.Tests.Integration.MySql
             Assert.Equal("Total", result.Measures.First().DisplayName);
 
             Assert.Single(result.Data);
-            Assert.Equal(25.86, Convert.ToDouble(result.Data.First()["max(`Total`)"]));
+            Assert.Equal(25.86, Convert.ToDouble(result.Data.First()["Total"]));
         }
 
         [Fact]
@@ -101,18 +101,18 @@ namespace Querier.Tests.Integration.MySql
             Assert.Equal("Total", result.Measures.First().DisplayName);
 
             Assert.Single(result.Data);
-            Assert.Equal(0.99, Convert.ToDouble(result.Data.First()["min(`Total`)"]));
+            Assert.Equal(0.99, Convert.ToDouble(result.Data.First()["Total"]));
         }
 
         [Fact]
         public void MeasureMixed()
         {
             var result = _query.New().From("Invoice")
-                .MeasureSum("Total")
-                .MeasureAvg("Total")
-                .MeasureCount("Total")
-                .MeasureMax("Total")
-                .MeasureMin("Total")
+                .MeasureSum("Total", "t1")
+                .MeasureAvg("Total", "t2")
+                .MeasureCount("Total", "t3")
+                .MeasureMax("Total", "t4")
+                .MeasureMin("Total", "t5")
                 .Execute();
 
             Assert.Empty(result.Dimensions);

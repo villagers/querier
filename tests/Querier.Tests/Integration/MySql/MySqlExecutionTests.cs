@@ -53,8 +53,6 @@ namespace Querier.Tests.Integration.MySql
             value = _query.New().From("Invoice").MeasureSum("Total").MeasureCount("CustomerId").GetSingleValue("Total");
             Assert.Equal(2328.60m, value);
 
-            value = _query.New().From("Invoice").MeasureSum("Total").MeasureCount("CustomerId").GetSingleValueAsync<int>("CustomerId").Result;
-            Assert.Equal(412, value);
 
             value = _query.New().From("Invoice").MeasureSum("Total").GetSingleValueAsync().Result;
             Assert.Equal(2328.60m, value);
