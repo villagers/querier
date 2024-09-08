@@ -15,6 +15,7 @@ namespace Querier.Interfaces
         IQuery New();
         IQuery From(string table);
 
+        IQuery Measure(string property, string? propertyAs = null, string? orderBy = null);
         IQuery MeasureCount(string property, string? propertyAs = null, string? orderBy = null);
         IQuery MeasureSum(string property, string? propertyAs = null, string? orderBy = null);
         IQuery MeasureAvg(string property, string? propertyAs = null, string? orderBy = null);
