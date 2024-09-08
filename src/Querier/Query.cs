@@ -53,6 +53,11 @@ namespace Querier
             return this;
         }
 
+        public IQuery Measure(string property, string? propertyAs = null, string? orderBy = null)
+        {
+            return MeasureSum(property, propertyAs, orderBy);
+        }
+
         public IQuery MeasureCount(string property, string? propertyAs = null, string? orderBy = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
