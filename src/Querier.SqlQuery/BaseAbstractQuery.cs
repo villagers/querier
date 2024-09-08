@@ -115,7 +115,8 @@ namespace Querier.SqlQuery
             if (_select.Count <= 0)
             {
                 result.Sql = selectTz.AddToken("*").Build(" ");
-                return result;
+                result.SqlTokenizer = selectTz;
+                return result.Enumerate();
             }
 
             if (_distinct)
