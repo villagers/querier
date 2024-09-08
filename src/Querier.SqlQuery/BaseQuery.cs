@@ -116,6 +116,18 @@ namespace Querier.SqlQuery
             return (TQuery)(object)this;
         }
 
+        public TQuery SelectCase(string column, AbstractOperator @operator, string value, string defaulValue)
+        {
+            var sqlCase = new SqlCase() { ElseValue = defaulValue };
+            sqlCase.AddCaseWhen(new SqlCaseWhen() { Operator = @operator, Value = value });
+
+            _select.Add(new SqlSelectCase()
+            {
+                SqlCase = sqlCase
+            });
+            return (TQuery)(object)this;
+        }
+
         public TQuery SelectDateFunction(IFunction function)
         {
             _select.Add(new SqlSelectFunction()
@@ -558,8 +570,5 @@ namespace Querier.SqlQuery
 
             return result;
         }
-
-
-
     }
 }

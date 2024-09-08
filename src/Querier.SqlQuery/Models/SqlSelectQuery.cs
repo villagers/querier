@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Functions;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Tokenizers;
 using System;
@@ -24,7 +25,7 @@ namespace Querier.SqlQuery.Models
             result.SqlParameters = result.SqlParameters;
             result.NameParameters = result.NameParameters;
             result.Sql = queryTz.Build("");
-            return result;
+            return result.Enumerate();
         }
     }
 }

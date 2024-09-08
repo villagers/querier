@@ -1,19 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.Collections;
-using Querier.SqlQuery;
-using MySql.Data.MySqlClient;
-using Querier.SqlQuery.Interfaces;
-using System.Data.SqlClient;
+﻿using Querier.SqlQuery.Interfaces;
 using Dapper;
 using Querier.Interfaces;
 using Querier.Attributes;
-using Querier.Helpers;
-using Querier.SqlQuery.Models;
 
 namespace Querier
 {
@@ -253,6 +241,26 @@ namespace Querier
                 .Query(complie.CompiledSql, complie.SqlParameters)
                 .Cast<IDictionary<string, object>>()
                 .Select(e => e.ToDictionary(k => k.Key, v => v.Value));
+        }
+
+        public IEnumerable<T>? GetValues<T>(string property)
+        {
+            var complie = _query.Compile();
+            return _connection.Connection
+                .Query(complie.CompiledSql, complie.SqlParameters)
+                .Cast<IDictionary<string, T>>()
+                .Select(e => e.ToDictionary(k => k.Key, v => v.Value))
+                .SelectMany(e => e.Values);
+        }
+
+        public IEnumerable<object>? GetValues(string property)
+        {
+            var complie = _query.Compile();
+            return _connection.Connection
+                .Query(complie.CompiledSql, complie.SqlParameters)
+                .Cast<IDictionary<string, object>>()
+                .Select(e => e.ToDictionary(k => k.Key, v => v.Value))
+                .SelectMany(e => e.Values);
         }
 
         public T? GetScalar<T>()

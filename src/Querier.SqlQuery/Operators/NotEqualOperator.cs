@@ -11,7 +11,7 @@ namespace Querier.SqlQuery.Operators
 {
     public class NotEqualOperator<T> : AbstractComparisonOperator<T>
     {
-        public override SqlOperatorResult Compile()
+        public override SqlQueryResult Compile()
         {
             var column = Column.Compile();
 
@@ -22,7 +22,7 @@ namespace Querier.SqlQuery.Operators
                 .AddToken("@value")
                 .Build();
 
-            var result = new SqlOperatorResult()
+            var result = new SqlQueryResult()
             {
                 Sql = sqlTz,
                 NameParameters = column.NameParameters,
@@ -31,12 +31,7 @@ namespace Querier.SqlQuery.Operators
                     { "@value", Value }
                 }
             };
-            result.NameParameters = result.NameParameters.Select((e, i) =>
-            {
-                result.Sql = result.Sql.ReplaceExact(e.Key, $"@name{i}");
-                return new KeyValuePair<string, string>($"@name{i}", e.Value);
-            }).ToDictionary();
-            return result;
+            return result.Enumerate();
         }
     }
 }

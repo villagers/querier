@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Querier.SqlQuery.Operators;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,7 @@ namespace Querier.SqlQuery.Interfaces
         TQuery SelectMax(string column, string? columnAs = null);
         TQuery SelectMin(string column, string? columnAs = null);
         TQuery SelectSum(string column, string? columnAs = null);
+        TQuery SelectCase(string column, AbstractOperator @operator, string value, string defaultValue);
 
         TQuery SelectSecond(string column, string? columnAs = null);
         TQuery SelectMinute(string column, string? columnAs = null);

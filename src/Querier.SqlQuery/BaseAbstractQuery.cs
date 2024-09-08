@@ -64,21 +64,11 @@ namespace Querier.SqlQuery
         }
         public virtual SqlTokenizer CompileTokens(SqlQueryResult result)
         {
-            var queryTz = new SqlTokenizer();
-
-            var selectQuery = CreateSelect();
-            var tableQuery = CreateTable();
-            var whereQuery = CreateWhere();
-            var groupByQuery = CreateGroupBy();
-            var orderByQuery = CreateOrderBy();
-
-            queryTz.AddToken(selectQuery.Sql);
-            queryTz.AddToken(tableQuery.Sql);
-            queryTz.AddToken(whereQuery.Sql);
-            queryTz.AddToken(groupByQuery.Sql);
-            queryTz.AddToken(orderByQuery.Sql);
-
-            return queryTz;
+            return CreateSelect()
+                .Merge(CreateTable())
+                .Merge(CreateWhere())
+                .Merge(CreateGroupBy())
+                .Merge(CreateOrderBy()).SqlTokenizer;
         }
         public virtual Dictionary<string, object> CompileSqlParameters(SqlQueryResult result)
         {
@@ -115,7 +105,7 @@ namespace Querier.SqlQuery
 
             tableTz.AddToken(tableCompiledSql);
             result.Sql = tableTz.Build(" ");
-            return result;
+            return result.Enumerate();
         }
         public virtual SqlQueryResult CreateSelect()
         {
@@ -172,7 +162,7 @@ namespace Querier.SqlQuery
 
             result.SqlTokenizer = selectTz;
             result.Sql = selectTz.Build(" ");
-            return result;
+            return result.Enumerate();
         }
         public virtual SqlQueryResult CreateWhere()
         {
@@ -215,7 +205,7 @@ namespace Querier.SqlQuery
                 whereTz.AddToken(whereCompiledSql);
             }
             result.Sql = whereTz.Build();
-            return result;
+            return result.Enumerate();
         }
         public virtual SqlQueryResult CreateGroupBy()
         {
@@ -249,7 +239,7 @@ namespace Querier.SqlQuery
             }, ", ");
 
             result.Sql = groupTz.Build();
-            return result;
+            return result.Enumerate();
         }
         public virtual SqlQueryResult CreateOrderBy()
         {
@@ -274,7 +264,7 @@ namespace Querier.SqlQuery
             }, ", ");
 
             result.Sql = orderTz.Build();
-            return result;
+            return result.Enumerate();
         }
     }
 }

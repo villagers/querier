@@ -11,6 +11,10 @@ namespace Querier.Interfaces
         QueryResult Execute();
 
         IEnumerable<Dictionary<string, object>>? Get();
+        IEnumerable<T>? GetValues<T>(string property);
+        IEnumerable<object>? GetValues(string property);
+        
+
 
         T? GetScalar<T>();
         Task<T?> GetScalarAsync<T>();

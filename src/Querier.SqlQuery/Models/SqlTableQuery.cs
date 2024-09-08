@@ -24,13 +24,8 @@ namespace Querier.SqlQuery.Models
                 tableTz.AddToken("as").AddToken("@as");
             }
 
-            result.Sql = tableTz.Build(" ");
-            result.NameParameters = result.NameParameters.Select((e, i) =>
-            {
-                result.Sql = result.Sql.ReplaceExact(e.Key, $"@name{i}");
-                return new KeyValuePair<string, string>($"@name{i}", e.Value);
-            }).ToDictionary();
-            return result;
+            result.Sql = tableTz.Build();
+            return result.Enumerate();
         }
     }
 }

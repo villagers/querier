@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Tokenizers;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Tokenizers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,6 @@ namespace Querier.SqlQuery.Models
     {
         public required SqlColumnAggregation SqlColumnAggregation {  get; set; }
 
-        public override SqlQueryResult Compile() => SqlColumnAggregation.Compile();
+        public override SqlQueryResult Compile() => SqlColumnAggregation.Compile().Enumerate();
     }
 }

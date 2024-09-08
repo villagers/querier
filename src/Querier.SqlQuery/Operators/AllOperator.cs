@@ -16,7 +16,7 @@ namespace Querier.SqlQuery.Operators
         public required string Operator { get; set; }
         public required TQuery Query { get; set; }
 
-        public override SqlOperatorResult Compile()
+        public override SqlQueryResult Compile()
         {
 
             var column = Column.Compile();
@@ -31,26 +31,13 @@ namespace Querier.SqlQuery.Operators
             var compiled = Query.Compile();
             var queryTz = new SqlTokenizer().AddToken(sqlTz).AddToken($"({compiled.Sql})").Build();
 
-            var result = new SqlOperatorResult()
+            var result = new SqlQueryResult()
             {
                 Sql = queryTz,
                 NameParameters = compiled.NameParameters ?? new Dictionary<string, string>(),
                 SqlParameters = compiled?.SqlParameters ?? new Dictionary<string, object>()
             };
-
-
-            column.NameParameters = column.NameParameters.Select((e, i) =>
-            {
-                result.Sql = result.Sql.ReplaceExact(e.Key, $"@name{i}");
-                return new KeyValuePair<string, string>($"@name{i}", e.Value);
-            }).ToDictionary();
-            result.NameParameters = result.NameParameters.Select((e, i) =>
-            {
-                result.Sql = result.Sql.ReplaceExact(e.Key, $"@name{i}");
-                return new KeyValuePair<string, string>($"@name{i}", e.Value);
-            }).ToDictionary();
-            result.NameParameters = result.NameParameters.Merge("@name", column.NameParameters);
-
+            result.NameParameters = result.NameParameters.Merge(column.NameParameters);
             return result;
         }
     }

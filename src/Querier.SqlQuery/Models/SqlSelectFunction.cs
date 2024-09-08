@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Functions;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Tokenizers;
 using System;
 using System.Collections;
@@ -21,7 +22,7 @@ namespace Querier.SqlQuery.Models
             var compliledFunction = Function.Compile();
             result.NameParameters = compliledFunction.NameParameters;
             result.Sql = compliledFunction.Sql;
-            return result;
+            return result.Enumerate();
         }
     }
 }

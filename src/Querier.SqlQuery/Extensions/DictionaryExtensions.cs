@@ -8,23 +8,23 @@ namespace Querier.SqlQuery.Extensions
 {
     public static class DictionaryExtensions
     {
-
-        public static Dictionary<string, string> Merge(this Dictionary<string, string> dictionary, string suffix, Dictionary<string, string> dictionaryToMerge)
+        public static Dictionary<string, TValue> Merge<TValue>(this Dictionary<string, TValue> dictionary, Dictionary<string, TValue> dictionaryToMerge, string prefix = "@name")
         {
             var index = 0;
-
-            var result = new Dictionary<string, string>();
+            var result = new Dictionary<string, TValue>();
 
             foreach (var item in dictionary)
             {
-                result.Add($"{suffix}{index++}", item.Value);
+                result.Add($"{prefix}{index++}", item.Value);
             }
 
-            foreach (var item in dictionaryToMerge)
+            if (dictionaryToMerge != null)
             {
-                result.Add($"{suffix}{index++}", item.Value);
+                foreach (var item in dictionaryToMerge)
+                {
+                    result.Add($"{prefix}{index++}", item.Value);
+                }
             }
-
 
             return result;
         }

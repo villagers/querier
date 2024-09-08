@@ -14,6 +14,7 @@ namespace Querier.SqlQuery.Models
     {
         public required string Column {  get; set; }
         public string? ColumnAs { get; set; }
+        public Func<Dictionary<string, object>, object>? ColumnAsFunc { get; set; }
 
         public virtual SqlQueryResult Compile()
         {
@@ -36,14 +37,8 @@ namespace Querier.SqlQuery.Models
                 selectTz.AddToken("as").AddToken("@as");
             }
 
-            result.Sql = selectTz.Build(" ");
-            result.NameParameters = result.NameParameters.Select((e, i) =>
-            {
-                result.Sql = result.Sql.ReplaceExact(e.Key, $"@name{i}");
-                return new KeyValuePair<string, string>($"@name{i}", e.Value);
-            }).ToDictionary();
-
-            return result;
+            result.Sql = selectTz.Build();
+            return result.Enumerate();
         }
     }
 }
