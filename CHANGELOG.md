@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/villagers/querier/compare/v1.6.2...v1.7.0) (2024-09-08)
+
+
+### Features
+
+* add default `Measure` method point to `MeasureSum` ([aba13d3](https://github.com/villagers/querier/commit/aba13d3764eaedf991fac7885acd4f2b0a2dad34))
+
 ## [1.6.2](https://github.com/villagers/querier/compare/v1.6.1...v1.6.2) (2024-09-06)
 
 
