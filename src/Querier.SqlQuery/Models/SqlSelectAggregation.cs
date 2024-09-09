@@ -1,4 +1,5 @@
 ﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Tokenizers;
 using System;
 using System.Collections.Generic;
@@ -8,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlSelectAggregation : SqlSelect
+    public class SqlSelectAggregation : ISqlSelect
     {
         public required SqlColumnAggregation SqlColumnAggregation {  get; set; }
 
-        public override SqlQueryResult Compile() => SqlColumnAggregation.Compile().Enumerate();
+        public SqlQueryResult Compile() => SqlColumnAggregation.Compile().Enumerate();
     }
 }

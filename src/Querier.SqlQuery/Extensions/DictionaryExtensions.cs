@@ -28,5 +28,24 @@ namespace Querier.SqlQuery.Extensions
 
             return result;
         }
+
+        public static Dictionary<string, TValue> CopyTo<TValue>(this Dictionary<string, TValue> dictionary, Dictionary<string, TValue> dictionaryToCopy, string prefix = "@name")
+        {
+            var index = dictionaryToCopy.Count;
+
+            foreach (var item in dictionary)
+            {
+                dictionaryToCopy.Add($"{prefix}{index++}", item.Value);
+            }
+
+            return dictionary;
+        }
+
+        public static void RenameKey<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey fromKey, TKey toKey)
+        {
+            TValue value = dictionary[fromKey];
+            dictionary.Remove(fromKey);
+            dictionary[toKey] = value;
+        }
     }
 }

@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlSelect : ISqlQueryCompile<SqlQueryResult>
+    public class SqlSelect : ISqlSelect
     {
-        public SqlColumn? SqlColumn { get; set; }
+        public required SqlColumn SqlColumn { get; set; }
         public virtual SqlQueryResult Compile() => SqlColumn.Compile().Enumerate();
     }
 }

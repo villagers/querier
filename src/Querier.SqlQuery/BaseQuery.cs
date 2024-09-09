@@ -65,7 +65,6 @@ namespace Querier.SqlQuery
         }
         public TQuery Select(string column, string? columnAs = null)
         {
-            RemoveSelect();
             _whereColumn = new SqlColumn() { Column = column };
 
             _select.Add(new SqlSelect()
@@ -76,7 +75,6 @@ namespace Querier.SqlQuery
         }
         public TQuery Select(string aggregation, string column, string? columnAs = null)
         {
-            RemoveSelect();
             _whereColumn = new SqlColumn() { Column = column };
 
             _select.Add(new SqlSelectAggregation()
@@ -169,18 +167,6 @@ namespace Querier.SqlQuery
         {
             _distinct = true;
             return (TQuery)(object)this;
-        }
-        private void RemoveSelect()
-        {
-            if (_select.Count <= 0) return;
-            if (_whereColumn == null) return;
-            if (_whereColumn.Column != "*") return;
-
-            var select = _select.Where(e => e.SqlColumn.Column == "*").FirstOrDefault();
-            if (select != null)
-            {
-                _select.Remove(select);
-            }
         }
 
         public TQuery WhereOperator(AbstractOperator @operator)

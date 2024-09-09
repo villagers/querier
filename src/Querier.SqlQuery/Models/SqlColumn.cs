@@ -19,25 +19,17 @@ namespace Querier.SqlQuery.Models
         public virtual SqlQueryResult Compile()
         {
             var result = new SqlQueryResult();
-            var selectTz = new SqlTokenizer();
-
-            if (Column == "*")
-            {
-                selectTz.AddToken("*");
-                result.Sql = selectTz.Build(" ");
-                return result;
-            }
 
             result.NameParameters.Add("@column", Column);
-            selectTz.AddToken("@column");
+            result.SqlTokenizer.AddToken("@column");
 
             if (!string.IsNullOrEmpty(ColumnAs))
             {
                 result.NameParameters.Add("@as", ColumnAs);
-                selectTz.AddToken("as").AddToken("@as");
+                result.SqlTokenizer.AddToken("as").AddToken("@as");
             }
 
-            result.Sql = selectTz.Build();
+            result.Sql = result.SqlTokenizer.Build();
             return result.Enumerate();
         }
     }

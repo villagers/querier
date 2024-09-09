@@ -1,5 +1,6 @@
 ﻿using Querier.SqlQuery.Extensions;
 using Querier.SqlQuery.Functions;
+using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Tokenizers;
 using System;
 using System.Collections;
@@ -10,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlSelectFunction : SqlSelect
+    public class SqlSelectFunction : ISqlSelect
     {
         public required IFunction Function { get; set; }
         public string? FunctionAs { get; set; }
 
-        public override SqlQueryResult Compile()
+        public SqlQueryResult Compile()
         {
             var result = new SqlQueryResult();
 

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlCase : SqlSelect, ISqlQueryCompile<SqlQueryResult>
+    public class SqlCase : ISqlSelect
     {
         private readonly List<SqlCaseWhen> _sqlWhen;
         public string? CaseAs { get; set; }
@@ -30,7 +30,7 @@ namespace Querier.SqlQuery.Models
             return this;
         }
 
-        public override SqlQueryResult Compile()
+        public SqlQueryResult Compile()
         {
             var selectTz = new SqlTokenizer();
             var result = new SqlQueryResult();
