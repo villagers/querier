@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/villagers/querier/compare/v1.7.0...v1.7.1) (2024-09-09)
+
+
+### Bug Fixes
+
+* improvements ([bae94f1](https://github.com/villagers/querier/commit/bae94f16406a9f46bbfc79e220685a9005639308))
+
 # [1.7.0](https://github.com/villagers/querier/compare/v1.6.2...v1.7.0) (2024-09-08)
 
 
