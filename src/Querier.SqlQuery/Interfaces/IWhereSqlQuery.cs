@@ -63,12 +63,6 @@ namespace Querier.SqlQuery.Interfaces
         TQuery WhereIn<T>(Func<IFunction, IFunction> function, IEnumerable<T> value);
         TQuery NotIn<T>(IEnumerable<T> value);
         TQuery WhereNotIn<T>(string column, IEnumerable<T> value);
-        TQuery All(string @operator, Func<TQuery, TQuery> query);
-        TQuery WhereAll(string column, string @operator, Func<TQuery, TQuery> query);
-        TQuery Any(string @operator, Func<TQuery, TQuery> query);
-        TQuery WhereAny(string column, string @operator, Func<TQuery, TQuery> query);
-        TQuery WhereExists(Func<TQuery, TQuery> query);
-        TQuery WhereNotExists(Func<TQuery, TQuery> query);
 
         TQuery Or();
         TQuery Or<T>(T value);

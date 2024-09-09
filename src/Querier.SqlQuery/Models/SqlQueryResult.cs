@@ -11,13 +11,13 @@ namespace Querier.SqlQuery.Models
     {
         public string Sql { get; set; } = string.Empty;
         public string CompiledSql { get; set; } = string.Empty;
-        public Tokenizer SqlTokenizer { get; set; }
+        public SqlTokenizer SqlTokenizer { get; set; }
         public Dictionary<string, object> SqlParameters { get; set; }
         public Dictionary<string, string> NameParameters { get; set; }
 
         public SqlQueryResult()
         {
-            SqlTokenizer = new Tokenizer();
+            SqlTokenizer = new SqlTokenizer();
             SqlParameters = new Dictionary<string, object>();
             NameParameters = new Dictionary<string, string>();
         }

@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Functions;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Tokenizers;
 using System;
@@ -9,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlSelectQuery<TQuery> : SqlSelect where TQuery : IBaseQuery<TQuery>
+    public class SqlSelectQuery<TQuery> : ISqlSelect where TQuery : IBaseQuery<TQuery>
     {
         public required TQuery Query { get; set; }
         public string? QueryAs { get; set; }
 
-        public override SqlQueryResult Compile()
+        public SqlQueryResult Compile()
         {
             var result = new SqlQueryResult();
 
@@ -24,7 +25,7 @@ namespace Querier.SqlQuery.Models
             result.SqlParameters = result.SqlParameters;
             result.NameParameters = result.NameParameters;
             result.Sql = queryTz.Build("");
-            return result;
+            return result.Enumerate();
         }
     }
 }

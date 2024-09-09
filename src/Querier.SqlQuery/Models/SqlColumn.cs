@@ -14,36 +14,23 @@ namespace Querier.SqlQuery.Models
     {
         public required string Column {  get; set; }
         public string? ColumnAs { get; set; }
+        public Func<Dictionary<string, object>, object>? ColumnAsFunc { get; set; }
 
         public virtual SqlQueryResult Compile()
         {
             var result = new SqlQueryResult();
-            var selectTz = new SqlTokenizer();
-
-            if (Column == "*")
-            {
-                selectTz.AddToken("*");
-                result.Sql = selectTz.Build(" ");
-                return result;
-            }
 
             result.NameParameters.Add("@column", Column);
-            selectTz.AddToken("@column");
+            result.SqlTokenizer.AddToken("@column");
 
             if (!string.IsNullOrEmpty(ColumnAs))
             {
                 result.NameParameters.Add("@as", ColumnAs);
-                selectTz.AddToken("as").AddToken("@as");
+                result.SqlTokenizer.AddToken("as").AddToken("@as");
             }
 
-            result.Sql = selectTz.Build(" ");
-            result.NameParameters = result.NameParameters.Select((e, i) =>
-            {
-                result.Sql = result.Sql.ReplaceExact(e.Key, $"@name{i}");
-                return new KeyValuePair<string, string>($"@name{i}", e.Value);
-            }).ToDictionary();
-
-            return result;
+            result.Sql = result.SqlTokenizer.Build();
+            return result.Enumerate();
         }
     }
 }

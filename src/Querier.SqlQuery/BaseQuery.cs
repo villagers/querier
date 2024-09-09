@@ -65,7 +65,6 @@ namespace Querier.SqlQuery
         }
         public TQuery Select(string column, string? columnAs = null)
         {
-            RemoveSelect();
             _whereColumn = new SqlColumn() { Column = column };
 
             _select.Add(new SqlSelect()
@@ -76,7 +75,6 @@ namespace Querier.SqlQuery
         }
         public TQuery Select(string aggregation, string column, string? columnAs = null)
         {
-            RemoveSelect();
             _whereColumn = new SqlColumn() { Column = column };
 
             _select.Add(new SqlSelectAggregation()
@@ -112,6 +110,18 @@ namespace Querier.SqlQuery
             {
                 Query = newQuery,
                 QueryAs = queryAs
+            });
+            return (TQuery)(object)this;
+        }
+
+        public TQuery SelectCase(string column, AbstractOperator @operator, string value, string defaulValue)
+        {
+            var sqlCase = new SqlCase() { ElseValue = defaulValue };
+            sqlCase.AddCaseWhen(new SqlCaseWhen() { Operator = @operator, Value = value });
+
+            _select.Add(new SqlSelectCase()
+            {
+                SqlCase = sqlCase
             });
             return (TQuery)(object)this;
         }
@@ -157,18 +167,6 @@ namespace Querier.SqlQuery
         {
             _distinct = true;
             return (TQuery)(object)this;
-        }
-        private void RemoveSelect()
-        {
-            if (_select.Count <= 0) return;
-            if (_whereColumn == null) return;
-            if (_whereColumn.Column != "*") return;
-
-            var select = _select.Where(e => e.SqlColumn.Column == "*").FirstOrDefault();
-            if (select != null)
-            {
-                _select.Remove(select);
-            }
         }
 
         public TQuery WhereOperator(AbstractOperator @operator)
@@ -400,37 +398,6 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "" }.Not());
         }
-
-        public TQuery WhereAll(string column, string @operator, Func<TQuery, TQuery> query)
-        {
-            var newQuery = query.Invoke(New());
-            return WhereOperator(column, new AllOperator<TQuery>() { Column = new SqlColumn() { Column = column }, Query = newQuery, Operator = @operator });
-        }
-        public TQuery All(string @operator, Func<TQuery, TQuery> query)
-        {
-            var newQuery = query.Invoke(New());
-            return WhereOperator(new AllOperator<TQuery>() { Column = _whereColumn, Query = newQuery, Operator = @operator });
-        }
-        public TQuery WhereAny(string column, string @operator, Func<TQuery, TQuery> query)
-        {
-            var newQuery = query.Invoke(New());
-            return WhereOperator(column, new AnyOperator<TQuery>() { Column = new SqlColumn() { Column = column }, Query = newQuery, Operator = @operator });
-        }
-        public TQuery Any(string @operator, Func<TQuery, TQuery> query)
-        {
-            var newQuery = query.Invoke(New());
-            return WhereOperator(new AnyOperator<TQuery>() { Column = _whereColumn, Query = newQuery, Operator = @operator });
-        }
-        public TQuery WhereExists(Func<TQuery, TQuery> query)
-        {
-            var newQuery = query.Invoke(New());
-            return WhereOperator("", new ExistsOperator<TQuery>() { Query = newQuery });
-        }
-        public TQuery WhereNotExists(Func<TQuery, TQuery> query)
-        {
-            var newQuery = query.Invoke(New());
-            return WhereOperator("", new ExistsOperator<TQuery>() { Query = newQuery }.Not());
-        }
         public TQuery WhereNull(string column)
         {
             return WhereOperator(column, new IsNullOperator() { Column = new SqlColumn() { Column = column } });
@@ -558,8 +525,5 @@ namespace Querier.SqlQuery
 
             return result;
         }
-
-
-
     }
 }

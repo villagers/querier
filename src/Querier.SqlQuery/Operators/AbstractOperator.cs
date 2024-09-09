@@ -23,7 +23,7 @@ namespace Querier.SqlQuery.Operators
         public SqlTokenizer Tokenizer { get; set; }
         
 
-        public abstract SqlOperatorResult Compile();
+        public abstract SqlQueryResult Compile();
 
         public AbstractOperator And(bool flag = true)
         {

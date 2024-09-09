@@ -31,13 +31,7 @@ namespace Querier.SqlQuery.Models
             }
 
             result.Sql = selectTz.Build();
-            result.NameParameters = result.NameParameters.Select((e, i) =>
-            {
-                result.Sql = result.Sql.ReplaceExact(e.Key, $"@name{i}");
-                return new KeyValuePair<string, string>($"@name{i}", e.Value);
-            }).ToDictionary();
-
-            return result;
+            return result.Enumerate();
         }
     }
 }
