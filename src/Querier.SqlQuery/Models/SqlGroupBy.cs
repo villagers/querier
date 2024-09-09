@@ -21,14 +21,8 @@ namespace Querier.SqlQuery.Models
             selectTz.AddToken("@column");
             result.NameParameters.Add("@column", Column);
 
-            result.Sql = selectTz.Build(" ");
-            result.NameParameters = result.NameParameters.Select((e, i) =>
-            {
-                result.Sql = result.Sql.ReplaceExact(e.Key, $"@name{i}");
-                return new KeyValuePair<string, string>($"@name{i}", e.Value);
-            }).ToDictionary();
-
-            return result;
+            result.Sql = selectTz.Build();
+            return result.Enumerate();
         }
     }
 }

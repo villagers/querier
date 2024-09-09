@@ -1,5 +1,4 @@
 ﻿using Querier.SqlQuery.Extensions;
-using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -9,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlColumnFunction : ISqlColumn
+    public class SqlSelectCase : ISqlSelect
     {
-        public required IFunction Function { get; set; }
-        public SqlQueryResult Compile() => Function.Compile().Enumerate();
+        public required SqlCase SqlCase { get; set; }
+        public SqlQueryResult Compile() => SqlCase.Compile().Enumerate();
     }
 }

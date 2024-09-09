@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Functions;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using System;
@@ -9,19 +10,11 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlWhereFunction : SqlWhere, ISqlQueryCompile<SqlOperatorResult>
+    public class SqlWhereFunction : SqlWhere, ISqlQueryCompile<SqlQueryResult>
     {
         public required IFunction Function;
         public SqlWhereFunction() : base() { }
 
-        public override SqlOperatorResult Compile()
-        {
-            var result = Function.Compile();
-            return new SqlOperatorResult()
-            {
-                Sql = result.Sql,
-                NameParameters = result.NameParameters
-            };
-        }
+        public override SqlQueryResult Compile() => Function.Compile().Enumerate();
     }
 }

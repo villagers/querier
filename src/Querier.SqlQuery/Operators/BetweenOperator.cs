@@ -15,7 +15,7 @@ namespace Querier.SqlQuery.Operators
         public required object Value { get; set; }
         public required object SecondValue { get; set; }
 
-        public override SqlOperatorResult Compile()
+        public override SqlQueryResult Compile()
         {
             var column = Column.Compile();
 
@@ -29,7 +29,7 @@ namespace Querier.SqlQuery.Operators
                 .AddToken("@secondValue")
                 .Build();
 
-            var result = new SqlOperatorResult()
+            var result = new SqlQueryResult()
             {
                 Sql = sqlTz,
                 NameParameters = column.NameParameters,
@@ -40,12 +40,7 @@ namespace Querier.SqlQuery.Operators
                 }
             };
 
-            result.NameParameters = result.NameParameters.Select((e, i) =>
-            {
-                result.Sql = result.Sql.ReplaceExact(e.Key, $"@name{i}");
-                return new KeyValuePair<string, string>($"@name{i}", e.Value);
-            }).ToDictionary();
-            return result;
+            return result.Enumerate();
         }
     }
 }

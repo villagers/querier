@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Functions;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Tokenizers;
 using System;
 using System.Collections.Generic;
@@ -12,15 +13,6 @@ namespace Querier.SqlQuery.Models
     {
         public required IFunction Function { get; set; }
 
-        public override SqlQueryResult Compile()
-        {
-            var compiledFunction = Function.Compile();
-
-            return new SqlQueryResult()
-            {
-                Sql = compiledFunction.Sql,
-                NameParameters = compiledFunction.NameParameters
-            };
-        }
+        public override SqlQueryResult Compile() => Function.Compile().Enumerate();
     }
 }

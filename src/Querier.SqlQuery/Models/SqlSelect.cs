@@ -1,4 +1,5 @@
-﻿using Querier.SqlQuery.Interfaces;
+﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Tokenizers;
 using System;
 using System.Collections.Generic;
@@ -8,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlSelect : ISqlQueryCompile<SqlQueryResult>
+    public class SqlSelect : ISqlSelect
     {
-        public SqlColumn? SqlColumn { get; set; }
-        public virtual SqlQueryResult Compile() => SqlColumn.Compile();
+        public required SqlColumn SqlColumn { get; set; }
+        public virtual SqlQueryResult Compile() => SqlColumn.Compile().Enumerate();
     }
 }

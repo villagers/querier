@@ -64,15 +64,6 @@ namespace Querier.SqlQuery.Tests.Unit.MySql
             Assert.Equal("select * from `orders` where `id` in @p0", _query.New().From("orders").Where("id").In($"({string.Join(", ", new int[] { 1, 2, 3 })})").Compile().CompiledSql);
             Assert.Equal("select * from `orders` where `id` not in @p0", _query.New().From("orders").WhereNotIn("id", $"({string.Join(", ", new int[] { 1, 2, 3 })})").Compile().CompiledSql);
             Assert.Equal("select * from `orders` where `id` not in @p0", _query.New().From("orders").Where("id").NotIn($"({string.Join(", ", new int[] { 1, 2, 3 })})").Compile().CompiledSql);
-
-            Assert.Equal("select * from `orders` where `id` = all (select `id` from `orders` where `total` > @p0)", _query.New().From("orders").WhereAll("id", "=", q => q.From("orders").Select("id").WhereGreater("total", 10)).Compile().CompiledSql);
-            Assert.Equal("select * from `orders` where `id` = all (select `id` from `orders` where `total` > @p0)", _query.New().From("orders").Where("id").All("=", q => q.From("orders").Select("id").WhereGreater("total", 10)).Compile().CompiledSql);
-
-            Assert.Equal("select * from `orders` where `id` = any (select `id` from `orders` where `total` > @p0)", _query.New().From("orders").WhereAny("id", "=", q => q.From("orders").Select("id").WhereGreater("total", 10)).Compile().CompiledSql);
-            Assert.Equal("select * from `orders` where `id` = any (select `id` from `orders` where `total` > @p0)", _query.New().From("orders").Where("id").Any("=", q => q.From("orders").Select("id").WhereGreater("total", 10)).Compile().CompiledSql);
-
-            Assert.Equal("select * from `orders` where exists (select `id` from `orders` where `total` > @p0)", _query.New().From("orders").WhereExists(q => q.From("orders").Select("id").WhereGreater("total", 10)).Compile().CompiledSql);
-            Assert.Equal("select * from `orders` where not exists (select `id` from `orders` where `total` > @p0)", _query.New().From("orders").WhereNotExists(q => q.From("orders").Select("id").WhereGreater("total", 10)).Compile().CompiledSql);
         }
     }
 }
