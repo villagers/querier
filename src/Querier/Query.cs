@@ -41,86 +41,61 @@ namespace Querier
             return this;
         }
 
-        public IQuery Measure(string property, string? propertyAs = null, string? orderBy = null)
+        public IQuery Measure(string property, string? propertyAs = null)
         {
-            return MeasureSum(property, propertyAs, orderBy);
+            return MeasureSum(property, propertyAs);
         }
 
-        public IQuery MeasureCount(string property, string? propertyAs = null, string? orderBy = null)
+        public IQuery MeasureCount(string property, string? propertyAs = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
             _query.SelectCount(propertyName, propertyAs ?? property);
 
-            if (!string.IsNullOrWhiteSpace(orderBy))
-            {
-                _query.OrderBy(propertyName, orderBy);
-            }
-
-            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs, OrderBy = orderBy };
+            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
             _queryMeasures.Add(measure);
 
             return this;
         }
 
-        public IQuery MeasureSum(string property, string? propertyAs = null, string? orderBy = null)
+        public IQuery MeasureSum(string property, string? propertyAs = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
             _query.SelectSum(propertyName, propertyAs ?? property);
 
-            if (!string.IsNullOrWhiteSpace(orderBy))
-            {
-                _query.OrderBy(propertyName, orderBy);
-            }
-
-            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs, OrderBy = orderBy };
+            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
             _queryMeasures.Add(measure);
 
             return this;
         }
 
-        public IQuery MeasureAvg(string property, string? propertyAs = null, string? orderBy = null)
+        public IQuery MeasureAvg(string property, string? propertyAs = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
             _query.SelectAvg(propertyName, propertyAs ?? property);
 
-            if (!string.IsNullOrWhiteSpace(orderBy))
-            {
-                _query.OrderBy(propertyName, orderBy);
-            }
-
-            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs, OrderBy = orderBy };
+            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
             _queryMeasures.Add(measure);
 
             return this;
         }
 
-        public IQuery MeasureMin(string property, string? propertyAs = null, string? orderBy = null)
+        public IQuery MeasureMin(string property, string? propertyAs = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
             _query.SelectMin(propertyName, propertyAs ?? property);
 
-            if (!string.IsNullOrWhiteSpace(orderBy))
-            {
-                _query.OrderBy(propertyName, orderBy);
-            }
-
-            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs, OrderBy = orderBy };
+            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
             _queryMeasures.Add(measure);
 
             return this;
         }
 
-        public IQuery MeasureMax(string property, string? propertyAs = null, string? orderBy = null)
+        public IQuery MeasureMax(string property, string? propertyAs = null)
         {
             var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
             _query.SelectMax(propertyName, propertyAs ?? property);
 
-            if (!string.IsNullOrWhiteSpace(orderBy))
-            {
-                _query.OrderBy(propertyName, orderBy);
-            }
-
-            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs, OrderBy = orderBy };
+            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
             _queryMeasures.Add(measure);
 
             return this;

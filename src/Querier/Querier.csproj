@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Authors>Villagers;Kostas Makris</Authors>
+    <Company>Villagers</Company>
     <Version>1.7.1</Version>
     <PackageVersion>1.7.1</PackageVersion>
     <TargetFramework>net8.0</TargetFramework>
@@ -10,6 +12,10 @@
     <Title>Querier</Title>
     <PackageTags>query;measures;dimensions;analytics;</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/villagers/querier</PackageProjectUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/villagers/querier</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="" />
