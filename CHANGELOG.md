@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/villagers/querier/compare/v1.7.1...v1.7.2) (2024-09-10)
+
+
+### Bug Fixes
+
+* remove orderby ([420c4bb](https://github.com/villagers/querier/commit/420c4bbd2ef27f1a8ad53cf394ad9e2d29cd6747))
+
 ## [1.7.1](https://github.com/villagers/querier/compare/v1.7.0...v1.7.1) (2024-09-09)
 
 
