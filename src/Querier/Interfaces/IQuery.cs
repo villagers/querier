@@ -15,12 +15,12 @@ namespace Querier.Interfaces
         IQuery New();
         IQuery From(string table);
 
-        IQuery Measure(string property, string? propertyAs = null, string? orderBy = null);
-        IQuery MeasureCount(string property, string? propertyAs = null, string? orderBy = null);
-        IQuery MeasureSum(string property, string? propertyAs = null, string? orderBy = null);
-        IQuery MeasureAvg(string property, string? propertyAs = null, string? orderBy = null);
-        IQuery MeasureMin(string property, string? propertyAs = null, string? orderBy = null);
-        IQuery MeasureMax(string property, string? propertyAs = null, string? orderBy = null);
+        IQuery Measure(string property, string? propertyAs = null);
+        IQuery MeasureCount(string property, string? propertyAs = null);
+        IQuery MeasureSum(string property, string? propertyAs = null);
+        IQuery MeasureAvg(string property, string? propertyAs = null);
+        IQuery MeasureMin(string property, string? propertyAs = null);
+        IQuery MeasureMax(string property, string? propertyAs = null);
 
         IQuery Dimension(string property, string? propertyAs = null);
 
