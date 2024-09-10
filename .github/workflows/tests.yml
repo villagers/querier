@@ -20,4 +20,4 @@ jobs:
           mysql -u root -p'root' -e 'SHOW TABLES;' Chinook
 
       - name: Test
-        run: dotnet test --verbosity normal
+        run: dotnet test tests/Querier.SqlQuery.MySql.Tests/Querier.SqlQuery.MySql.Tests.csproj --verbosity normal

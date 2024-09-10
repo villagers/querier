@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Querier.SqlQuery.Tests.Unit.MySql
+namespace Querier.SqlQuery.MySql.Tests.Unit
 {
     public class SqlGroupByTests
     {
