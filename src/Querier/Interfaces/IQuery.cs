@@ -32,6 +32,8 @@ namespace Querier.Interfaces
 
         IQuery Filter(Func<IQueryFilter, IQueryFilter> filter);
 
+        IQuery Union(Func<IQuery, IQuery> query);
+
         List<Dictionary<string, string>> GetMeasures<TType>();
         List<Dictionary<string, string>> GetMeasures(string queryKey);
         List<Dictionary<string, string>> GetDimensions<TType>();

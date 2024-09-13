@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface IBaseQuery<TQuery> : IFromSqlQuery<TQuery>, ISelectSqlQuery<TQuery>, IWhereSqlQuery<TQuery>, IGroupSqlQuery<TQuery>, IOrderSqlQuery<TQuery> where TQuery : IBaseQuery<TQuery>
+    public interface IBaseQuery<TQuery> : IFromSqlQuery<TQuery>, ISelectSqlQuery<TQuery>, IWhereSqlQuery<TQuery>, IGroupSqlQuery<TQuery>, IUnionSqlQuery<TQuery>, IOrderSqlQuery<TQuery> where TQuery : IBaseQuery<TQuery>
     {
         TQuery New();
         SqlQueryResult Compile();

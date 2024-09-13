@@ -2,6 +2,7 @@
 using Dapper;
 using Querier.Interfaces;
 using Querier.Attributes;
+using Querier.SqlQuery.Extensions;
 
 namespace Querier
 {
@@ -10,6 +11,8 @@ namespace Querier
         private readonly List<QueryMeasure> _queryMeasures;
         private readonly List<QueryDimension> _queryDimension;
         private QueryTimeDimension _queryTimeDimension;
+
+        private readonly List<IQuery> _combineQueries;
 
         private readonly IQueryFilter _queryFilter;
 
@@ -25,6 +28,8 @@ namespace Querier
             _queryMeasures = new List<QueryMeasure>();
             _queryDimension = new List<QueryDimension>();
             _connection = connection;
+
+            _combineQueries = new List<IQuery>();
 
             _queryFilter = new QueryFilter<TQuery>(query);
             _propertyKeyMapper = propertyKeyMapper;
@@ -174,6 +179,16 @@ namespace Querier
         public IQuery Limit(int limit)
         {
             _query.Limit(limit);
+            return this;
+        }
+
+        public IQuery Union(Func<IQuery, IQuery> query)
+        {
+            var newT = _query.New();
+            var newQ = new Query<TQuery>(newT, _connection, _propertyKeyMapper);
+
+            var newQuery = query.Invoke(newQ);
+            _query.UnionAll(newT);
             return this;
         }
 

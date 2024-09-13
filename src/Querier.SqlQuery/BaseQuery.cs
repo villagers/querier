@@ -432,6 +432,7 @@ namespace Querier.SqlQuery
             var clonedComparisonOperator = clonedComparison.Operator.And() as AbstractComparisonOperator<T>;
             clonedComparisonOperator.Value = value;
 
+            And();
             return WhereOperator(clonedComparisonOperator);
         }
         public TQuery And<T>(T value, T? secondValue)
@@ -443,6 +444,7 @@ namespace Querier.SqlQuery
             var clonedComparisonOperator = clonedComparison.Operator.And() as AbstractComparisonOperator<T>;
             clonedComparisonOperator.Value = value;
 
+            And();
             return WhereOperator(clonedComparisonOperator);
         }
 
@@ -461,6 +463,7 @@ namespace Querier.SqlQuery
             var clonedComparisonOperator = clonedComparison.Operator.Or() as AbstractComparisonOperator<T>;
             clonedComparisonOperator.Value = value;
 
+            Or();
             return WhereOperator(clonedComparisonOperator);
         }
         public TQuery Or<T>(T value, T? secondValue)
@@ -472,6 +475,7 @@ namespace Querier.SqlQuery
             var clonedComparisonOperator = clonedComparison.Operator.Or() as AbstractComparisonOperator<T>;
             clonedComparisonOperator.Value = value;
 
+            Or();
             return WhereOperator(clonedComparisonOperator);
         }
 
@@ -491,6 +495,18 @@ namespace Querier.SqlQuery
                 Column = string.Empty,
                 Function = function.Invoke(_functionFactory.New())
             });
+            return (TQuery)(object)this;
+        }
+
+        public TQuery Union(TQuery query)
+        {
+            _union.Add(new SqlUnion<TQuery>() { All = false, Query = query });
+            return (TQuery)(object)this;
+        }
+
+        public TQuery UnionAll(TQuery query)
+        {
+            _union.Add(new SqlUnion<TQuery>() { All = true, Query = query });
             return (TQuery)(object)this;
         }
 
