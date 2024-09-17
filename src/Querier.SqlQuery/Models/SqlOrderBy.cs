@@ -14,13 +14,16 @@ namespace Querier.SqlQuery.Models
         public required string Column { get; set; }
         public required string Order { get; set; }
 
-        public virtual SqlQueryResult Compile()
+        public virtual SqlQueryResult Compile(ISqlTable table)
         {
             var result = new SqlQueryResult();
             var selectTz = new SqlTokenizer();
 
-            selectTz.AddToken("@column").AddToken(Order);
+            result.NameParameters.Add("@table", table.TableOrAlias);
             result.NameParameters.Add("@column", Column);
+
+            selectTz.AddToken(e => e.AddToken("@table").AddToken(".").AddToken("@column"), "").AddToken(Order);
+            
 
             result.Sql = selectTz.Build();
             return result.Enumerate();

@@ -9,6 +9,6 @@ namespace Querier.SqlQuery.Interfaces
 {
     public interface ISqlQueryCompile<TResult> where TResult : class
     {
-        TResult Compile();
+        TResult Compile(ISqlTable table);
     }
 }

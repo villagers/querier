@@ -16,13 +16,15 @@ namespace Querier.SqlQuery
 
         protected readonly IFunction _functionFactory;
 
-        public SqlTable<TQuery> _table;
+        public ISqlTable _table;
         protected readonly List<ISqlSelect> _select;
+        protected readonly List<SqlJoin> _join;
         protected readonly List<SqlWhere> _where;
-        protected readonly List<SqlGroupBy> _groupBy;
+        protected readonly List<ISqlGroupBy> _groupBy;
         protected readonly List<SqlUnion<TQuery>> _union;
         protected readonly List<SqlOrderBy> _orderBy;
 
+        protected readonly Dictionary<string, string> _alias;
 
 
         protected bool _whereAnd = false;
@@ -43,12 +45,13 @@ namespace Querier.SqlQuery
         {
             _functionFactory = functionFactory;
 
-            _table = new SqlTable<TQuery>();
             _select = new List<ISqlSelect>();
+            _join = new List<SqlJoin>();
             _where = new List<SqlWhere>();
-            _groupBy = new List<SqlGroupBy>();
+            _groupBy = new List<ISqlGroupBy>();
             _union = new List<SqlUnion<TQuery>>();
             _orderBy = new List<SqlOrderBy>();
+            _alias = new Dictionary<string, string>();
 
             SqlParameters = new Dictionary<string, object>();
             NameParameters = new Dictionary<string, string>();
@@ -73,6 +76,7 @@ namespace Querier.SqlQuery
         {
             return CreateSelect()
                 .Merge(CreateTable())
+                .Merge(CreateJoin())
                 .Merge(CreateWhere())
                 .Merge(CreateGroupBy())
                 .Merge(CreateUnion())
@@ -113,7 +117,7 @@ namespace Querier.SqlQuery
             {
                 foreach (var select in _select)
                 {
-                    var selectCompiled = select.Compile();
+                    var selectCompiled = select.Compile(_table);
                     result = result.Merge(selectCompiled);
                     tz.AddToken(selectCompiled.Sql);
                 }
@@ -128,13 +132,35 @@ namespace Querier.SqlQuery
             result.Sql = selectTz.Build(" ");
             return result.Enumerate();
         }
+
+        public virtual SqlQueryResult CreateJoin()
+        {
+            var result = new SqlQueryResult();
+
+            if (_join.Count <= 0) return result;
+
+            var tz = new SqlTokenizer();
+            foreach (var join in _join)
+            {
+                var compiled = join.Compile(_table);
+                result = result.Merge(compiled);
+                tz.AddToken(compiled.Sql);
+            }
+
+            result.NameParameters.CopyTo(NameParameters);
+            result.SqlParameters.CopyTo(SqlParameters);
+
+            result.SqlTokenizer = tz;
+            result.Sql = tz.Build();
+            return result.Enumerate();
+        }
         public virtual SqlQueryResult CreateTable()
         {
             var result = new SqlQueryResult();
 
             var tableTz = new SqlTokenizer().AddToken("from");
 
-            var tableCompiled = _table.Compile();
+            var tableCompiled = _table.Compile(_table);
             result = result.Merge(tableCompiled);
             tableTz.AddToken(tableCompiled.Sql);
 
@@ -155,7 +181,7 @@ namespace Querier.SqlQuery
 
             foreach (var where in _where)
             {
-                var whereCompiled = where.Compile();
+                var whereCompiled = where.Compile(_table);
                 result = result.Merge(whereCompiled);
                 whereTz.AddToken(whereCompiled.Sql);
             }
@@ -179,7 +205,7 @@ namespace Querier.SqlQuery
             {
                 foreach (var group in _groupBy)
                 {
-                    var groupByCompiled = group.Compile();
+                    var groupByCompiled = group.Compile(_table);
                     result = result.Merge(groupByCompiled);
                     e.AddToken(groupByCompiled.Sql);
                 }
@@ -202,7 +228,7 @@ namespace Querier.SqlQuery
             var _unionTz = new SqlTokenizer();
             foreach (var union in _union)
             {
-                var unionCompiled = union.Compile();
+                var unionCompiled = union.Compile(_table);
                 result = result.Merge(unionCompiled);
                 _unionTz.AddToken(unionCompiled.Sql);
             }
@@ -226,7 +252,7 @@ namespace Querier.SqlQuery
             {
                 foreach (var order in _orderBy)
                 {
-                    var orderByCompiled = order.Compile();
+                    var orderByCompiled = order.Compile(_table);
                     result = result.Merge(orderByCompiled);
                     e.AddToken(orderByCompiled.Sql);
                 }

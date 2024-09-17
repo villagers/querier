@@ -10,6 +10,5 @@ namespace Querier.SqlQuery
 {
     public interface IMySqlQuery : IBaseQuery<IMySqlQuery>
     {
-        IMySqlQuery TestMethod();
     }
 }

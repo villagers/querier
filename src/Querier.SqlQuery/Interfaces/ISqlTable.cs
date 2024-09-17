@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface ISqlColumn : ISqlQueryCompile<SqlQueryResult>
+    public interface ISqlTable : ISqlQueryCompile<SqlQueryResult>
     {
+        string TableOrAlias { get; }
     }
 }

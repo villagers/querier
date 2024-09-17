@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface IFromSqlQuery<TQuery> 
+    public interface IFromSqlQuery<TQuery>
     {
         TQuery From(string table, string? tableAs = null);
-        TQuery From(Func<TQuery, TQuery> query, string? tableAs = null);
+        TQuery From(Func<TQuery, TQuery> query, string tableAs);
     }
 }

@@ -13,13 +13,13 @@ namespace Querier.SqlQuery.Models
     public class SqlCaseWhen : ISqlQueryCompile<SqlQueryResult>
     {
         public required AbstractOperator Operator { get; set; }
-        public required string Value { get; set; }
+        public required object Value { get; set; }
 
-        public SqlQueryResult Compile()
+        public SqlQueryResult Compile(ISqlTable table)
         {
             var selectTz = new SqlTokenizer();
 
-            var compiledOperator = Operator.Compile();
+            var compiledOperator = Operator.Compile(table);
             compiledOperator.SqlParameters.Add("@caseValue", Value);
 
             selectTz

@@ -26,6 +26,6 @@ namespace Querier.SqlQuery
             return new SqlWhere((AbstractOperator)Operator.Clone());
         }
 
-        public virtual SqlQueryResult Compile() => Operator.Compile().Enumerate();
+        public virtual SqlQueryResult Compile(ISqlTable table) => Operator.Compile(table).Enumerate();
     }
 }

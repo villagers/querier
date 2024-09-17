@@ -11,6 +11,6 @@ namespace Querier.SqlQuery.Models
     public class SqlSelectCase : ISqlSelect
     {
         public required SqlCase SqlCase { get; set; }
-        public SqlQueryResult Compile() => SqlCase.Compile().Enumerate();
+        public SqlQueryResult Compile(ISqlTable table) => SqlCase.Compile(table).Enumerate();
     }
 }

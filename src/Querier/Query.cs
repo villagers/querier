@@ -215,6 +215,8 @@ namespace Querier
 
             var complie = _query.Compile();
 
+            var res = _connection.Connection.Query("select case when `s`.`Name` = 'Base' then 'actual' when `s`.`Name` = 'Good' then 'actual' when `s`.`Name` = 'Poor' then 'actual' else `s`.`Name` end as `SName`, `cf`.`Year`, `cf`.`Year` as `Label`, sum(`cf`.`Value`) FROM `CacheFinancial` as `cf` join `Scenario` as `s` on `cf`.`ScenarioId` = `s`.`Id` WHERE `cf`.`ReitId` = 40 AND `cf`.`ScenarioId` = 306 AND `cf`.`Type` = 0 AND `cf`.`Year` < 2024 GROUP BY `cf`.`Year`, `Label`, `SName` union all select `s`.`Name` as `SName`, `cf`.`Year`, `cf`.`Year` as `Label`, sum(`cf`.`Value`) FROM `CacheFinancial` as `cf` join `Scenario` as `s` on `cf`.`ScenarioId` = `s`.`Id` WHERE `cf`.`ReitId` = 40 AND `cf`.`ScenarioId` IN (306,307,308) AND `cf`.`Type` = 0 AND `cf`.`Year` >= 2024 AND `cf`.`Year` <= 2028 GROUP BY `cf`.`Year`, `Label`, `SName` ORDER BY `Year` ASC;");
+
             result.Data = _connection.Connection
                 .Query(complie.CompiledSql, complie.SqlParameters)
                 .Cast<IDictionary<string, object>>()

@@ -9,16 +9,18 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlGroupBy : ISqlQueryCompile<SqlQueryResult>
+    public class SqlGroupBy : ISqlGroupBy
     {
         public virtual required string Column { get; set; }
 
-        public virtual SqlQueryResult Compile()
+        public virtual SqlQueryResult Compile(ISqlTable table)
         {
             var result = new SqlQueryResult();
             var selectTz = new SqlTokenizer();
 
-            selectTz.AddToken("@column");
+            selectTz.AddToken(e => e.AddToken("@table").AddToken(".").AddToken("@column"), "");
+
+            result.NameParameters.Add("@table", table.TableOrAlias);
             result.NameParameters.Add("@column", Column);
 
             result.Sql = selectTz.Build();

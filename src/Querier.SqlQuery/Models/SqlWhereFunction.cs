@@ -15,6 +15,6 @@ namespace Querier.SqlQuery.Models
         public required IFunction Function;
         public SqlWhereFunction() : base() { }
 
-        public override SqlQueryResult Compile() => Function.Compile().Enumerate();
+        public override SqlQueryResult Compile(ISqlTable table) => Function.Compile(table).Enumerate();
     }
 }

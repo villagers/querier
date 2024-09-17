@@ -1,5 +1,6 @@
 ﻿using Querier.SqlQuery.Extensions;
 using Querier.SqlQuery.Functions;
+using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
 using System;
@@ -14,9 +15,9 @@ namespace Querier.SqlQuery.Operators
     {
         public required object Value { get; set; }
 
-        public override SqlQueryResult Compile()
+        public override SqlQueryResult Compile(ISqlTable table)
         {
-            var column = Column.Compile();
+            var column = Column.Compile(table);
 
             var sqlTz = new SqlTokenizer()
                 .AddToken(AndOrOperator)

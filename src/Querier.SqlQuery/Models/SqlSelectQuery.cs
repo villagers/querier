@@ -15,7 +15,7 @@ namespace Querier.SqlQuery.Models
         public required TQuery Query { get; set; }
         public string? QueryAs { get; set; }
 
-        public SqlQueryResult Compile()
+        public SqlQueryResult Compile(ISqlTable table)
         {
             var result = new SqlQueryResult();
 

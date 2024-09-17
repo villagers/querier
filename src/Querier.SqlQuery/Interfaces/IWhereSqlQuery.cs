@@ -64,6 +64,8 @@ namespace Querier.SqlQuery.Interfaces
         TQuery NotIn<T>(IEnumerable<T> value);
         TQuery WhereNotIn<T>(string column, IEnumerable<T> value);
 
+        TQuery WhereRaw(string sql);
+
         TQuery Or();
         TQuery Or<T>(T value);
         TQuery Or<T>(T value, T? secondValue);

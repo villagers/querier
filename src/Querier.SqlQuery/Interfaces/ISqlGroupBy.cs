@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface ISqlColumn : ISqlQueryCompile<SqlQueryResult>
+    public interface ISqlGroupBy : ISqlQueryCompile<SqlQueryResult>
     {
     }
 }

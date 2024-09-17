@@ -4,37 +4,27 @@ using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Operators
 {
-    public class GreaterThanOperator<T> : AbstractComparisonOperator<T>
+    public class RawOperator : AbstractOperator
     {
+        public required string RawSql { get; set; }
         public override SqlQueryResult Compile(ISqlTable table)
         {
-            var column = Column.Compile(table);
-
             var sqlTz = new SqlTokenizer()
                 .AddToken(AndOrOperator)
-                .AddToken(NotOperator)
-                .AddToken(column.Sql)
-                .AddToken(">")
-                .AddToken("@value")
+                .AddToken(RawSql)
                 .Build();
-
             var result = new SqlQueryResult()
             {
                 Sql = sqlTz,
-                NameParameters = column.NameParameters,
-                SqlParameters = new Dictionary<string, object>()
-                {
-                    { "@value", Value }
-                }
             };
-
-            return result.Enumerate();
+            return result;
         }
     }
 }

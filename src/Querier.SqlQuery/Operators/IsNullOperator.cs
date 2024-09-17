@@ -1,4 +1,5 @@
 ﻿using Querier.SqlQuery.Extensions;
+using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
 using System;
@@ -11,9 +12,9 @@ namespace Querier.SqlQuery.Operators
 {
     public class IsNullOperator : AbstractOperator
     {
-        public override SqlQueryResult Compile()
+        public override SqlQueryResult Compile(ISqlTable table)
         {
-            var column = Column.Compile();
+            var column = Column.Compile(table);
 
             var sqlTz = new SqlTokenizer()
                 .AddToken(AndOrOperator)

@@ -24,6 +24,10 @@ namespace Querier.SqlQuery
             return new MySqlQuery(_functionFactory);
         }
 
+        public override SqlQueryResult CompileSql(SqlQueryResult result)
+        {
+            return base.CompileSql(result);
+        }
         public override SqlTokenizer CompileTokens(SqlQueryResult result)
         {
             var tokens = base.CompileTokens(result);
@@ -32,11 +36,6 @@ namespace Querier.SqlQuery
                 tokens.AddToken("limit").AddToken($"{_limit}");
             }
             return tokens;
-        }
-
-        public IMySqlQuery TestMethod()
-        {
-            return this;
         }
     }
 }

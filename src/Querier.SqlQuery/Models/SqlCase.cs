@@ -17,7 +17,7 @@ namespace Querier.SqlQuery.Models
     {
         private readonly List<SqlCaseWhen> _sqlWhen;
         public string? CaseAs { get; set; }
-        public required string ElseValue { get; set; }
+        public required object ElseValue { get; set; }
 
         public SqlCase()
         {
@@ -30,7 +30,7 @@ namespace Querier.SqlQuery.Models
             return this;
         }
 
-        public SqlQueryResult Compile()
+        public SqlQueryResult Compile(ISqlTable table)
         {
             var selectTz = new SqlTokenizer();
             var result = new SqlQueryResult();
@@ -38,7 +38,7 @@ namespace Querier.SqlQuery.Models
             selectTz.AddToken("case");
             foreach (var caseWhen in _sqlWhen)
             {
-                var compiledWhen = caseWhen.Compile();
+                var compiledWhen = caseWhen.Compile(table);
                 selectTz.AddToken(compiledWhen.Sql);
 
                 result.SqlParameters = result.SqlParameters.Merge(compiledWhen.SqlParameters, "@value");

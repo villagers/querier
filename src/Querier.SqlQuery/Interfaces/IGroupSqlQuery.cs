@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Interfaces
 {
-    public interface IGroupSqlQuery<TQuery> 
+    public interface IGroupSqlQuery<TQuery>
     {
         TQuery GroupBy(string column);
         TQuery GroupBy(Func<IFunction, IFunction> function);
+
+        TQuery GroupByRaw(string sql);
     }
 }

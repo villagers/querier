@@ -1,4 +1,5 @@
 ﻿using Querier.SqlQuery.Functions;
+using Querier.SqlQuery.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,6 @@ namespace Querier.Interfaces
         IQueryFilter Less<T>(Func<IFunction, IFunction> function, T value);
         IQueryFilter LessOrEqual<T>(string column, T value);
         IQueryFilter LessOrEqual<T>(Func<IFunction, IFunction> function, T value);
-
         IQueryFilter And();
         IQueryFilter And<T>(T value);
         IQueryFilter Or();

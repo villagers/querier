@@ -10,9 +10,13 @@ using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlTableQuery<TQuery> : SqlTable<TQuery> where TQuery : IBaseQuery<TQuery>
+    public class SqlTableQuery<TQuery> : ISqlTable where TQuery : IBaseQuery<TQuery>
     {
-        public override SqlQueryResult Compile()
+        public required TQuery? Query { get; set; }
+        public required string TableAs { get; set; }
+        public string TableOrAlias => TableAs;
+
+        public SqlQueryResult Compile(ISqlTable table)
         {
             var result = Query?.Compile();
             var queryTz = new SqlTokenizer().AddToken("(").AddToken(result?.Sql).AddToken(")").Build("");

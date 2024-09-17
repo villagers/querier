@@ -19,8 +19,11 @@ namespace Querier.SqlQuery.MySql.Tests.Unit
         [Fact]
         public void GroupBy()
         {
-            Assert.Equal("select * from `orders` group by `product`", _query.New().From("orders").GroupBy("product").Compile().CompiledSql);
-            Assert.Equal("select * from `orders` group by `product`, `category`", _query.New().From("orders").GroupBy("product").GroupBy("category").Compile().CompiledSql);
+            const string groupBy1 = "select * from `orders` as `orders` group by `orders`.`product`";
+            const string groupBy2 = "select * from `orders` as `orders` group by `orders`.`product`, `orders`.`category`";
+
+            Assert.Equal(groupBy1, _query.New().From("orders").GroupBy("product").Compile().CompiledSql);
+            Assert.Equal(groupBy2, _query.New().From("orders").GroupBy("product").GroupBy("category").Compile().CompiledSql);
         }
     }
 }

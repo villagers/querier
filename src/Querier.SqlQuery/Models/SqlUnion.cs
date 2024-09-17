@@ -15,7 +15,7 @@ namespace Querier.SqlQuery.Models
         public required TQuery Query { get; set; }
         public required bool All { get; set; } = false;
 
-        public SqlQueryResult Compile()
+        public SqlQueryResult Compile(ISqlTable table)
         {
             var compiledQuery = Query.Compile();
 

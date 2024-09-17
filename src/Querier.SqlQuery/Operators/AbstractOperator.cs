@@ -9,7 +9,7 @@ using Querier.SqlQuery.Tokenizers;
 
 namespace Querier.SqlQuery.Operators
 {
-    public abstract class AbstractOperator : ICloneable
+    public abstract class AbstractOperator : ISqlQueryCompile<SqlQueryResult>, ICloneable
     {
         public ISqlColumn? Column { get; set; }
 
@@ -20,10 +20,7 @@ namespace Querier.SqlQuery.Operators
         protected string NotOperator { get; set; } = string.Empty;
         protected string AndOrOperator { get; set; } = string.Empty;
 
-        public SqlTokenizer Tokenizer { get; set; }
-        
-
-        public abstract SqlQueryResult Compile();
+        public abstract SqlQueryResult Compile(ISqlTable table);
 
         public AbstractOperator And(bool flag = true)
         {

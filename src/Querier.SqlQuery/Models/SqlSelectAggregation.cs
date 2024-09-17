@@ -13,6 +13,6 @@ namespace Querier.SqlQuery.Models
     {
         public required SqlColumnAggregation SqlColumnAggregation {  get; set; }
 
-        public SqlQueryResult Compile() => SqlColumnAggregation.Compile().Enumerate();
+        public SqlQueryResult Compile(ISqlTable table) => SqlColumnAggregation.Compile(table).Enumerate();
     }
 }
