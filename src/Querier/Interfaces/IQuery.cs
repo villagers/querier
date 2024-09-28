@@ -1,5 +1,6 @@
 ﻿using Org.BouncyCastle.Tls;
 using Querier.Attributes;
+using Querier.Schema;
 using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using System;
@@ -30,15 +31,15 @@ namespace Querier.Interfaces
         IQuery OrderBy(string property, string direction);
         IQuery Limit(int limit);
 
-        IQuery Filter(Func<IQueryFilter, IQueryFilter> filter);
+        IQuery FilterRaw(string sql);
 
         IQuery Union(Func<IQuery, IQuery> query);
 
-        List<Dictionary<string, string>> GetMeasures<TType>();
-        List<Dictionary<string, string>> GetMeasures(string queryKey);
-        List<Dictionary<string, string>> GetDimensions<TType>();
-        List<Dictionary<string, string>> GetDimensions(string queryKey);
-        List<Dictionary<string, string>> GetTimeDimensions<TType>();
-        List<Dictionary<string, string>> GetTimeDimensions(string queryKey);
+        HashSet<QueryMeasureSchema> GetMeasures<TType>();
+        HashSet<QueryMeasureSchema> GetMeasures(string queryKey);
+        HashSet<QueryDimensionSchema> GetDimensions<TType>();
+        HashSet<QueryDimensionSchema> GetDimensions(string queryKey);
+        HashSet<QueryTimeDimensionSchema> GetTimeDimensions<TType>();
+        HashSet<QueryTimeDimensionSchema> GetTimeDimensions(string queryKey);
     }
 }

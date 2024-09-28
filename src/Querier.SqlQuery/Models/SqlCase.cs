@@ -41,7 +41,7 @@ namespace Querier.SqlQuery.Models
                 var compiledWhen = caseWhen.Compile(table);
                 selectTz.AddToken(compiledWhen.Sql);
 
-                result.SqlParameters = result.SqlParameters.Merge(compiledWhen.SqlParameters, "@value");
+                result.SqlParameters = result.SqlParameters.Merge(compiledWhen.SqlParameters, "@v");
                 result.NameParameters = result.NameParameters.Merge(compiledWhen.NameParameters);
 
                 result.Enumerate();

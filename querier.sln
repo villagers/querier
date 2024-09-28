@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Querier.Tests", "tests\Quer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Querier.Web.Tests", "tests\Querier.Web.Tests\Querier.Web.Tests.csproj", "{4BC48889-B4CD-42D0-9B03-09E8ED25DDE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Querier.SqlQuery.MySql.Tests", "tests\Querier.SqlQuery.MySql.Tests\Querier.SqlQuery.MySql.Tests.csproj", "{5411B918-EB9E-4E6B-B208-DDCBCE465BE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Querier.SqlQuery.MySql.Tests", "tests\Querier.SqlQuery.MySql.Tests\Querier.SqlQuery.MySql.Tests.csproj", "{5411B918-EB9E-4E6B-B208-DDCBCE465BE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

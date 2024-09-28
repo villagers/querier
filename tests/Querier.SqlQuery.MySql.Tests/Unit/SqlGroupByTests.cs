@@ -9,11 +9,11 @@ namespace Querier.SqlQuery.MySql.Tests.Unit
 {
     public class SqlGroupByTests
     {
-        private IMySqlQuery _query;
+        private IMySqlQueryBuilder _query;
 
         public SqlGroupByTests()
         {
-            _query = new MySqlQuery(new MySqlFunction());
+            _query = new MySqlQueryBuilder(new MySqlFunction());
         }
 
         [Fact]

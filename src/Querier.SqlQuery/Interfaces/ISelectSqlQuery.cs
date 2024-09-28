@@ -28,7 +28,7 @@ namespace Querier.SqlQuery.Interfaces
         TQuery SelectMonth(string column, string? columnAs = null);
         TQuery SelectYear(string column, string? columnAs = null);
 
-        TQuery SelectRaw(string sql);
+        TQuery SelectRaw(string sql, string sqlAs);
 
         TQuery Distinct();
     }

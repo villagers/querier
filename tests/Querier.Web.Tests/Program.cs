@@ -14,10 +14,11 @@ var connectionString = builder.Configuration.GetConnectionString("MySQL");
 builder.Services.AddQuerier(o =>
 {
     o.UseMySql(connectionString);
+    o.LocalStoragePath = "/home/queries";
 });
 
 var app = builder.Build();
-
+//app.UseQuerier();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
