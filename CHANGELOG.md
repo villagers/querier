@@ -1,3 +1,19 @@
+# [1.8.0-beta.1](https://github.com/villagers/querier/compare/v1.7.2...v1.8.0-beta.1) (2024-09-28)
+
+
+### Features
+
+* allow `Raw` querier, add `Join` methods, add `Case` methods ([b2de599](https://github.com/villagers/querier/commit/b2de599441ad6027d21854cbc31c6aa90a48bb8a))
+* allow `union` queries ([9a2705a](https://github.com/villagers/querier/commit/9a2705a8200e31daef86600329384a3532e216bf))
+
+# [1.8.0-beta.1](https://github.com/villagers/querier/compare/v1.7.2...v1.8.0-beta.1) (2024-09-28)
+
+
+### Features
+
+* allow `Raw` querier, add `Join` methods, add `Case` methods ([b2de599](https://github.com/villagers/querier/commit/b2de599441ad6027d21854cbc31c6aa90a48bb8a))
+* allow `union` queries ([9a2705a](https://github.com/villagers/querier/commit/9a2705a8200e31daef86600329384a3532e216bf))
+
 ## [1.7.2](https://github.com/villagers/querier/compare/v1.7.1...v1.7.2) (2024-09-10)
 
 

@@ -9,6 +9,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Querier.Schema;
 
 namespace Querier.Options
 {
@@ -17,6 +18,7 @@ namespace Querier.Options
         private IDbConnection _dbConnection;
         private readonly IServiceCollection _services;
 
+        public string? LocalStoragePath { set; get; }
         public ValidationOption Validation { private set; get; }
 
         public QuerierRegistrationOption(IServiceCollection services)
@@ -33,8 +35,10 @@ namespace Querier.Options
             _dbConnection = new MySqlConnection(connectionString);
 
             _services.AddScoped<IFunction, MySqlFunction>();
-            _services.AddScoped<IMySqlQuery, MySqlQuery>();
-            _services.AddScoped<IQuery, Query<IMySqlQuery>>();
+            _services.AddScoped<IMySqlQueryBuilder, MySqlQueryBuilder>();
+            
+
+            _services.AddScoped<ISchemaSqlGenerator, SchemaSqlGenerator<IMySqlQueryBuilder>>();
         }
     }
 }
