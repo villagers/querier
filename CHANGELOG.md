@@ -10,7 +10,7 @@
 
 ### BREAKING CHANGES
 
-*
+* Breaking changes to the API
 
 # [1.8.0-beta.1](https://github.com/villagers/querier/compare/v1.7.2...v1.8.0-beta.1) (2024-09-28)
 
