@@ -18,7 +18,13 @@ namespace Querier.Schema
 
         public string DataSource(QuerySchema schema)
         {
-            var path = Path.Combine(LocalStoragePath ?? "", schema.DbFile);
+            var dbFile = schema.DbFile;
+            var extension = Path.GetExtension(dbFile);
+            if (string.IsNullOrWhiteSpace(extension))
+            {
+                dbFile += ".db";
+            }
+            var path = Path.Combine(LocalStoragePath, dbFile);
             return $"DataSource={path}";
         }
     }
