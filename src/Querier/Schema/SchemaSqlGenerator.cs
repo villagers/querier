@@ -65,7 +65,7 @@ namespace Querier.Schema
                 {
                     if (!string.IsNullOrWhiteSpace(dimension.Sql))
                     {
-                        sqlQuery.SelectRaw(dimension.Sql, dimension.Alias ?? $"c{columnIndex}");
+                        sqlQuery.SelectRaw(dimension.Sql, dimension.Alias ?? $"c{columnIndex}").GroupBy(columnIndex);
                     }
                     else
                     {
@@ -83,7 +83,7 @@ namespace Querier.Schema
                 {
                     if (!string.IsNullOrWhiteSpace(timeDimension.Sql))
                     {
-                        sqlQuery.SelectRaw(timeDimension.Sql, timeDimension.Alias ?? $"c{columnIndex}");
+                        sqlQuery.SelectRaw(timeDimension.Sql, timeDimension.Alias ?? $"c{columnIndex}").GroupBy(columnIndex);
                     }
                     else
                     {
