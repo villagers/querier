@@ -11,7 +11,7 @@ namespace Querier.Extensions
 {
     public static class DuckDbExtensions
     {
-        public static DuckDBAppenderRow AppendValue(this DuckDBAppenderRow row, object value, int fieldIndex, string fieldName)
+        public static DuckDBAppenderRow AppendValue(this DuckDBAppenderRow row, object value)
         {
             var type = value.GetType();
             if (value == null) return row.AppendNullValue();
