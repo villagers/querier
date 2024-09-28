@@ -1,3 +1,17 @@
+# [2.0.0-beta.1](https://github.com/villagers/querier/compare/v1.7.2...v2.0.0-beta.1) (2024-09-28)
+
+
+### Features
+
+* allow `Raw` querier, add `Join` methods, add `Case` methods ([b2de599](https://github.com/villagers/querier/commit/b2de599441ad6027d21854cbc31c6aa90a48bb8a))
+* allow `union` queries ([9a2705a](https://github.com/villagers/querier/commit/9a2705a8200e31daef86600329384a3532e216bf))
+* version  2 ([f56fcdf](https://github.com/villagers/querier/commit/f56fcdfd322655a2a1cda79dc98ae8f07ee39160))
+
+
+### BREAKING CHANGES
+
+* Breaking changes to the API
+
 # [1.8.0-beta.1](https://github.com/villagers/querier/compare/v1.7.2...v1.8.0-beta.1) (2024-09-28)
 
 
