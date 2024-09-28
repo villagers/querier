@@ -33,6 +33,15 @@ namespace Querier.SqlQuery
             return (TQuery)(object)this;
         }
 
+        public TQuery FromRaw(string sql)
+        {
+            _table = new SqlTableRaw()
+            {
+                RawSql = sql
+            };
+
+            return (TQuery)(object)this;
+        }
         public TQuery From(string table, string? tableAs = null)
         {
             _table = new SqlTable<TQuery>()
@@ -174,11 +183,12 @@ namespace Querier.SqlQuery
         {
             return SelectDateFunction(_functionFactory.New().Year(column, columnAs));
         }
-        public TQuery SelectRaw(string sql)
+        public TQuery SelectRaw(string sql, string sqlAs)
         {
             _select.Add(new SqlSelectRaw()
             {
-                RawSql = sql
+                RawSql = sql,
+                RawSqlAs = sqlAs
             });
             return (TQuery)(object)this;
         }
@@ -512,6 +522,26 @@ namespace Querier.SqlQuery
             return WhereOperator(clonedComparisonOperator);
         }
 
+
+        public TQuery GroupBy()
+        {
+            _groupBy.Add(new SqlGroupBy()
+            {
+                OrderId = _groupBy.Count + 1
+            });
+
+            return (TQuery)(object)this;
+        }
+        public TQuery GroupBy(int orderId)
+        {
+            _groupBy.Add(new SqlGroupBy()
+            {
+                OrderId = orderId
+            });
+
+            return (TQuery)(object)this;
+        }
+
         public TQuery GroupBy(string column)
         {
             _groupBy.Add(new SqlGroupBy()
@@ -552,6 +582,17 @@ namespace Querier.SqlQuery
             return (TQuery)(object)this;
         }
 
+        public TQuery OrderBy(int orderId, string? order = "asc")
+        {
+            _orderBy.Add(new SqlOrderBy()
+            {
+                OrderId = orderId,
+                Order = order
+            });
+
+            return (TQuery)(object)this;
+        }
+
         public TQuery OrderBy(string column, string? order = "asc")
         {
             _orderBy.Add(new SqlOrderBy()
@@ -574,11 +615,9 @@ namespace Querier.SqlQuery
 
             var result = new SqlQueryResult();
 
-            var queryTz = CompileTokens(result);
+            result.Sql = CompileTokens(result).Build();
             result.SqlParameters = CompileSqlParameters(result);
             result.NameParameters = CompileNameParameters(result);
-
-            result.Sql = queryTz.Build(" ");
             result = CompileSql(result);
 
             return result;

@@ -7,20 +7,20 @@ using System.Threading.Tasks;
 namespace Querier.Attributes
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class QueryMeasureAttribute : BaseAttribute, IKeyAttribute, IDisplayAttribute
+    public class QueryMeasureAttribute : BaseAttribute, IKeyAttribute, IAliasAttribute, IOrderAttribute, IDescriptionAttribute, IColumnAttribute, ISqlAttribute, IAggregationAttribute
     {
-        public string Key { get; set; }
-        public string DisplayName { get; set; }
+        public string? Sql { get; set; }
+        public string? Key { get; set; }
+        public string? Alias { get; set; }
+        public string? Order { get; set; }
+        public string? Column { get; set; }
+        public string? Description { get; set; }
+        public string? Aggregation { get; set; }
 
         public QueryMeasureAttribute() { }
         public QueryMeasureAttribute(string key)
         {
             Key = key;
-        }
-        public QueryMeasureAttribute(string key, string displayName)
-        {
-            Key = key;
-            DisplayName = displayName;
         }
     }
 }

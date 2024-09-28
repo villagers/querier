@@ -85,7 +85,12 @@ namespace Querier.SqlQuery
         }
         public virtual Dictionary<string, object> CompileSqlParameters(SqlQueryResult result)
         {
-            return SqlParameters.Select((e, i) => new KeyValuePair<string, object>($"{SqlParameterPlaceholder}{i}", e.Value)).ToDictionary();
+            return SqlParameters
+                .Select((e, i) =>
+                {
+                    result.Sql = result.Sql.ReplaceExact(e.Key, $"{SqlParameterPlaceholder}{i}");
+                    return new KeyValuePair<string, object>($"{SqlParameterPlaceholder}{i}", e.Value);
+                }).ToDictionary();
         }
         public virtual Dictionary<string, string> CompileNameParameters(SqlQueryResult result)
         {
@@ -125,8 +130,8 @@ namespace Querier.SqlQuery
                 return tz;
             }, ", ");
 
-            result.NameParameters.CopyTo(NameParameters);
-            result.SqlParameters.CopyTo(SqlParameters);
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
 
             result.SqlTokenizer = selectTz;
             result.Sql = selectTz.Build(" ");
@@ -147,8 +152,8 @@ namespace Querier.SqlQuery
                 tz.AddToken(compiled.Sql);
             }
 
-            result.NameParameters.CopyTo(NameParameters);
-            result.SqlParameters.CopyTo(SqlParameters);
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
 
             result.SqlTokenizer = tz;
             result.Sql = tz.Build();
@@ -164,8 +169,8 @@ namespace Querier.SqlQuery
             result = result.Merge(tableCompiled);
             tableTz.AddToken(tableCompiled.Sql);
 
-            result.NameParameters.CopyTo(NameParameters);
-            result.SqlParameters.CopyTo(SqlParameters);
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
 
             result.SqlTokenizer = tableTz;
             result.Sql = tableTz.Build();
@@ -186,8 +191,8 @@ namespace Querier.SqlQuery
                 whereTz.AddToken(whereCompiled.Sql);
             }
 
-            result.NameParameters.CopyTo(NameParameters);
-            result.SqlParameters.CopyTo(SqlParameters);
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
 
             result.SqlTokenizer = whereTz;
             result.Sql = whereTz.Build();
@@ -212,8 +217,8 @@ namespace Querier.SqlQuery
                 return e;
             }, ", ");
 
-            result.NameParameters.CopyTo(NameParameters);
-            result.SqlParameters.CopyTo(SqlParameters);
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
 
             result.SqlTokenizer = groupTz;
             result.Sql = groupTz.Build();
@@ -233,8 +238,8 @@ namespace Querier.SqlQuery
                 _unionTz.AddToken(unionCompiled.Sql);
             }
 
-            result.NameParameters.CopyTo(NameParameters);
-            result.SqlParameters.CopyTo(SqlParameters);
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
 
             result.SqlTokenizer = _unionTz;
             result.Sql = _unionTz.Build();
@@ -259,8 +264,8 @@ namespace Querier.SqlQuery
                 return e;
             }, ", ");
 
-            result.NameParameters.CopyTo(NameParameters);
-            result.SqlParameters.CopyTo(SqlParameters);
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
 
             result.SqlTokenizer = orderTz;
             result.Sql = orderTz.Build();

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Dapper;
+using DuckDB.NET.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Querier.Helpers;
 using Querier.Interfaces;
@@ -29,7 +31,7 @@ namespace Querier.Web.Tests.Controllers
         [Route("measures")]
         public IActionResult GetMeasures()
         {
-            var measures = _query.GetMeasures<CustomerEntity>();
+            var measures = _query.GetMeasures<InvoiceEntity>();
             return Ok(measures);
         }
 
@@ -52,20 +54,16 @@ namespace Querier.Web.Tests.Controllers
 
         [HttpGet]
         [Route("query")]
-        public IActionResult GetQuery()
+        public async Task<IActionResult> GetQuery()
         {
             try
             {
                 var invoiceIds = new int[] { 1, 3, 5, 6 };
-                var query = _query.From("Invoice");
-                query.Filter(e => e.In("InvoiceId", invoiceIds));
-                query.Filter(e => e.GreaterOrEqual(e => e.Date("InvoiceDate"), "2021-01-11"));
+                var query = _query.From("InvoiceEntity");
 
-
-                query.MeasureSum("Total").Dimension("BillingCountry").TimeDimension("InvoiceDate");
+                query.Measure("Total").Dimension("CustomerId").TimeDimension("InvoiceDate").OrderBy("Total", "asc").OrderBy("CustomerId", "asc");
 
                 var result = query.Execute();
-
                 return Ok(result);
             }
             catch (Exception ex)

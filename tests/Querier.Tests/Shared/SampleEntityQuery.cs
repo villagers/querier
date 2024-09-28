@@ -12,7 +12,7 @@ namespace Querier.Tests.Shared
     internal class SampleEntityQuery
     {
         [QueryKey("IID")]
-        [QueryDisplay("Invoice ID")]
+        [QueryAlias("Invoice ID")]
         [QueryDimension(Key = "ID")]
         public int Id { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using Querier.Interfaces;
+using Querier.SqlQuery;
 using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using System;
@@ -9,19 +10,19 @@ using System.Threading.Tasks;
 
 namespace Querier
 {
-    public class QueryFilter<TQuery> : IQueryFilter where TQuery : IBaseQuery<TQuery>
+    public class QueryFilter : IQueryFilter
     {
 
-        private readonly TQuery _query;
+        private readonly IDuckDBQueryBuilder _query;
 
-        public QueryFilter(TQuery query)
+        public QueryFilter(IDuckDBQueryBuilder query)
         {
             _query = query;
         }
 
         public IQueryFilter New()
         {
-            return new QueryFilter<TQuery>(_query);
+            return new QueryFilter(_query);
         }
 
         public IQueryFilter In<T>(string column, IEnumerable<T> value)

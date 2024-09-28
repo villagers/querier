@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace Querier.Web.Tests.Shared.Entites
 {
-    [Query]
     public class InvoiceLineEntity
     {
         public int InvoiceLineId { get; set; }

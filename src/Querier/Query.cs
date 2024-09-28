@@ -3,58 +3,69 @@ using Dapper;
 using Querier.Interfaces;
 using Querier.Attributes;
 using Querier.SqlQuery.Extensions;
+using Querier.Schema;
+using Querier.SqlQuery;
+using DuckDB.NET.Data;
 
 namespace Querier
 {
-    public class Query<TQuery> : IQuery where TQuery : IBaseQuery<TQuery>
+    public class Query : IQuery
     {
         private readonly List<QueryMeasure> _queryMeasures;
         private readonly List<QueryDimension> _queryDimension;
         private QueryTimeDimension _queryTimeDimension;
 
-        private readonly List<IQuery> _combineQueries;
-
+        private readonly SchemaStore _schemaStore;
         private readonly IQueryFilter _queryFilter;
+        private readonly IQueryDbConnection _dbConnection;
+        private readonly IDuckDBQueryBuilder _duckDbQueryBuilder;
 
-        private readonly TQuery _query;
-        private readonly IQueryDbConnection _connection;
+        private string _table;
 
-        private readonly IPropertyMapper _propertyKeyMapper;
-
-        private string _from;
-        public Query(TQuery query, IQueryDbConnection connection, IPropertyMapper propertyKeyMapper)
+        public Query(IDuckDBQueryBuilder duckDbQueryBuilder, IQueryDbConnection dbConnection, SchemaStore schemaStore)
         {
-            _query = query;
+            _schemaStore = schemaStore;
+            _duckDbQueryBuilder = duckDbQueryBuilder;
+            _dbConnection = dbConnection;
+
             _queryMeasures = new List<QueryMeasure>();
             _queryDimension = new List<QueryDimension>();
-            _connection = connection;
-
-            _combineQueries = new List<IQuery>();
-
-            _queryFilter = new QueryFilter<TQuery>(query);
-            _propertyKeyMapper = propertyKeyMapper;
+            _queryFilter = new QueryFilter(duckDbQueryBuilder);
         }
 
         public IQuery New()
         {
-            return new Query<TQuery>(_query.New(), _connection, _propertyKeyMapper);
+            return new Query(_duckDbQueryBuilder.New(), _dbConnection, _schemaStore);
         }
         public IQuery From(string table)
         {
-            _from = table;
-            _query.From(_propertyKeyMapper.GetTypeName(table) ?? table);
+            _table = table;
+
+            var tableKey = _schemaStore.Schemas.FirstOrDefault(e => e.Key == table);
+
+            _duckDbQueryBuilder.From(tableKey?.Table ?? table);
             return this;
         }
 
         public IQuery Measure(string property, string? propertyAs = null)
         {
-            return MeasureSum(property, propertyAs);
+            var table = _schemaStore.Schemas.First(e => e.Key == _table);
+            var tableMeasure = table.Measures.Where(e => e.Key == property).FirstOrDefault();
+
+            _duckDbQueryBuilder.Select(tableMeasure?.Column ?? property, propertyAs ?? property).GroupBy();
+
+            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
+            _queryMeasures.Add(measure);
+
+            return this;
         }
 
         public IQuery MeasureCount(string property, string? propertyAs = null)
         {
-            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.SelectCount(propertyName, propertyAs ?? property);
+            var table = _schemaStore.Schemas.First(e => e.Key == _table);
+            var tableMeasure = table.Measures.Where(e => e.Key == property).FirstOrDefault();
+
+            _duckDbQueryBuilder.SelectCount(tableMeasure?.Column ?? property, propertyAs ?? property);
 
             var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
             _queryMeasures.Add(measure);
@@ -64,8 +75,10 @@ namespace Querier
 
         public IQuery MeasureSum(string property, string? propertyAs = null)
         {
-            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.SelectSum(propertyName, propertyAs ?? property);
+            var table = _schemaStore.Schemas.First(e => e.Key == _table);
+            var tableMeasure = table.Measures.Where(e => e.Key == property).FirstOrDefault();
+
+            _duckDbQueryBuilder.SelectSum(tableMeasure?.Column ?? property, propertyAs ?? property);
 
             var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
             _queryMeasures.Add(measure);
@@ -75,8 +88,10 @@ namespace Querier
 
         public IQuery MeasureAvg(string property, string? propertyAs = null)
         {
-            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.SelectAvg(propertyName, propertyAs ?? property);
+            var table = _schemaStore.Schemas.First(e => e.Key == _table);
+            var tableMeasure = table.Measures.Where(e => e.Key == property).FirstOrDefault();
+
+            _duckDbQueryBuilder.SelectAvg(tableMeasure?.Column ?? property, propertyAs ?? property);
 
             var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
             _queryMeasures.Add(measure);
@@ -86,8 +101,10 @@ namespace Querier
 
         public IQuery MeasureMin(string property, string? propertyAs = null)
         {
-            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.SelectMin(propertyName, propertyAs ?? property);
+            var table = _schemaStore.Schemas.First(e => e.Key == _table);
+            var tableMeasure = table.Measures.Where(e => e.Key == property).FirstOrDefault();
+
+            _duckDbQueryBuilder.SelectMin(tableMeasure?.Column ?? property, propertyAs ?? property);
 
             var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
             _queryMeasures.Add(measure);
@@ -97,8 +114,10 @@ namespace Querier
 
         public IQuery MeasureMax(string property, string? propertyAs = null)
         {
-            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.SelectMax(propertyName, propertyAs ?? property);
+            var table = _schemaStore.Schemas.First(e => e.Key == _table);
+            var tableMeasure = table.Measures.Where(e => e.Key == property).FirstOrDefault();
+
+            _duckDbQueryBuilder.SelectMax(tableMeasure?.Column ?? property, propertyAs ?? property);
 
             var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
             _queryMeasures.Add(measure);
@@ -108,8 +127,10 @@ namespace Querier
 
         public IQuery Dimension(string property, string? propertyAs = null)
         {
-            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.Select(propertyName, propertyAs ?? property).GroupBy(propertyName);
+            var table = _schemaStore.Schemas.First(e => e.Key == _table);
+            var tableDimension = table.Dimensions.Where(e => e.Key == property).FirstOrDefault();
+
+            _duckDbQueryBuilder.Select(tableDimension?.Column ?? property, propertyAs ?? property).GroupBy();
 
             var dimension = new QueryDimension() { Property = property, PropertyAs = propertyAs };
             _queryDimension.Add(dimension);
@@ -118,49 +139,54 @@ namespace Querier
         }
         public IQuery TimeDimension(string property, string? propertyAs = null)
         {
-            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.Select(propertyName, propertyAs ?? property).GroupBy(propertyName);
+            var table = _schemaStore.Schemas.First(e => e.Key == _table);
+            var tableDimension = table.Dimensions.Where(e => e.Key == property).FirstOrDefault();
+
+            _duckDbQueryBuilder.Select(tableDimension?.Column ?? property, propertyAs ?? property).GroupBy();
 
             _queryTimeDimension = new QueryTimeDimension() { Property = property };
 
             return this;
         }
-        public IQuery Filter(Func<IQueryFilter, IQueryFilter> filter)
+
+        public IQuery FilterRaw(string sql)
         {
-            filter.Invoke(_queryFilter);
+            _duckDbQueryBuilder.WhereRaw(sql);
             return this;
         }
+
         public IQuery TimeDimension(string property, string timeDimensionPart, string? propertyAs = null)
         {
-            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
+            var table = _schemaStore.Schemas.First(e => e.Key == _table);
+            var tableTimeDimension = table.Dimensions.Where(e => e.Key == property).FirstOrDefault();
 
             var sqlColumn = propertyAs;
 
             switch (timeDimensionPart)
             {
                 case "date":
-                    _query.SelectDate(propertyName, propertyAs ?? property).GroupBy(e => e.Date(propertyName));
+                    _duckDbQueryBuilder.SelectDate(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
                     break;
                 case "second":
-                    _query.SelectSecond(propertyName, propertyAs ?? property).GroupBy(e => e.Second(propertyName));
+                    _duckDbQueryBuilder.SelectSecond(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
                     break;
                 case "minute":
-                    _query.SelectMinute(propertyName, propertyAs ?? property).GroupBy(e => e.Minute(propertyName));
+                    _duckDbQueryBuilder.SelectMinute(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
                     break;
                 case "hour":
-                    _query.SelectHour(propertyName, propertyAs ?? property).GroupBy(e => e.Hour(propertyName));
+                    _duckDbQueryBuilder.SelectHour(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
                     break;
                 case "day":
-                    _query.SelectDay(propertyName, propertyAs ?? property).GroupBy(e => e.Day(propertyName));
+                    _duckDbQueryBuilder.SelectDay(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
                     break;
                 case "month":
-                    _query.SelectMonth(propertyName, propertyAs ?? property).GroupBy(e => e.Month(propertyName));
+                    _duckDbQueryBuilder.SelectMonth(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
                     break;
                 case "year":
-                    _query.SelectYear(propertyName, propertyAs ?? property).GroupBy(e => e.Year(propertyName));
+                    _duckDbQueryBuilder.SelectYear(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
                     break;
                 default:
-                    _query.Select(propertyName, propertyAs ?? property).GroupBy(propertyName);
+                    _duckDbQueryBuilder.Select(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
                     break;
             }
             _queryTimeDimension = new QueryTimeDimension() { Property = property, PropertyAs = propertyAs, TimeDimensionPart = timeDimensionPart };
@@ -169,8 +195,14 @@ namespace Querier
         }
         public IQuery OrderBy(string property, string direction)
         {
-            var propertyName = _propertyKeyMapper.GetPropertyName(_from, property) ?? property;
-            _query.OrderBy(propertyName, direction);
+            var table = _schemaStore.Schemas.First(e => e.Key == _table);
+            var tableProperty =
+                table.Measures.FirstOrDefault(e => e.Key == property)?.Column ??
+                table.Dimensions.FirstOrDefault(e => e.Key == property)?.Column ??
+                table.TimeDimensions.FirstOrDefault(e => e.Key == property)?.Column ??
+                property;
+
+            _duckDbQueryBuilder.OrderBy(tableProperty, direction);
             //_queryTimeDimension = new QueryTimeDimension() { Property = property };
 
             return this;
@@ -178,28 +210,28 @@ namespace Querier
 
         public IQuery Limit(int limit)
         {
-            _query.Limit(limit);
+            _duckDbQueryBuilder.Limit(limit);
             return this;
         }
 
         public IQuery Union(Func<IQuery, IQuery> query)
         {
-            var newT = _query.New();
-            var newQ = new Query<TQuery>(newT, _connection, _propertyKeyMapper);
+            var newT = _duckDbQueryBuilder.New();
+            var newQ = new Query(newT, _dbConnection, _schemaStore);
 
             var newQuery = query.Invoke(newQ);
-            _query.UnionAll(newT);
+            _duckDbQueryBuilder.UnionAll(newT);
             return this;
         }
 
 
 
-        public List<Dictionary<string, string>> GetMeasures<TType>() => _propertyKeyMapper.GetAttributeProperties<TType, QueryMeasureAttribute>();
-        public List<Dictionary<string, string>> GetMeasures(string queryKey) => _propertyKeyMapper.GetAttributeProperties<QueryMeasureAttribute>(queryKey);
-        public List<Dictionary<string, string>> GetDimensions<TType>() => _propertyKeyMapper.GetAttributeProperties<TType, QueryDimensionAttribute>();
-        public List<Dictionary<string, string>> GetDimensions(string queryKey) => _propertyKeyMapper.GetAttributeProperties<QueryDimensionAttribute>(queryKey);
-        public List<Dictionary<string, string>> GetTimeDimensions<TType>() => _propertyKeyMapper.GetAttributeProperties<TType, QueryTimeDimensionAttribute>();
-        public List<Dictionary<string, string>> GetTimeDimensions(string queryKey) => _propertyKeyMapper.GetAttributeProperties<QueryTimeDimensionAttribute>(queryKey);
+        public HashSet<QueryMeasureSchema> GetMeasures<TType>() => _schemaStore.Schemas.FirstOrDefault(e => e.Type == typeof(TType))?.Measures ?? [];
+        public HashSet<QueryMeasureSchema> GetMeasures(string queryKey) => _schemaStore.Schemas.FirstOrDefault(e => e.Key == queryKey)?.Measures ?? [];
+        public HashSet<QueryDimensionSchema> GetDimensions<TType>() => _schemaStore.Schemas.FirstOrDefault(e => e.Type == typeof(TType))?.Dimensions ?? [];
+        public HashSet<QueryDimensionSchema> GetDimensions(string queryKey) => _schemaStore.Schemas.FirstOrDefault(e => e.Key == queryKey)?.Dimensions ?? [];
+        public HashSet<QueryTimeDimensionSchema> GetTimeDimensions<TType>() => _schemaStore.Schemas.FirstOrDefault(e => e.Type == typeof(TType))?.TimeDimensions ?? [];
+        public HashSet<QueryTimeDimensionSchema> GetTimeDimensions(string queryKey) => _schemaStore.Schemas.FirstOrDefault(e => e.Key == queryKey)?.TimeDimensions ?? [];
 
         public QueryResult Execute()
         {
@@ -213,178 +245,32 @@ namespace Querier
                 result.TimeDimensions = new List<QueryProperty>() { new QueryProperty() { Key = _queryTimeDimension.Property, DisplayName = _queryTimeDimension.Property } };
             }
 
-            var complie = _query.Compile();
 
-            var res = _connection.Connection.Query("select case when `s`.`Name` = 'Base' then 'actual' when `s`.`Name` = 'Good' then 'actual' when `s`.`Name` = 'Poor' then 'actual' else `s`.`Name` end as `SName`, `cf`.`Year`, `cf`.`Year` as `Label`, sum(`cf`.`Value`) FROM `CacheFinancial` as `cf` join `Scenario` as `s` on `cf`.`ScenarioId` = `s`.`Id` WHERE `cf`.`ReitId` = 40 AND `cf`.`ScenarioId` = 306 AND `cf`.`Type` = 0 AND `cf`.`Year` < 2024 GROUP BY `cf`.`Year`, `Label`, `SName` union all select `s`.`Name` as `SName`, `cf`.`Year`, `cf`.`Year` as `Label`, sum(`cf`.`Value`) FROM `CacheFinancial` as `cf` join `Scenario` as `s` on `cf`.`ScenarioId` = `s`.`Id` WHERE `cf`.`ReitId` = 40 AND `cf`.`ScenarioId` IN (306,307,308) AND `cf`.`Type` = 0 AND `cf`.`Year` >= 2024 AND `cf`.`Year` <= 2028 GROUP BY `cf`.`Year`, `Label`, `SName` ORDER BY `Year` ASC;");
+            var complie = _duckDbQueryBuilder.Compile();
 
-            result.Data = _connection.Connection
-                .Query(complie.CompiledSql, complie.SqlParameters)
-                .Cast<IDictionary<string, object>>()
-                .Select(e => e.ToDictionary(k => k.Key, v => v.Value));
 
+            var schema = _schemaStore.Schemas.First(e => e.Key == _table);
+            var dbPath = Path.Combine(_schemaStore.LocalStoragePath ?? "", $"{schema.Key}.db");
+
+            using (var duckDBConnection = new DuckDBConnection($"DataSource={dbPath}"))
+            {
+                duckDBConnection.Open();
+                result.Data = duckDBConnection
+                    .Query(complie.CompiledSql, complie.SqlParameters)
+                    .Cast<IDictionary<string, object>>()
+                    .Select(e => e.ToDictionary(k => k.Key, v => v.Value));
+            }
             return result;
         }
 
         public IEnumerable<Dictionary<string, object>>? Get()
         {
-            var complie = _query.Compile();
+            var complie = _duckDbQueryBuilder.Compile();
 
-            return _connection.Connection
+            return _dbConnection.Connection
                 .Query(complie.CompiledSql, complie.SqlParameters)
                 .Cast<IDictionary<string, object>>()
                 .Select(e => e.ToDictionary(k => k.Key, v => v.Value));
-        }
-
-        public IEnumerable<T>? GetValues<T>(string property)
-        {
-            var complie = _query.Compile();
-            return _connection.Connection
-                .Query(complie.CompiledSql, complie.SqlParameters)
-                .Cast<IDictionary<string, T>>()
-                .Select(e => e.ToDictionary(k => k.Key, v => v.Value))
-                .SelectMany(e => e.Values);
-        }
-
-        public IEnumerable<object>? GetValues(string property)
-        {
-            var complie = _query.Compile();
-            return _connection.Connection
-                .Query(complie.CompiledSql, complie.SqlParameters)
-                .Cast<IDictionary<string, object>>()
-                .Select(e => e.ToDictionary(k => k.Key, v => v.Value))
-                .SelectMany(e => e.Values);
-        }
-
-        public T? GetScalar<T>()
-        {
-            var complie = _query.Compile();
-            var result = _connection.Connection.ExecuteScalar<T>(complie.CompiledSql, complie.SqlParameters);
-            if (result == null) return default;
-            return result;
-        }
-        public async Task<T?> GetScalarAsync<T>()
-        {
-            var complie = _query.Compile();
-            var result = await _connection.Connection.ExecuteScalarAsync<T>(complie.CompiledSql, complie.SqlParameters);
-            if (result == null) return default;
-            return result;
-        }
-        public object? GetScalar()
-        {
-            var complie = _query.Compile();
-            var result = _connection.Connection.ExecuteScalar(complie.CompiledSql, complie.SqlParameters);
-            if (result == null) return default;
-            return result;
-        }
-        public async Task<object?> GetScalarAsync()
-        {
-            var complie = _query.Compile();
-            var result = await _connection.Connection.ExecuteScalarAsync(complie.CompiledSql, complie.SqlParameters);
-            if (result == null) return default;
-            return result;
-        }
-        public IDictionary<string, object>? GetSingle()
-        {
-            var complie = _query.Compile();
-            return _connection.Connection.QuerySingleOrDefault(complie.CompiledSql, complie.SqlParameters) as IDictionary<string, object>;
-        }
-        public async Task<IDictionary<string, object>?> GetSingleAsync()
-        {
-            var complie = _query.Compile();
-            return await _connection.Connection.QuerySingleOrDefaultAsync(complie.CompiledSql, complie.SqlParameters) as IDictionary<string, object>;
-        }
-
-        public T? GetSingleValue<T>(string? property = null)
-        {
-            var result = GetSingle();
-            if (result == null) return default;
-            if (!string.IsNullOrWhiteSpace(property)) return (T)result[property];
-
-            var key = _queryMeasures.FirstOrDefault()?.Property ?? _queryDimension.FirstOrDefault()?.Property ?? _queryTimeDimension.Property;
-            return (T)result[key];
-        }
-
-        public async Task<T?> GetSingleValueAsync<T>(string? property = null)
-        {
-            var result = await GetSingleAsync();
-            if (result == null) return default;
-            if (!string.IsNullOrWhiteSpace(property)) return (T)result[property];
-
-            var key = _queryMeasures.FirstOrDefault()?.Property ?? _queryDimension.FirstOrDefault()?.Property ?? _queryTimeDimension.Property;
-            return (T)result[key];
-        }
-
-        public object? GetSingleValue(string? property = null)
-        {
-            var result = GetSingle();
-            if (result == null) return default;
-            if (!string.IsNullOrWhiteSpace(property)) return result[property];
-
-            var key = _queryMeasures.FirstOrDefault()?.Property ?? _queryDimension.FirstOrDefault()?.Property ?? _queryTimeDimension.Property;
-            return result[key];
-        }
-
-        public async Task<object?> GetSingleValueAsync(string? property = null)
-        {
-            var result = await GetSingleAsync();
-            if (result == null) return default;
-            if (!string.IsNullOrWhiteSpace(property)) return result[property];
-
-            var key = _queryMeasures.FirstOrDefault()?.Property ?? _queryDimension.FirstOrDefault()?.Property ?? _queryTimeDimension.Property;
-            return result[key];
-        }
-
-        public IDictionary<string, object>? GetFirst()
-        {
-            var complie = _query.Compile();
-            return _connection.Connection.QueryFirstOrDefault(complie.CompiledSql, complie.SqlParameters) as IDictionary<string, object>;
-        }
-
-        public async Task<IDictionary<string, object>?> GetFirstAsync()
-        {
-            var complie = _query.Compile();
-            return await _connection.Connection.QueryFirstOrDefaultAsync(complie.CompiledSql, complie.SqlParameters) as IDictionary<string, object>;
-        }
-
-        public T? GetFirstValue<T>(string? property = null)
-        {
-            var result = GetFirst();
-            if (result == null) return default;
-            if (!string.IsNullOrWhiteSpace(property)) return (T)result[property];
-
-            var key = _queryMeasures.FirstOrDefault()?.SqlColumn ?? _queryDimension.FirstOrDefault()?.SqlColumn ?? _queryTimeDimension.SqlColumn;
-            return (T)result[key];
-        }
-
-        public async Task<T?> GetFirstValueAsync<T>(string? property = null)
-        {
-            var result = await GetFirstAsync();
-            if (result == null) return default;
-            var ttt = result[property].GetType();
-            if (!string.IsNullOrWhiteSpace(property)) return (T)(object)result[property];
-
-            var key = _queryMeasures.FirstOrDefault()?.SqlColumn ?? _queryDimension.FirstOrDefault()?.SqlColumn ?? _queryTimeDimension.SqlColumn;
-            return (T)result[key];
-        }
-
-        public object? GetFirstValue(string? property = null)
-        {
-            var result = GetFirst();
-            if (result == null) return default;
-            if (!string.IsNullOrWhiteSpace(property)) return result[property];
-
-            var key = _queryMeasures.FirstOrDefault()?.SqlColumn ?? _queryDimension.FirstOrDefault()?.SqlColumn ?? _queryTimeDimension.SqlColumn;
-            return result[key];
-        }
-
-        public async Task<object?> GetFirstValueAsync(string? property = null)
-        {
-            var result = await GetFirstAsync();
-            if (result == null) return default;
-            if (!string.IsNullOrWhiteSpace(property)) return result[property];
-
-            var key = _queryMeasures.FirstOrDefault()?.Property ?? _queryDimension.FirstOrDefault()?.Property ?? _queryTimeDimension.Property;
-            return result[key];
         }
     }
 }

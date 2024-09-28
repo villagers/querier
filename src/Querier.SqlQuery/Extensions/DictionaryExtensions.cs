@@ -8,7 +8,7 @@ namespace Querier.SqlQuery.Extensions
 {
     public static class DictionaryExtensions
     {
-        public static Dictionary<string, TValue> Merge<TValue>(this Dictionary<string, TValue> dictionary, Dictionary<string, TValue> dictionaryToMerge, string prefix = "@name")
+        public static Dictionary<string, TValue> Merge<TValue>(this Dictionary<string, TValue> dictionary, Dictionary<string, TValue> dictionaryToMerge, string prefix = "@n")
         {
             var index = 0;
             var result = new Dictionary<string, TValue>();
@@ -29,7 +29,7 @@ namespace Querier.SqlQuery.Extensions
             return result;
         }
 
-        public static Dictionary<string, TValue> CopyTo<TValue>(this Dictionary<string, TValue> dictionary, Dictionary<string, TValue> dictionaryToCopy, string prefix = "@name")
+        public static Dictionary<string, TValue> CopyTo<TValue>(this Dictionary<string, TValue> dictionary, Dictionary<string, TValue> dictionaryToCopy, string prefix = "@n")
         {
             var index = dictionaryToCopy.Count;
 
