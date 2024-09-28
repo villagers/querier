@@ -1,3 +1,15 @@
+# [2.0.0-beta.2](https://github.com/villagers/querier/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2024-09-28)
+
+
+### Bug Fixes
+
+* ensure data source file has a `.db` extensions ([d0e8e34](https://github.com/villagers/querier/commit/d0e8e34d9eceb2419f6a7060300271903e6e6cb6))
+* group by sql dimensions and time dimensions ([903375d](https://github.com/villagers/querier/commit/903375d0c32f114a06bf4e638f190b8ec87ea34a))
+* remove extra parameters ([2a6d832](https://github.com/villagers/querier/commit/2a6d83241915e80734055c6a5ac1c9f49342da3b))
+* update `appsettings.ci.json` ([9554d98](https://github.com/villagers/querier/commit/9554d98021122228f206f5c91e9afcf5115a8de2))
+* use `AppendNullValue` when value is `DBNull` ([da3c756](https://github.com/villagers/querier/commit/da3c75636906975f5af1ecc9ee012a66f11cacf2))
+* use `AppendNullValue` when value type is `DBNull` ([58bbaad](https://github.com/villagers/querier/commit/58bbaadec515684be5a84c6d74a4d31a0eb40074))
+
 # [2.0.0-beta.1](https://github.com/villagers/querier/compare/v1.7.2...v2.0.0-beta.1) (2024-09-28)
 
 
