@@ -71,12 +71,12 @@ namespace Querier.Extensions
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 scope.ServiceProvider.GetRequiredService<ISchemaSqlGenerator>().Generate();
+                scope.ServiceProvider.GetRequiredService<QuerySchemaInitiator>().InitiateAsync().Wait();
 
                 app.ApplicationServices.UseScheduler(e =>
                 {
                     foreach (var schema in store.Schemas)
                     {
-                        scope.ServiceProvider.GetRequiredService<QuerySchemaInitiator>().InitiateAsync().Wait();
                         if (!schema.Initialized) continue;
                         if (schema.WarmUp)
                         {
