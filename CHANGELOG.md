@@ -1,3 +1,10 @@
+# [2.0.0-beta.5](https://github.com/villagers/querier/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2024-10-01)
+
+
+### Bug Fixes
+
+* calling `QuerySchemaInitiator` multiple times ([74c8cf9](https://github.com/villagers/querier/commit/74c8cf917fdc0734d6e4fb3ceeae9bc9c34361c5))
+
 # [2.0.0-beta.4](https://github.com/villagers/querier/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2024-10-01)
 
 
