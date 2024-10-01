@@ -10,6 +10,7 @@ namespace Querier.Schema
     {
         public readonly HashSet<QuerySchema> Schemas;
         public string? LocalStoragePath { get; set; }
+        public bool Initialized => Schemas.All(e => e.Initialized);
 
         public SchemaStore()
         {
