@@ -1,3 +1,10 @@
+# [2.0.0-beta.4](https://github.com/villagers/querier/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2024-10-01)
+
+
+### Features
+
+* meta attributes, enable switch, initialization check ([5c3c74f](https://github.com/villagers/querier/commit/5c3c74f2329adde08daf8edf4cb6bccc3c3523ec))
+
 # [2.0.0-beta.3](https://github.com/villagers/querier/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2024-09-28)
 
 
