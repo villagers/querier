@@ -1,11 +1,9 @@
-﻿using Querier.SqlQuery.Interfaces;
-using Dapper;
+﻿using Dapper;
 using Querier.Interfaces;
-using Querier.Attributes;
-using Querier.SqlQuery.Extensions;
 using Querier.Schema;
 using Querier.SqlQuery;
 using DuckDB.NET.Data;
+using Querier.SqlQuery.Models;
 
 namespace Querier
 {
@@ -22,6 +20,8 @@ namespace Querier
 
         private string _table;
         private int _numColumns = 0;
+
+        private SqlQueryResult SqlResult { get; set; }
 
         public Query(IDuckDBQueryBuilder duckDbQueryBuilder, IQueryDbConnection dbConnection, SchemaStore schemaStore)
         {
@@ -256,7 +256,7 @@ namespace Querier
             }
 
 
-            var complie = _duckDbQueryBuilder.Compile();
+            SqlResult = _duckDbQueryBuilder.Compile();
             var schema = _schemaStore.Schemas.First(e => e.Key == _table);
 
             var datasource = _schemaStore.DataSource(schema);
@@ -264,7 +264,7 @@ namespace Querier
             {
                 duckDBConnection.Open();
                 result.Data = duckDBConnection
-                    .Query(complie.CompiledSql, complie.SqlParameters)
+                    .Query(SqlResult.CompiledSql, SqlResult.SqlParameters)
                     .Cast<IDictionary<string, object>>()
                     .Select(e => e.ToDictionary(k => k.Key, v => v.Value));
             }
