@@ -1,3 +1,10 @@
+# [2.0.0-beta.6](https://github.com/villagers/querier/compare/v2.0.0-beta.5...v2.0.0-beta.6) (2024-10-01)
+
+
+### Bug Fixes
+
+* remove redundant `.ToString()` ([172dd38](https://github.com/villagers/querier/commit/172dd3833383e0866aa10ce1a3cb7cc4f366456a))
+
 # [2.0.0-beta.5](https://github.com/villagers/querier/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2024-10-01)
 
 
