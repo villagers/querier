@@ -41,7 +41,7 @@ namespace Querier.Schema
                     var result = await connection.ExecuteScalarAsync<string>(schema.RefreshSql);
                     if (!string.IsNullOrWhiteSpace(result))
                     {
-                        var refreshKey = Convert.ToBase64String(Encoding.UTF8.GetBytes(result.ToString()));
+                        var refreshKey = Convert.ToBase64String(Encoding.UTF8.GetBytes(result));
                         var existingRefreshKey = await duckDBConnection.ExecuteScalarAsync<string>(_schemaDatabase.TableConfigSelectSql, new { query = schema.Table.ToLowerInvariant() });
                         if (existingRefreshKey != null && refreshKey == existingRefreshKey) return;
                         await duckDBConnection.QueryAsync(_schemaDatabase.TableConfigInsertSql, new { query = schema.Table.ToLowerInvariant(), key = refreshKey });
