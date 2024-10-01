@@ -13,9 +13,10 @@ namespace Querier.Extensions
     {
         public static DuckDBAppenderRow AppendValue(this DuckDBAppenderRow row, object value)
         {
-            var type = value.GetType();
             if (value == null) return row.AppendNullValue();
-            if (value.GetType() == typeof(DBNull)) return row.AppendNullValue();
+
+            var type = value.GetType();
+            if (type == typeof(DBNull)) return row.AppendNullValue();
             if (type == typeof(int)) return row.AppendValue((int?)value);
             if (type == typeof(bool)) return row.AppendValue((bool?)value);
             if (type == typeof(byte)) return row.AppendValue((byte?)value);

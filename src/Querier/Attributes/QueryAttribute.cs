@@ -18,6 +18,8 @@ namespace Querier.Attributes
         public string? RefreshSql { get; set; }
         public string? RefreshInterval { get; set; }
 
+        public bool WarmUp { get; set; } = true;
+
         public QueryAttribute() { }
         public QueryAttribute(string key)
         {

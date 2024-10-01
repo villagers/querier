@@ -257,12 +257,10 @@ namespace Querier
 
 
             var complie = _duckDbQueryBuilder.Compile();
-
-
             var schema = _schemaStore.Schemas.First(e => e.Key == _table);
-            var dbPath = Path.Combine(_schemaStore.LocalStoragePath ?? "", $"{schema.Key}.db");
 
-            using (var duckDBConnection = new DuckDBConnection($"DataSource={dbPath}"))
+            var datasource = _schemaStore.DataSource(schema);
+            using (var duckDBConnection = new DuckDBConnection(datasource))
             {
                 duckDBConnection.Open();
                 result.Data = duckDBConnection

@@ -1,65 +1,51 @@
-﻿using Coravel.Invocable;
-using Dapper;
+﻿using Dapper;
 using DuckDB.NET.Data;
-using Google.Protobuf.WellKnownTypes;
-using Querier.Attributes;
 using Querier.Extensions;
 using Querier.Interfaces;
-using Querier.Schema;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Numerics;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Querier.Schedules
+namespace Querier.Schema
 {
-    public class QuerySchemaExecutor : IInvocable
+    public class QuerySchemaExecutor
     {
-        public required QuerySchema Payload { get; set; }
-
         private readonly SchemaStore _schemaStore;
         private readonly IQueryDbConnection _dbConnection;
+        private readonly QuerySchemaDatabase _schemaDatabase;
 
-        public QuerySchemaExecutor(SchemaStore schemaStore, IQueryDbConnection dbConnection, QuerySchema payload)
+
+        public QuerySchemaExecutor(SchemaStore schemaStore, IQueryDbConnection dbConnection, QuerySchemaDatabase schemaDatabase)
         {
-            Payload = payload;
-
             _schemaStore = schemaStore;
             _dbConnection = dbConnection;
+            _schemaDatabase = schemaDatabase;
         }
 
-        public async Task Invoke()
+        public async Task Invoke(QuerySchema schema)
         {
-            var command = Payload.SchemaCommand;
+            var command = schema.SchemaCommand;
 
-            var datasource = _schemaStore.DataSource(Payload);
+            var datasource = _schemaStore.DataSource(schema);
             using (var duckDBConnection = new DuckDBConnection(datasource))
             {
                 await duckDBConnection.OpenAsync();
 
                 var connection = _dbConnection.Connection;
                 var columnType = new List<Dictionary<string, string>>();
-                var columnNames = new List<string>();
 
-                if (!string.IsNullOrWhiteSpace(Payload.RefreshSql))
+                if (!string.IsNullOrWhiteSpace(schema.RefreshSql))
                 {
-                    var result = await connection.ExecuteScalarAsync(Payload.RefreshSql);
-                    var refreshKey = Convert.ToBase64String(Encoding.UTF8.GetBytes(result.ToString()));
-                    var existingRefreshKey = await duckDBConnection.ExecuteScalarAsync<string>($"SELECT refresh_key FROM config WHERE query = $query", new { query = Payload.Table.ToLowerInvariant() });
-
-                    if (existingRefreshKey != null && refreshKey == existingRefreshKey)
+                    var result = await connection.ExecuteScalarAsync<string>(schema.RefreshSql);
+                    if (!string.IsNullOrWhiteSpace(result))
                     {
-                        return;
-                    }
-                    var insert = $"INSERT INTO config VALUES ($query, $key)";
-                    await duckDBConnection.QueryAsync(insert, new { query = Payload.Table.ToLowerInvariant(), key = refreshKey });
-
-
+                        var refreshKey = Convert.ToBase64String(Encoding.UTF8.GetBytes(result.ToString()));
+                        var existingRefreshKey = await duckDBConnection.ExecuteScalarAsync<string>(_schemaDatabase.TableConfigSelectSql, new { query = schema.Table.ToLowerInvariant() });
+                        if (existingRefreshKey != null && refreshKey == existingRefreshKey) return;
+                        await duckDBConnection.QueryAsync(_schemaDatabase.TableConfigInsertSql, new { query = schema.Table.ToLowerInvariant(), key = refreshKey });
+                    }  
                 }
 
 
@@ -67,7 +53,6 @@ namespace Querier.Schedules
                 {
                     for (var i = 0; i < reader.FieldCount; i++)
                     {
-                        columnNames.Add(reader.GetName(i));
                         var columnTypeItem = new Dictionary<string, string>
                         {
                             { "name", reader.GetName(i) },
@@ -76,12 +61,9 @@ namespace Querier.Schedules
                         columnType.Add(columnTypeItem);
                     }
                     var tableSql = string.Join(",", columnType.Select(e => $"{e["name"]} {e["type"]}"));
-                    Payload.SchemaCommandDuckDbTable = string.Format(Payload.SchemaCommandDuckDbTable, Payload.Table, tableSql);
-                    await duckDBConnection.ExecuteAsync(Payload.SchemaCommandDuckDbTable);
+                    await duckDBConnection.ExecuteAsync(string.Format(_schemaDatabase.TableCreateSql, schema.Table, tableSql));
 
-
-
-                    using (var appender = duckDBConnection.CreateAppender(Payload.Table))
+                    using (var appender = duckDBConnection.CreateAppender(schema.Table))
                     {
                         while (reader.Read())
                         {
@@ -96,8 +78,10 @@ namespace Querier.Schedules
                         }
                     }
                     await duckDBConnection.CloseAsync();
-                }
+                }      
             }
+
+            _dbConnection.Connection.Close();
         }
     }
 }

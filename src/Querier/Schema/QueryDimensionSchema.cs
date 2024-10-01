@@ -17,6 +17,13 @@ namespace Querier.Schema
         public string? Description { get; set; }
         public string? Granularity { get; set; }
 
+        public Dictionary<string, object?> Meta { get; set; }
+
         public required Type Type { get; set; }
+
+        public QueryDimensionSchema()
+        {
+            Meta = new Dictionary<string, object?>();
+        }
     }
 }

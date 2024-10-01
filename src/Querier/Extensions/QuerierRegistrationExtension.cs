@@ -3,6 +3,7 @@ using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
 using Querier.Interfaces;
@@ -31,32 +32,38 @@ namespace Querier.Extensions
             var options = new QuerierRegistrationOption(services);
             opt.Invoke(options);
 
+            services.AddSingleton<SchemaLoader>();
+            services.AddSingleton(new SchemaStore()
+            {
+                LocalStoragePath = options.LocalStoragePath
+            });
+            services.AddSingleton(new QuerierOption()
+            {
+                Enabled = options.Enabled,
+                LocalStoragePath = options.LocalStoragePath
+            });
+
             services.AddScoped<IQuery, Query>();
             services.AddScoped<IDuckDBQueryBuilder, DuckDBQueryBuilder>();
-
             services.AddScoped<IQueryDbConnection>(e => new QueryDbConnection(options.Connection()));
 
             services.TryAddScoped<IMeasurePropertyValidator, MeasurePropertyValidator>();
             services.TryAddScoped<IDimensionPropertyValidator, DimensionPropertyValidator>();
             services.TryAddScoped<ITimeDimensionPropertyValidator, TimeDimensionPropertyValidator>();
 
-            services.AddSingleton<SchemaLoader>();
-            services.AddSingleton(new SchemaStore()
-            {
-                LocalStoragePath = options.LocalStoragePath
-            });
-            
+            services.AddTransient<QuerySchemaExecutor>();
+            services.AddTransient<QuerySchemaDatabase>();
+            services.AddTransient<QuerySchemaInitiator>();
 
             services.AddScheduler();
-            services.AddScoped<SchemaScheduler>();
-
-            services.AddTransient<QuerySchemaInitiator>();
 
             return services;
         }
 
         public static IApplicationBuilder UseQuerier(this IApplicationBuilder app)
         {
+            var options = app.ApplicationServices.GetRequiredService<QuerierOption>();
+            if (!options.Enabled) return app;
 
             app.ApplicationServices.GetRequiredService<SchemaLoader>().LoadDefaults();
 
@@ -70,30 +77,16 @@ namespace Querier.Extensions
                     foreach (var schema in store.Schemas)
                     {
                         scope.ServiceProvider.GetRequiredService<QuerySchemaInitiator>().InitiateAsync().Wait();
-                        if (schema.RunOnceAtStart)
+                        if (!schema.Initialized) continue;
+                        if (schema.WarmUp)
                         {
-                            var executor = new QuerySchemaExecutor(store, scope.ServiceProvider.GetRequiredService<IQueryDbConnection>(), schema)
-                            {
-                                Payload = schema
-                            };
-                            executor.Invoke().Wait();
+                            e.ScheduleWithParams<QuerySchemaScheduler>(schema).EverySecond().Once().PreventOverlapping(schema.Key);
                         }
-                        e.ScheduleWithParams<QuerySchemaExecutor>(schema).Cron(schema.RefreshInterval).PreventOverlapping(schema.Key);
+                        e.ScheduleWithParams<QuerySchemaScheduler>(schema).Cron(schema.RefreshInterval).PreventOverlapping(schema.Key);
                     }
-                }).OnError(e =>
-                {
-                    var err = e;
                 });
-                //scope.ServiceProvider.GetRequiredService<SchemaScheduler>().Schedule();
             }
 
-
-            return app;
-        }
-        public static IApplicationBuilder UseQuerier(this IApplicationBuilder app, Action<SchemaLoader> opt)
-        {
-            var options = new SchemaLoader(app.ApplicationServices.GetRequiredService<SchemaStore>(), app.ApplicationServices);
-            opt.Invoke(options);
 
             return app;
         }

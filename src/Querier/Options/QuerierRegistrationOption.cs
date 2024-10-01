@@ -18,7 +18,8 @@ namespace Querier.Options
         private IDbConnection _dbConnection;
         private readonly IServiceCollection _services;
 
-        public string? LocalStoragePath { set; get; }
+        public bool Enabled { get; set; } = true;
+        public string LocalStoragePath { set; get; }
         public ValidationOption Validation { private set; get; }
 
         public QuerierRegistrationOption(IServiceCollection services)
