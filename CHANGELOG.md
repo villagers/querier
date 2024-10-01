@@ -1,3 +1,10 @@
+# [2.0.0-beta.3](https://github.com/villagers/querier/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2024-09-28)
+
+
+### Bug Fixes
+
+* group by column order ([5ffa45e](https://github.com/villagers/querier/commit/5ffa45e5b2464b406079be0b43436cbfd5580294))
+
 # [2.0.0-beta.2](https://github.com/villagers/querier/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2024-09-28)
 
 
