@@ -1,5 +1,4 @@
 ﻿using Coravel.Invocable;
-using Microsoft.Extensions.Logging;
 using Querier.Schema;
 
 namespace Querier.Schedules
@@ -7,26 +6,17 @@ namespace Querier.Schedules
     public class QuerySchemaScheduler : IInvocable
     {
         private readonly QuerySchema _schema;
-        private readonly QuerySchemaExecutor _schemaExecutor;
-        private readonly ILogger<QuerySchemaScheduler> _logger;
+        private readonly QuerySchemaExecutor _executor;
 
-        public QuerySchemaScheduler(QuerySchemaExecutor schemaExecutor, QuerySchema schema, ILogger<QuerySchemaScheduler> logger)
+        public QuerySchemaScheduler(QuerySchemaExecutor executor, QuerySchema schema)
         {
             _schema = schema;
-            _schemaExecutor = schemaExecutor;
-            _logger = logger;
+            _executor = executor;
         }
 
         public async Task Invoke()
         {
-            try
-            {
-                await _schemaExecutor.Invoke(_schema);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Fail to execute scheduler: {ex.Message}");
-            }  
+            await _executor.Invoke(_schema);
         }
-    }
+    }      
 }
