@@ -1,12 +1,4 @@
-﻿using DuckDB.NET.Data;
-using MySqlX.XDevAPI;
-using Querier.Attributes;
-using Querier.Descriptors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Querier.Descriptors;
 
 namespace Querier.Schema
 {

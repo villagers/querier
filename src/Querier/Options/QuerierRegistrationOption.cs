@@ -3,7 +3,6 @@ using Querier.Interfaces;
 using Querier.SqlQuery.Functions;
 using Querier.SqlQuery;
 using Querier.Schema;
-using Microsoft.Extensions.Options;
 
 namespace Querier.Options
 {

@@ -1,26 +1,13 @@
 ﻿using Coravel;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Common;
 using Querier.Interfaces;
 using Querier.Options;
 using Querier.Schedules;
 using Querier.Schema;
 using Querier.SqlQuery;
-using Querier.SqlQuery.Functions;
-using Querier.SqlQuery.Interfaces;
 using Querier.Validators;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Querier.Extensions
 {

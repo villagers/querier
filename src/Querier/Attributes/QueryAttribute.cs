@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Querier.Attributes
+﻿namespace Querier.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class QueryAttribute : BaseAttribute, IKeyAttribute, IAliasAttribute, IDescriptionAttribute, ITableAttribute, ISqlAttribute
