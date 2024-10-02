@@ -72,20 +72,25 @@ namespace Querier.Extensions
             {
                 scope.ServiceProvider.GetRequiredService<ISchemaSqlGenerator>().Generate();
                 scope.ServiceProvider.GetRequiredService<QuerySchemaInitiator>().InitiateAsync().Wait();
+            }
 
-                app.ApplicationServices.UseScheduler(e =>
+            app.ApplicationServices.UseScheduler(e =>
+            {
+                e.OnWorker("query");
+                foreach (var schema in store.Schemas)
                 {
-                    foreach (var schema in store.Schemas)
-                    {
-                        if (!schema.Initialized) continue;
+                    if (!schema.Initialized) continue;
+
+                    using (var scope = app.ApplicationServices.CreateScope())
+                    {    
                         if (schema.WarmUp)
                         {
-                            e.ScheduleWithParams<QuerySchemaScheduler>(schema).EverySecond().Once().PreventOverlapping(schema.Key);
+                            scope.ServiceProvider.GetRequiredService<QuerySchemaExecutor>().Invoke(schema).Wait();
                         }
-                        e.ScheduleWithParams<QuerySchemaScheduler>(schema).Cron(schema.RefreshInterval).PreventOverlapping(schema.Key);
                     }
-                });
-            }
+                    e.ScheduleWithParams<QuerySchemaScheduler>(schema).Cron(schema.RefreshInterval).PreventOverlapping(schema.Key);
+                }
+            });
 
 
             return app;
