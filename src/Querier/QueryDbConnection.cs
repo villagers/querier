@@ -1,22 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 using Querier.Interfaces;
 
 namespace Querier
 {
-    public class QueryDbConnection : IQueryDbConnection
+    public abstract class QueryDbConnection
     {
-        private readonly IDbConnection _dbConnection;
+        protected readonly string _connectionString;
 
-        public QueryDbConnection(IDbConnection dbConnection)
+        public QueryDbConnection(string connectionString)
         {
-            _dbConnection = dbConnection;
-        }
+            _connectionString = connectionString;
 
-        public IDbConnection Connection => _dbConnection;
+        }
+    }
+
+    public class QueryDbMySqlConnection : QueryDbConnection, IQueryDbConnection
+    {
+        public QueryDbMySqlConnection(string connectionString) : base(connectionString) { }
+
+        public IDbConnection Connection()
+        {
+            return new MySqlConnection(_connectionString);
+        }
     }
 }

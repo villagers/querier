@@ -275,7 +275,7 @@ namespace Querier
         {
             var complie = _duckDbQueryBuilder.Compile();
 
-            return _dbConnection.Connection
+            return _dbConnection.Connection()
                 .Query(complie.CompiledSql, complie.SqlParameters)
                 .Cast<IDictionary<string, object>>()
                 .Select(e => e.ToDictionary(k => k.Key, v => v.Value));

@@ -34,7 +34,7 @@ namespace Querier.Schema
                 {
                     await duckDBConnection.OpenAsync();
 
-                    var connection = _dbConnection.Connection;
+                    var connection = _dbConnection.Connection();
                     var columnType = new List<Dictionary<string, string>>();
 
                     if (!string.IsNullOrWhiteSpace(schema.RefreshSql))
@@ -55,15 +55,14 @@ namespace Querier.Schema
                         for (var i = 0; i < reader.FieldCount; i++)
                         {
                             var columnTypeItem = new Dictionary<string, string>
-                        {
-                            { "name", reader.GetName(i) },
-                            { "type", reader.GetDataTypeName(i) }
-                        };
+                            {
+                                { "name", reader.GetName(i) },
+                                { "type", reader.GetDataTypeName(i) }
+                            };
                             columnType.Add(columnTypeItem);
                         }
                         var tableSql = string.Join(",", columnType.Select(e => $"{e["name"]} {e["type"]}"));
                         await duckDBConnection.ExecuteAsync(string.Format(_schemaDatabase.TableCreateSql, schema.Table, tableSql));
-
                         using (var appender = duckDBConnection.CreateAppender(schema.Table))
                         {
                             while (reader.Read())
@@ -80,13 +79,12 @@ namespace Querier.Schema
                         }
                         await duckDBConnection.CloseAsync();
                     }
-                }
-
-                _dbConnection.Connection.Close();
+                    connection.Close();
+                }  
             }
             catch (Exception ex)
             {
-                
+
                 _logger.LogError(ex, $"Fail to run executor: {ex.Message}");
             }
         }

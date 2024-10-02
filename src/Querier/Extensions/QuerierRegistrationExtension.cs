@@ -45,7 +45,6 @@ namespace Querier.Extensions
 
             services.AddScoped<IQuery, Query>();
             services.AddScoped<IDuckDBQueryBuilder, DuckDBQueryBuilder>();
-            services.AddScoped<IQueryDbConnection>(e => new QueryDbConnection(options.Connection()));
 
             services.TryAddScoped<IMeasurePropertyValidator, MeasurePropertyValidator>();
             services.TryAddScoped<IDimensionPropertyValidator, DimensionPropertyValidator>();
@@ -76,7 +75,6 @@ namespace Querier.Extensions
 
             app.ApplicationServices.UseScheduler(e =>
             {
-                e.OnWorker("query");
                 foreach (var schema in store.Schemas)
                 {
                     if (!schema.Initialized) continue;
@@ -85,7 +83,7 @@ namespace Querier.Extensions
                     {    
                         if (schema.WarmUp)
                         {
-                            scope.ServiceProvider.GetRequiredService<QuerySchemaExecutor>().Invoke(schema).Wait();
+                            e.ScheduleWithParams<QuerySchemaScheduler>(schema).EverySecond().Once().PreventOverlapping(schema.Key);
                         }
                     }
                     e.ScheduleWithParams<QuerySchemaScheduler>(schema).Cron(schema.RefreshInterval).PreventOverlapping(schema.Key);

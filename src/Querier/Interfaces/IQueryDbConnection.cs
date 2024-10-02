@@ -9,6 +9,6 @@ namespace Querier.Interfaces
 {
     public interface IQueryDbConnection
     {
-        public IDbConnection Connection { get; }
+        public IDbConnection Connection();
     }
 }
