@@ -1,3 +1,10 @@
+# [2.0.0-beta.7](https://github.com/villagers/querier/compare/v2.0.0-beta.6...v2.0.0-beta.7) (2024-10-01)
+
+
+### Bug Fixes
+
+* construct `SqlQueryResult` ([1f6c0e7](https://github.com/villagers/querier/commit/1f6c0e7519006a1a3ebed2c59083f866e1f67a28))
+
 # [2.0.0-beta.6](https://github.com/villagers/querier/compare/v2.0.0-beta.5...v2.0.0-beta.6) (2024-10-01)
 
 
