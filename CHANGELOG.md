@@ -1,3 +1,10 @@
+# [2.0.0-beta.8](https://github.com/villagers/querier/compare/v2.0.0-beta.7...v2.0.0-beta.8) (2024-10-02)
+
+
+### Bug Fixes
+
+* run schedulers on the same worker ([954863f](https://github.com/villagers/querier/commit/954863f40e698b0f83fe0fc7d30319eb7ed236c8))
+
 # [2.0.0-beta.7](https://github.com/villagers/querier/compare/v2.0.0-beta.6...v2.0.0-beta.7) (2024-10-01)
 
 
