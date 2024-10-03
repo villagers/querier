@@ -158,13 +158,18 @@ namespace Querier
 
             return this;
         }
-
         public IQuery FilterRaw(string sql)
         {
             _duckDbQueryBuilder.WhereRaw(sql);
             return this;
         }
+        public IQuery Filter(string column, Func<IQueryFilter, IQueryFilter> filter)
+        {
+            var newFilter = new QueryFilter(_duckDbQueryBuilder, column);
+            filter.Invoke(newFilter);
+            return this;
 
+        }
         public IQuery TimeDimension(string property, string timeDimensionPart, string? propertyAs = null)
         {
             _numColumns++;

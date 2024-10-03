@@ -240,6 +240,10 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new EqualOperator<T>() { Column = _whereColumn, Value = value });
         }
+        public TQuery Equal(string sql)
+        {
+            return WhereOperator(new EqualRawOperator() { Column = _whereColumn, RawSql = sql });
+        }
         public TQuery WhereNotEqual<T>(string column, T value)
         {
             return WhereOperator(column, new NotEqualOperator<T>() { Column = new SqlColumn() { Column = column }, Value = value });
@@ -247,6 +251,10 @@ namespace Querier.SqlQuery
         public TQuery NotEqual<T>(T value)
         {
             return WhereOperator(new NotEqualOperator<T>() { Column = _whereColumn, Value = value });
+        }
+        public TQuery NotEqual(string sql)
+        {
+            return WhereOperator(new NotEqualRawOperator() { Column = _whereColumn, RawSql = sql });
         }
         public TQuery WhereGreater<T>(string column, T value)
         {
@@ -260,6 +268,10 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new GreaterThanOperator<T>() { Column = _whereColumn, Value = value });
         }
+        public TQuery Greater(string sql)
+        {
+            return WhereOperator(new GreaterThanRawOperator() { Column = _whereColumn, RawSql = sql });
+        }
         public TQuery WhereNotGreater<T>(string column, T value)
         {
             return WhereOperator(column, new GreaterThanOperator<T>() { Column = new SqlColumn() { Column = column }, Value = value }.Not());
@@ -267,6 +279,10 @@ namespace Querier.SqlQuery
         public TQuery NotGreater<T>(T value)
         {
             return WhereOperator(new GreaterThanOperator<T>() { Column = _whereColumn, Value = value }.Not());
+        }
+        public TQuery NotGreater(string sql)
+        {
+            return WhereOperator(new GreaterThanRawOperator() { Column = _whereColumn, RawSql = sql }.Not());
         }
         public TQuery WhereLess<T>(string column, T value)
         {
@@ -280,6 +296,10 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new LessThanOperator<T>() { Column = _whereColumn, Value = value });
         }
+        public TQuery Less(string sql)
+        {
+            return WhereOperator(new LessThanRawOperator() { Column = _whereColumn, RawSql = sql });
+        }
         public TQuery WhereNotLess<T>(string column, T value)
         {
             return WhereOperator(column, new LessThanOperator<T>() { Column = new SqlColumn() { Column = column }, Value = value }.Not());
@@ -287,6 +307,10 @@ namespace Querier.SqlQuery
         public TQuery NotLess<T>(T value)
         {
             return WhereOperator(new LessThanOperator<T>() { Column = _whereColumn, Value = value }.Not());
+        }
+        public TQuery NotLess(string sql)
+        {
+            return WhereOperator(new LessThanRawOperator() { Column = _whereColumn, RawSql = sql }.Not());
         }
         public TQuery WhereGreaterOrEqual<T>(string column, T value)
         {
@@ -300,6 +324,10 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new GreaterThanOrEqualOperator<T>() { Column = _whereColumn, Value = value });
         }
+        public TQuery GreaterOrEqual(string sql)
+        {
+            return WhereOperator(new GreaterThanOrEqualRawOperator() { Column = _whereColumn, RawSql = sql });
+        }
         public TQuery WhereNotGreaterOrEqual<T>(string column, T value)
         {
             return WhereOperator(column, new GreaterThanOrEqualOperator<T>() { Column = new SqlColumn() { Column = column }, Value = value }.Not());
@@ -307,6 +335,10 @@ namespace Querier.SqlQuery
         public TQuery NotGreaterOrEqual<T>(T value)
         {
             return WhereOperator(new GreaterThanOrEqualOperator<T>() { Column = _whereColumn, Value = value }.Not());
+        }
+        public TQuery NotGreaterOrEqual(string sql)
+        {
+            return WhereOperator(new GreaterThanOrEqualRawOperator() { Column = _whereColumn, RawSql = sql }.Not());
         }
         public TQuery WhereLessOrEqual<T>(string column, T value)
         {
@@ -320,6 +352,10 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new LessThanOrEqualOperator<T>() { Column = _whereColumn, Value = value });
         }
+        public TQuery LessOrEqual(string sql)
+        {
+            return WhereOperator(new LessThanOrEqualRawOperator() { Column = _whereColumn, RawSql = sql });
+        }
         public TQuery WhereNotLessOrEqual<T>(string column, T value)
         {
             return WhereOperator(column, new LessThanOrEqualOperator<T>() { Column = new SqlColumn() { Column = column }, Value = value }.Not());
@@ -327,6 +363,10 @@ namespace Querier.SqlQuery
         public TQuery NotLessOrEqual<T>(T value)
         {
             return WhereOperator(new LessThanOrEqualOperator<T>() { Column = _whereColumn, Value = value }.Not());
+        }
+        public TQuery NotLessOrEqual(string sql)
+        {
+            return WhereOperator(new LessThanOrEqualRawOperator() { Column = _whereColumn, RawSql = sql }.Not());
         }
         public TQuery WhereBetween<T>(string column, T value, T secondValue)
         {
@@ -336,6 +376,10 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new BetweenOperator() { Column = _whereColumn, Value = value, SecondValue = secondValue });
         }
+        public TQuery Between(string sql)
+        {
+            return WhereOperator(new BetweenRawOperator() { Column = _whereColumn, RawSql = sql });
+        }
         public TQuery WhereNotBetween<T>(string column, T value, T secondValue)
         {
             return WhereOperator(column, new BetweenOperator() { Column = new SqlColumn() { Column = column }, Value = value, SecondValue = secondValue }.Not());
@@ -343,6 +387,10 @@ namespace Querier.SqlQuery
         public TQuery NotBetween<T>(T value, T secondValue)
         {
             return WhereOperator(new BetweenOperator() { Column = _whereColumn, Value = value, SecondValue = secondValue }.Not());
+        }
+        public TQuery NotBetween(string sql)
+        {
+            return WhereOperator(new BetweenRawOperator() { Column = _whereColumn, RawSql = sql }.Not());
         }
         public TQuery WhereIn<T>(string column, IEnumerable<T> value)
         {
@@ -356,6 +404,10 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new InOperator() { Column = _whereColumn, Value = value });
         }
+        public TQuery In(string sql)
+        {
+            return WhereOperator(new InRawOperator() { Column = _whereColumn, RawSql = sql });
+        }
         public TQuery WhereNotIn<T>(string column, IEnumerable<T> value)
         {
             return WhereOperator(column, new InOperator() { Column = new SqlColumn() { Column = column }, Value = value }.Not());
@@ -363,6 +415,10 @@ namespace Querier.SqlQuery
         public TQuery NotIn<T>(IEnumerable<T> value)
         {
             return WhereOperator(new InOperator() { Column = _whereColumn, Value = value }.Not());
+        }
+        public TQuery NotIn(string sql)
+        {
+            return WhereOperator(new InRawOperator() { Column = _whereColumn, RawSql = sql }.Not());
         }
         public TQuery WhereLike<T>(string column, T value)
         {
@@ -376,6 +432,10 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "%" });
         }
+        public TQuery Like(string sql)
+        {
+            return WhereOperator(new LikeRawOperator() { Column = _whereColumn, RawSql = sql, LikeStarts = "%", LikeEnds = "%" });
+        }
         public TQuery WhereNotLike<T>(string column, T value)
         {
             return WhereOperator(column, new LikeOperator() { Column = new SqlColumn() { Column = column }, Value = value, LikeStarts = "%", LikeEnds = "%" }.Not());
@@ -384,7 +444,10 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "%" }.Not());
         }
-
+        public TQuery NotLike(string sql)
+        {
+            return WhereOperator(new LikeRawOperator() { Column = _whereColumn, RawSql = sql, LikeStarts = "%", LikeEnds = "%" }.Not());
+        }
         public TQuery WhereStarts<T>(string column, T value)
         {
             return WhereOperator(column, new LikeOperator() { Column = new SqlColumn() { Column = column }, Value = value, LikeStarts = "", LikeEnds = "%" });
@@ -401,11 +464,18 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "", LikeEnds = "%" });
         }
+        public TQuery Starts(string sql)
+        {
+            return WhereOperator(new LikeRawOperator() { Column = _whereColumn, RawSql = sql, LikeStarts = "", LikeEnds = "%" });
+        }
         public TQuery NotStarts<T>(T value)
         {
             return WhereOperator(new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "", LikeEnds = "%" }.Not());
         }
-
+        public TQuery NotStarts(string sql)
+        {
+            return WhereOperator(new LikeRawOperator() { Column = _whereColumn, RawSql = sql, LikeStarts = "", LikeEnds = "%" }.Not());
+        }
         public TQuery WhereEnds<T>(string column, T value)
         {
             return WhereOperator(column, new LikeOperator() { Column = new SqlColumn() { Column = column }, Value = value, LikeStarts = "%", LikeEnds = "" });
@@ -422,9 +492,17 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "" });
         }
+        public TQuery Ends(string sql)
+        {
+            return WhereOperator(new LikeRawOperator() { Column = _whereColumn, RawSql = sql, LikeStarts = "%", LikeEnds = "" });
+        }
         public TQuery NotEnds<T>(T value)
         {
             return WhereOperator(new LikeOperator() { Column = _whereColumn, Value = value, LikeStarts = "%", LikeEnds = "" }.Not());
+        }
+        public TQuery NotEnds(string sql)
+        {
+            return WhereOperator(new LikeRawOperator() { Column = _whereColumn, RawSql = sql, LikeStarts = "%", LikeEnds = "" }.Not());
         }
         public TQuery WhereNull(string column)
         {

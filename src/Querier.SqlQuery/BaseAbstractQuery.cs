@@ -84,7 +84,7 @@ namespace Querier.SqlQuery
                 .Select((e, i) =>
                 {
                     result.Sql = result.Sql.ReplaceExact(e.Key, $"{SqlParameterPlaceholder}{i}");
-                    return new KeyValuePair<string, object>($"{SqlParameterPlaceholder}{i}", e.Value);
+                    return new KeyValuePair<string, object>($"{SqlParameterPlaceholder.Substring(1)}{i}", e.Value);
                 }).ToDictionary();
         }
         public virtual Dictionary<string, string> CompileNameParameters(SqlQueryResult result)

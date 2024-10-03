@@ -23,6 +23,7 @@ namespace Querier.Interfaces
         IQuery Limit(int limit);
 
         IQuery FilterRaw(string sql);
+        IQuery Filter(string column, Func<IQueryFilter, IQueryFilter> filter);
 
         IQuery Union(Func<IQuery, IQuery> query);
 
