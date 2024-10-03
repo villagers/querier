@@ -60,10 +60,10 @@ namespace Querier.SqlQuery.MySql.Tests.Unit
             Assert.Equal("select * from `orders` as `orders` where `orders`.`id` is null", _query.New().From("orders").Where("id").Null().Compile().CompiledSql);
             Assert.Equal("select * from `orders` as `orders` where `orders`.`id` is not null", _query.New().From("orders").WhereNotNull("id").Compile().CompiledSql);
             Assert.Equal("select * from `orders` as `orders` where `orders`.`id` is not null", _query.New().From("orders").Where("id").NotNull().Compile().CompiledSql);
-            Assert.Equal("select * from `orders` as `orders` where `orders`.`id` in @p0", _query.New().From("orders").WhereIn("id", $"({string.Join(", ", new int[] { 1, 2, 3 })})").Compile().CompiledSql);
-            Assert.Equal("select * from `orders` as `orders` where `orders`.`id` in @p0", _query.New().From("orders").Where("id").In($"({string.Join(", ", new int[] { 1, 2, 3 })})").Compile().CompiledSql);
-            Assert.Equal("select * from `orders` as `orders` where `orders`.`id` not in @p0", _query.New().From("orders").WhereNotIn("id", $"({string.Join(", ", new int[] { 1, 2, 3 })})").Compile().CompiledSql);
-            Assert.Equal("select * from `orders` as `orders` where `orders`.`id` not in @p0", _query.New().From("orders").Where("id").NotIn($"({string.Join(", ", new int[] { 1, 2, 3 })})").Compile().CompiledSql);
+            Assert.Equal("select * from `orders` as `orders` where `orders`.`id` in @p0", _query.New().From("orders").WhereIn("id", new int[] { 1, 2, 3 }).Compile().CompiledSql);
+            Assert.Equal("select * from `orders` as `orders` where `orders`.`id` in @p0", _query.New().From("orders").Where("id").In(new int[] { 1, 2, 3 }).Compile().CompiledSql);
+            Assert.Equal("select * from `orders` as `orders` where `orders`.`id` not in @p0", _query.New().From("orders").WhereNotIn("id", new int[] { 1, 2, 3 }).Compile().CompiledSql);
+            Assert.Equal("select * from `orders` as `orders` where `orders`.`id` not in @p0", _query.New().From("orders").Where("id").NotIn(new int[] { 1, 2, 3 }).Compile().CompiledSql);
         }
     }
 }
