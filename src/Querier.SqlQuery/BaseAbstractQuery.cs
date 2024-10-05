@@ -3,11 +3,6 @@ using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Tokenizers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Querier.SqlQuery
 {
@@ -16,12 +11,15 @@ namespace Querier.SqlQuery
 
         protected readonly IFunction _functionFactory;
 
-        public SqlTable<TQuery> _table;
+        public ISqlTable _table;
         protected readonly List<ISqlSelect> _select;
+        protected readonly List<SqlJoin> _join;
         protected readonly List<SqlWhere> _where;
-        protected readonly List<SqlGroupBy> _groupBy;
+        protected readonly List<ISqlGroupBy> _groupBy;
+        protected readonly List<SqlUnion<TQuery>> _union;
         protected readonly List<SqlOrderBy> _orderBy;
 
+        protected readonly Dictionary<string, string> _alias;
 
 
         protected bool _whereAnd = false;
@@ -42,11 +40,13 @@ namespace Querier.SqlQuery
         {
             _functionFactory = functionFactory;
 
-            _table = new SqlTable<TQuery>();
             _select = new List<ISqlSelect>();
+            _join = new List<SqlJoin>();
             _where = new List<SqlWhere>();
-            _groupBy = new List<SqlGroupBy>();
+            _groupBy = new List<ISqlGroupBy>();
+            _union = new List<SqlUnion<TQuery>>();
             _orderBy = new List<SqlOrderBy>();
+            _alias = new Dictionary<string, string>();
 
             SqlParameters = new Dictionary<string, object>();
             NameParameters = new Dictionary<string, string>();
@@ -71,14 +71,21 @@ namespace Querier.SqlQuery
         {
             return CreateSelect()
                 .Merge(CreateTable())
+                .Merge(CreateJoin())
                 .Merge(CreateWhere())
                 .Merge(CreateGroupBy())
+                .Merge(CreateUnion())
                 .Merge(CreateOrderBy())
                 .SqlTokenizer;
         }
         public virtual Dictionary<string, object> CompileSqlParameters(SqlQueryResult result)
         {
-            return SqlParameters.Select((e, i) => new KeyValuePair<string, object>($"{SqlParameterPlaceholder}{i}", e.Value)).ToDictionary();
+            return SqlParameters
+                .Select((e, i) =>
+                {
+                    result.Sql = result.Sql.ReplaceExact(e.Key, $"{SqlParameterPlaceholder}{i}");
+                    return new KeyValuePair<string, object>($"{SqlParameterPlaceholder}{i}", e.Value);
+                }).ToDictionary();
         }
         public virtual Dictionary<string, string> CompileNameParameters(SqlQueryResult result)
         {
@@ -88,22 +95,6 @@ namespace Querier.SqlQuery
                     result.Sql = result.Sql.ReplaceExact(e.Key, $"{NameParameterPlaceholder}{i}");
                     return new KeyValuePair<string, string>($"{NameParameterPlaceholder}{i}", e.Value);
                 }).ToDictionary();
-        }
-        public virtual SqlQueryResult CreateTable()
-        {
-            var result = new SqlQueryResult();
-
-            var tableTz = new SqlTokenizer().AddToken("from");
-
-            var tableCompiled = _table.Compile();
-            result = result.Merge(tableCompiled);
-            tableTz.AddToken(tableCompiled.Sql);
-
-            result.NameParameters.CopyTo(NameParameters);
-            result.SqlParameters.CopyTo(SqlParameters);
-
-            result.Sql = tableTz.Build(" ");
-            return result.Enumerate();
         }
         public virtual SqlQueryResult CreateSelect()
         {
@@ -126,7 +117,7 @@ namespace Querier.SqlQuery
             {
                 foreach (var select in _select)
                 {
-                    var selectCompiled = select.Compile();
+                    var selectCompiled = select.Compile(_table);
                     result = result.Merge(selectCompiled);
                     tz.AddToken(selectCompiled.Sql);
                 }
@@ -134,11 +125,50 @@ namespace Querier.SqlQuery
                 return tz;
             }, ", ");
 
-            result.NameParameters.CopyTo(NameParameters);
-            result.SqlParameters.CopyTo(SqlParameters);
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
 
             result.SqlTokenizer = selectTz;
             result.Sql = selectTz.Build(" ");
+            return result.Enumerate();
+        }
+
+        public virtual SqlQueryResult CreateJoin()
+        {
+            var result = new SqlQueryResult();
+
+            if (_join.Count <= 0) return result;
+
+            var tz = new SqlTokenizer();
+            foreach (var join in _join)
+            {
+                var compiled = join.Compile(_table);
+                result = result.Merge(compiled);
+                tz.AddToken(compiled.Sql);
+            }
+
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
+
+            result.SqlTokenizer = tz;
+            result.Sql = tz.Build();
+            return result.Enumerate();
+        }
+        public virtual SqlQueryResult CreateTable()
+        {
+            var result = new SqlQueryResult();
+
+            var tableTz = new SqlTokenizer().AddToken("from");
+
+            var tableCompiled = _table.Compile(_table);
+            result = result.Merge(tableCompiled);
+            tableTz.AddToken(tableCompiled.Sql);
+
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
+
+            result.SqlTokenizer = tableTz;
+            result.Sql = tableTz.Build();
             return result.Enumerate();
         }
         public virtual SqlQueryResult CreateWhere()
@@ -151,14 +181,15 @@ namespace Querier.SqlQuery
 
             foreach (var where in _where)
             {
-                var whereCompiled = where.Compile();
+                var whereCompiled = where.Compile(_table);
                 result = result.Merge(whereCompiled);
                 whereTz.AddToken(whereCompiled.Sql);
             }
 
-            result.NameParameters.CopyTo(NameParameters);
-            result.SqlParameters.CopyTo(SqlParameters);
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
 
+            result.SqlTokenizer = whereTz;
             result.Sql = whereTz.Build();
             return result.Enumerate();
         }
@@ -174,17 +205,39 @@ namespace Querier.SqlQuery
             {
                 foreach (var group in _groupBy)
                 {
-                    var groupByCompiled = group.Compile();
+                    var groupByCompiled = group.Compile(_table);
                     result = result.Merge(groupByCompiled);
                     e.AddToken(groupByCompiled.Sql);
                 }
                 return e;
             }, ", ");
 
-            result.NameParameters.CopyTo(NameParameters);
-            result.SqlParameters.CopyTo(SqlParameters);
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
 
+            result.SqlTokenizer = groupTz;
             result.Sql = groupTz.Build();
+            return result.Enumerate();
+        }
+        public virtual SqlQueryResult CreateUnion()
+        {
+            var result = new SqlQueryResult();
+
+            if (_union.Count <= 0) return result;
+
+            var _unionTz = new SqlTokenizer();
+            foreach (var union in _union)
+            {
+                var unionCompiled = union.Compile(_table);
+                result = result.Merge(unionCompiled);
+                _unionTz.AddToken(unionCompiled.Sql);
+            }
+
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
+
+            result.SqlTokenizer = _unionTz;
+            result.Sql = _unionTz.Build();
             return result.Enumerate();
         }
         public virtual SqlQueryResult CreateOrderBy()
@@ -199,16 +252,17 @@ namespace Querier.SqlQuery
             {
                 foreach (var order in _orderBy)
                 {
-                    var orderByCompiled = order.Compile();
+                    var orderByCompiled = order.Compile(_table);
                     result = result.Merge(orderByCompiled);
                     e.AddToken(orderByCompiled.Sql);
                 }
                 return e;
             }, ", ");
 
-            result.NameParameters.CopyTo(NameParameters);
-            result.SqlParameters.CopyTo(SqlParameters);
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
 
+            result.SqlTokenizer = orderTz;
             result.Sql = orderTz.Build();
             return result.Enumerate();
         }

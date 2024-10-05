@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace Querier.Web.Tests.Shared.Entites
 {
-    [Query(Key = "invoices")]
+    [Query(RefreshSql = "select MAX(`InvoiceDate`) from `Invoice`")]
+    [QueryTable("Invoice")]
     public class InvoiceEntity
     {
-        [QueryKey("IID")]
-        [QueryDisplay("Invoice ID")]
-        [QueryDimension(Key = "ID")]
+        [QueryDimension]
         public int InvoiceId { get; set; }
 
+        [QueryDimension]
         public int CustomerId { get; set; }
 
         [QueryTimeDimension]

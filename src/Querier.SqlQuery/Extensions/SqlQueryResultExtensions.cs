@@ -1,10 +1,4 @@
 ﻿using Querier.SqlQuery.Models;
-using Querier.SqlQuery.Tokenizers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Extensions
 {
@@ -12,10 +6,14 @@ namespace Querier.SqlQuery.Extensions
     {
         public static SqlQueryResult Merge(this SqlQueryResult result, SqlQueryResult resultToMerge)
         {
-            var keys = resultToMerge.NameParameters.Keys.ToList();
-            foreach (var item in keys)
+            foreach (var item in resultToMerge.NameParameters.Keys.ToList())
             {
                 resultToMerge.NameParameters.RenameKey(item, $"@temp_{item}");
+                resultToMerge.Sql = resultToMerge.Sql.ReplaceExact(item, $"@temp_{item}");
+            }
+            foreach (var item in resultToMerge.SqlParameters.Keys.ToList())
+            {
+                resultToMerge.SqlParameters.RenameKey(item, $"@temp_{item}");
                 resultToMerge.Sql = resultToMerge.Sql.ReplaceExact(item, $"@temp_{item}");
             }
 

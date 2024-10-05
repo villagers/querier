@@ -25,6 +25,7 @@ namespace Querier.Tests.Integration.MySql
                 services.AddQuerier(o =>
                 {
                     o.UseMySql(connectionString);
+                    o.LocalStoragePath = "/home";
                 });
             });
         }

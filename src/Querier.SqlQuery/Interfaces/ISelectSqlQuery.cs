@@ -1,11 +1,4 @@
-﻿using Querier.SqlQuery.Operators;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Querier.SqlQuery.Interfaces
+﻿namespace Querier.SqlQuery.Interfaces
 {
     public interface ISelectSqlQuery<TQuery>
     {
@@ -18,7 +11,7 @@ namespace Querier.SqlQuery.Interfaces
         TQuery SelectMax(string column, string? columnAs = null);
         TQuery SelectMin(string column, string? columnAs = null);
         TQuery SelectSum(string column, string? columnAs = null);
-        TQuery SelectCase(string column, AbstractOperator @operator, string value, string defaultValue);
+        TQuery SelectCase<T>(string column, T value, object thenValue, object? elseValue = null);
 
         TQuery SelectSecond(string column, string? columnAs = null);
         TQuery SelectMinute(string column, string? columnAs = null);
@@ -27,6 +20,8 @@ namespace Querier.SqlQuery.Interfaces
         TQuery SelectDate(string column, string? columnAs = null);
         TQuery SelectMonth(string column, string? columnAs = null);
         TQuery SelectYear(string column, string? columnAs = null);
+
+        TQuery SelectRaw(string sql, string sqlAs);
 
         TQuery Distinct();
     }

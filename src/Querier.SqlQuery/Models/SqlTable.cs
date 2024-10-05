@@ -1,23 +1,16 @@
 ﻿using Querier.SqlQuery.Extensions;
 using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Tokenizers;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlTable<TQuery> : ISqlQueryCompile<SqlQueryResult>
+    public class SqlTable<TQuery> : ISqlTable
     {
-        public string? Table { get; set; }
+        public required string Table { get; set; }
         public string? TableAs { get; set; }
+        public string TableOrAlias => TableAs ?? Table;
 
-        public TQuery? Query { get; set; }
-
-        public virtual SqlQueryResult Compile()
+        public virtual SqlQueryResult Compile(ISqlTable table)
         {
             var result = new SqlQueryResult();
             result.NameParameters.Add("@table", Table);

@@ -1,9 +1,5 @@
-﻿using Querier.SqlQuery.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Querier.SqlQuery.Interfaces;
+using Querier.SqlQuery.Models;
 
 namespace Querier.SqlQuery.Functions
 {
@@ -25,8 +21,10 @@ namespace Querier.SqlQuery.Functions
             return newParameter;
         }
 
-        public SqlQueryResult Compile()
+        public SqlQueryResult Compile(ISqlTable table)
         {
+            NameParameters.Add("@table", table.TableOrAlias);
+
             var result = new SqlQueryResult()
             {
                 Sql = string.Join(" ", this),

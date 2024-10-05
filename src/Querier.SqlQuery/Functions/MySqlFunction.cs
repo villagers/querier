@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace Querier.SqlQuery.Functions
+﻿namespace Querier.SqlQuery.Functions
 {
     public class MySqlFunction : BaseFunction, IFunction
     {
@@ -13,10 +6,9 @@ namespace Querier.SqlQuery.Functions
         {
             return new MySqlFunction();
         }
-
         public IFunction Date(string column, string? columnAs = null)
         {
-            AddLast($"date({NameParameter(column)})");
+            AddLast($"date(@table.{NameParameter(column)})");
             if (!string.IsNullOrWhiteSpace(columnAs))
             {
                 AddLast("as");
@@ -26,7 +18,7 @@ namespace Querier.SqlQuery.Functions
         }
         public IFunction Year(string column, string? columnAs = null)
         {
-            AddLast($"year({NameParameter(column)})");
+            AddLast($"year(@table.{NameParameter(column)})");
             if (!string.IsNullOrWhiteSpace(columnAs))
             {
                 AddLast("as");
@@ -37,7 +29,7 @@ namespace Querier.SqlQuery.Functions
 
         public IFunction Month(string column, string? columnAs = null)
         {
-            AddLast($"month({NameParameter(column)})");
+            AddLast($"month(@table.{NameParameter(column)})");
             if (!string.IsNullOrWhiteSpace(columnAs))
             {
                 AddLast("as");
@@ -47,7 +39,7 @@ namespace Querier.SqlQuery.Functions
         }
         public IFunction Day(string column, string? columnAs = null)
         {
-            AddLast($"day({NameParameter(column)})");
+            AddLast($"day(@table.{NameParameter(column)})");
             if (!string.IsNullOrWhiteSpace(columnAs))
             {
                 AddLast("as");
@@ -57,7 +49,7 @@ namespace Querier.SqlQuery.Functions
         }
         public IFunction Hour(string column, string? columnAs = null)
         {
-            AddLast($"hour({NameParameter(column)})");
+            AddLast($"hour(@table.{NameParameter(column)})");
             if (!string.IsNullOrWhiteSpace(columnAs))
             {
                 AddLast("as");
@@ -68,7 +60,7 @@ namespace Querier.SqlQuery.Functions
 
         public IFunction Minute(string column, string? columnAs = null)
         {
-            AddLast($"minute({NameParameter(column)})");
+            AddLast($"minute(@table.{NameParameter(column)})");
             if (!string.IsNullOrWhiteSpace(columnAs))
             {
                 AddLast("as");
@@ -79,7 +71,7 @@ namespace Querier.SqlQuery.Functions
 
         public IFunction Second(string column, string? columnAs = null)
         {
-            AddLast($"second({NameParameter(column)})");
+            AddLast($"second(@table.{NameParameter(column)})");
             if (!string.IsNullOrWhiteSpace(columnAs))
             {
                 AddLast("as");

@@ -1,13 +1,7 @@
 ﻿using Querier.SqlQuery.Extensions;
-using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Models;
 using Querier.SqlQuery.Operators;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Querier.SqlQuery
 {
@@ -26,6 +20,6 @@ namespace Querier.SqlQuery
             return new SqlWhere((AbstractOperator)Operator.Clone());
         }
 
-        public virtual SqlQueryResult Compile() => Operator.Compile().Enumerate();
+        public virtual SqlQueryResult Compile(ISqlTable table) => Operator.Compile(table).Enumerate();
     }
 }

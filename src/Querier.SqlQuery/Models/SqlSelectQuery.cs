@@ -1,12 +1,6 @@
 ﻿using Querier.SqlQuery.Extensions;
-using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Interfaces;
 using Querier.SqlQuery.Tokenizers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Querier.SqlQuery.Models
 {
@@ -15,7 +9,7 @@ namespace Querier.SqlQuery.Models
         public required TQuery Query { get; set; }
         public string? QueryAs { get; set; }
 
-        public SqlQueryResult Compile()
+        public SqlQueryResult Compile(ISqlTable table)
         {
             var result = new SqlQueryResult();
 

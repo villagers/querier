@@ -1,6 +1,8 @@
 name: tests
 
 on:
+  push:
+    branches: ["main", "develop"]
   pull_request:
     branches: ["main", "develop"]
 
@@ -16,8 +18,8 @@ jobs:
       - name: Setup MySQL
         run: |
           sudo /etc/init.d/mysql start
-          mysql -u root -p'root' < scripts/Chinook_MySql.sql
+          mysql -u root -p'root' < scripts/chinook_mysql.sql
           mysql -u root -p'root' -e 'SHOW TABLES;' Chinook
 
       - name: Test
-        run: dotnet test --verbosity normal
+        run: dotnet test tests/Querier.SqlQuery.MySql.Tests/Querier.SqlQuery.MySql.Tests.csproj --verbosity normal

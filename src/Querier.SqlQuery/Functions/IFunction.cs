@@ -1,15 +1,11 @@
-﻿using Querier.SqlQuery.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Querier.SqlQuery.Interfaces;
+using Querier.SqlQuery.Models;
 
 namespace Querier.SqlQuery.Functions
 {
-    public interface IFunction : IDateFunction
+    public interface IFunction : IDateFunction, ISqlQueryCompile<SqlQueryResult>
     {
         IFunction New();
-        SqlQueryResult Compile();
+        SqlQueryResult Compile(ISqlTable table);
     }
 }

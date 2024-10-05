@@ -1,27 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Querier.Attributes
+﻿namespace Querier.Attributes
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class QueryDimensionAttribute : BaseAttribute, IKeyAttribute, IDisplayAttribute
+    public class QueryDimensionAttribute : BaseAttribute, IKeyAttribute, IAliasAttribute, IOrderAttribute, IDescriptionAttribute, IColumnAttribute, ISqlAttribute
     {
-        public string Key { get; set; }
-        public string DisplayName { get; set; }
+        public string? Sql { get; set; }
+        public string? Key { get; set; }
+        public string? Alias { get; set; }
+        public string? Order { get; set; }
+        public string? Column { get; set; }
+        public string? Description { get; set; }
 
         public QueryDimensionAttribute() { }
         public QueryDimensionAttribute(string key)
         {
             Key = key;
-        }
-        public QueryDimensionAttribute(string key, string displayName)
-        {
-            Key = key;
-            DisplayName = displayName;
         }
     }
 }
