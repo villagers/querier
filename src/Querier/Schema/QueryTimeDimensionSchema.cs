@@ -1,9 +1,4 @@
 ﻿using Querier.Descriptors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Querier.Schema
 {
@@ -17,6 +12,13 @@ namespace Querier.Schema
         public string? Description { get; set; }
         public string? Granularity { get; set; }
 
+        public Dictionary<string, object?> Meta { get; set; }
+
         public required Type Type { get; set; }
+
+        public QueryTimeDimensionSchema()
+        {
+            Meta = new Dictionary<string, object?>();
+        }
     }
 }

@@ -1,126 +1,125 @@
 ﻿using Querier.Interfaces;
 using Querier.SqlQuery;
-using Querier.SqlQuery.Functions;
-using Querier.SqlQuery.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Querier
 {
     public class QueryFilter : IQueryFilter
     {
-
+        private readonly string _column;
         private readonly IDuckDBQueryBuilder _query;
 
         public QueryFilter(IDuckDBQueryBuilder query)
         {
             _query = query;
         }
+        public QueryFilter(IDuckDBQueryBuilder query, string column)
+        {
+            _query = query;
+            _column = column;
 
+            _query.Where(column);
+        }
         public IQueryFilter New()
         {
             return new QueryFilter(_query);
         }
 
-        public IQueryFilter In<T>(string column, IEnumerable<T> value)
+        public IQueryFilter In<T>(IEnumerable<T> value)
         {
-            _query.WhereIn(column, value);
+            _query.In(value);
             return this;
         }
-        public IQueryFilter In<T>(Func<IFunction, IFunction> function, IEnumerable<T> value)
+        public IQueryFilter In(string rawSql)
         {
-            _query.WhereIn(function, value);
-            return this;
-        }
-
-        public IQueryFilter Equal<T>(string column, T value)
-        {
-            _query.WhereEqual(column, value);
-            return this;
-        }
-        public IQueryFilter Equal<T>(Func<IFunction, IFunction> function, T value)
-        {
-            _query.WhereEqual(function, value);
+            _query.In(rawSql);
             return this;
         }
 
-        public IQueryFilter Contains<T>(string column, T value)
+        public IQueryFilter Equal<T>(T value)
         {
-            _query.WhereLike(column, value);
+            _query.Equal(value);
             return this;
         }
-        public IQueryFilter Contains<T>(Func<IFunction, IFunction> function, T value)
+        public IQueryFilter Equal(string rawSql)
         {
-            _query.WhereLike(function, value);
-            return this;
-        }
-
-        public IQueryFilter StartsWith<T>(string column, T value)
-        {
-            _query.WhereStarts(column, value);
-            return this;
-        }
-        public IQueryFilter StartsWith<T>(Func<IFunction, IFunction> function, T value)
-        {
-            _query.WhereStarts(function, value);
+            _query.Equal(rawSql);
             return this;
         }
 
-        public IQueryFilter EndsWith<T>(string column, T value)
+        public IQueryFilter Contains<T>(T value)
         {
-            _query.WhereEnds(column, value);
+            _query.Like(value);
             return this;
         }
-        public IQueryFilter EndsWith<T>(Func<IFunction, IFunction> function, T value)
+        public IQueryFilter Contains(string rawSql)
         {
-            _query.WhereEnds(function, value);
-            return this;
-        }
-
-        public IQueryFilter Greater<T>(string column, T value)
-        {
-            _query.WhereGreater(column, value);
-            return this;
-        }
-        public IQueryFilter Greater<T>(Func<IFunction, IFunction> function, T value)
-        {
-            _query.WhereGreater(function, value);
+            _query.Like(rawSql);
             return this;
         }
 
-        public IQueryFilter GreaterOrEqual<T>(string column, T value)
+        public IQueryFilter StartsWith<T>(T value)
         {
-            _query.WhereGreaterOrEqual(column, value);
+            _query.Starts(value);
             return this;
         }
-        public IQueryFilter GreaterOrEqual<T>(Func<IFunction, IFunction> function, T value)
+        public IQueryFilter StartsWith(string rawSql)
         {
-            _query.WhereGreaterOrEqual(function, value);
-            return this;
-        }
-
-        public IQueryFilter Less<T>(string column, T value)
-        {
-            _query.WhereLess(column, value);
-            return this;
-        }
-        public IQueryFilter Less<T>(Func<IFunction, IFunction> function, T value)
-        {
-            _query.WhereLess(function, value);
+            _query.Starts(rawSql);
             return this;
         }
 
-        public IQueryFilter LessOrEqual<T>(string column, T value)
+        public IQueryFilter EndsWith<T>(T value)
         {
-            _query.WhereLessOrEqual(column, value);
+            _query.Ends(value);
             return this;
         }
-        public IQueryFilter LessOrEqual<T>(Func<IFunction, IFunction> function, T value)
+        public IQueryFilter EndsWith(string rawSql)
         {
-            _query.WhereLessOrEqual(function, value);
+            _query.Ends(rawSql);
+            return this;
+        }
+
+        public IQueryFilter Greater<T>(T value)
+        {
+            _query.Greater(value);
+            return this;
+        }
+        public IQueryFilter Greater(string rawSql)
+        {
+            _query.Greater(rawSql);
+            return this;
+        }
+
+        public IQueryFilter GreaterOrEqual<T>(T value)
+        {
+            _query.GreaterOrEqual(value);
+            return this;
+        }
+        public IQueryFilter GreaterOrEqual(string rawSql)
+        {
+            _query.GreaterOrEqual(rawSql);
+            return this;
+        }
+
+        public IQueryFilter Less<T>(T value)
+        {
+            _query.Less(value);
+            return this;
+        }
+        public IQueryFilter Less(string rawSql)
+        {
+            _query.Less(rawSql);
+            return this;
+        }
+
+        public IQueryFilter LessOrEqual<T>(T value)
+        {
+            _query.LessOrEqual(value);
+            return this;
+        }
+        public IQueryFilter LessOrEqual(string rawSql)
+        {
+            _query.LessOrEqual(rawSql);
             return this;
         }
 

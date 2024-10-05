@@ -1,16 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Org.BouncyCastle.Asn1.Cms;
 using Querier.Attributes;
 using Querier.Helpers;
 using Querier.Interfaces;
-using Querier.Validators;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Querier.Schema
 {
@@ -63,16 +55,21 @@ namespace Querier.Schema
         }
         private QuerySchema LoadDefined(Type type)
         {
+
             var querySchema = new QuerySchema()
             {
                 Sql = AttributeHelper.GetAttributeValue<ISqlAttribute>(type, e => e.Sql),
-                Key = AttributeHelper.GetAttributeValue<IKeyAttribute>(type, e => e.Key) ?? type.Name,
+                Key = AttributeHelper.GetAttributeValue<IKeyAttribute>(type, e => e.Key, type.Name),
                 Alias = AttributeHelper.GetAttributeValue<IAliasAttribute>(type, e => e.Alias),
-                Table = AttributeHelper.GetAttributeValue<ITableAttribute>(type, e => e.Table) ?? type.Name,
+                Table = AttributeHelper.GetAttributeValue<ITableAttribute>(type, e => e.Table, type.Name),
                 DbFile = AttributeHelper.GetAttributeValue<IKeyAttribute>(type, e => e.Key) ?? type.Name,
                 Description = AttributeHelper.GetAttributeValue<IDescriptionAttribute>(type, e => e.Description),
                 RefreshSql = AttributeHelper.GetAttributeValue<QueryAttribute>(type, e => e.RefreshSql),
-                RefreshInterval = AttributeHelper.GetAttributeValue<QueryAttribute>(type, e => e.RefreshInterval) ?? "* * * * *",
+                RefreshInterval = AttributeHelper.GetAttributeValue<QueryAttribute>(type, e => e.RefreshInterval, "* * * * *"),
+
+                WarmUp = AttributeHelper.GetAttributeValue<QueryAttribute, bool>(type, e => e.WarmUp, false),
+
+                Meta = AttributeHelper.GetAttributeValues<IMetaAttribute, KeyValuePair<string, object?>>(type, e => new KeyValuePair<string, object?>(e.Key, e.Value)).ToDictionary(),
 
                 Type = type
             };
@@ -89,12 +86,14 @@ namespace Querier.Schema
                 var measureSchema = new QueryMeasureSchema()
                 {
                     Sql = AttributeHelper.GetAttributeValue<ISqlAttribute>(property, e => e.Sql),
-                    Key = AttributeHelper.GetAttributeValue<IKeyAttribute>(property, e => e.Key) ?? property.Name,
+                    Key = AttributeHelper.GetAttributeValue<IKeyAttribute>(property, e => e.Key, property.Name),
                     Alias = AttributeHelper.GetAttributeValue<IAliasAttribute>(property, e => e.Alias),
                     Order = AttributeHelper.GetAttributeValue<IOrderAttribute>(property, e => e.Order),
-                    Column = AttributeHelper.GetAttributeValue<IColumnAttribute>(property, e => e.Column) ?? property.Name,
+                    Column = AttributeHelper.GetAttributeValue<IColumnAttribute>(property, e => e.Column, property.Name),
                     Description = AttributeHelper.GetAttributeValue<IDescriptionAttribute>(property, e => e.Description),
                     Aggregation = AttributeHelper.GetAttributeValue<IAggregationAttribute>(property, e => e.Aggregation),
+
+                    Meta = AttributeHelper.GetAttributeValues<IMetaAttribute, KeyValuePair<string, object?>>(property, e => new KeyValuePair<string, object?>(e.Key, e.Value)).ToDictionary(),
 
                     Type = property.PropertyType
                 };
@@ -113,14 +112,17 @@ namespace Querier.Schema
                 var dimensionSchema = new QueryDimensionSchema()
                 {
                     Sql = AttributeHelper.GetAttributeValue<ISqlAttribute>(property, e => e.Sql),
-                    Key = AttributeHelper.GetAttributeValue<IKeyAttribute>(property, e => e.Key) ?? property.Name,
+                    Key = AttributeHelper.GetAttributeValue<IKeyAttribute>(property, e => e.Key, property.Name),
                     Alias = AttributeHelper.GetAttributeValue<IAliasAttribute>(property, e => e.Alias),
                     Order = AttributeHelper.GetAttributeValue<IOrderAttribute>(property, e => e.Order),
-                    Column = AttributeHelper.GetAttributeValue<IColumnAttribute>(property, e => e.Column) ?? property.Name,
+                    Column = AttributeHelper.GetAttributeValue<IColumnAttribute>(property, e => e.Column, property.Name),
                     Description = AttributeHelper.GetAttributeValue<IDescriptionAttribute>(property, e => e.Description),
+
+                    Meta = AttributeHelper.GetAttributeValues<IMetaAttribute, KeyValuePair<string, object?>>(property, e => new KeyValuePair<string, object?>(e.Key, e.Value)).ToDictionary(),
 
                     Type = property.PropertyType
                 };
+
                 querySchema.Dimensions.Add(dimensionSchema);
             }
             return this;
@@ -136,12 +138,14 @@ namespace Querier.Schema
                 var timeDimensionSchema = new QueryTimeDimensionSchema()
                 {
                     Sql = AttributeHelper.GetAttributeValue<ISqlAttribute>(property, e => e.Sql),
-                    Key = AttributeHelper.GetAttributeValue<IKeyAttribute>(property, e => e.Key) ?? property.Name,
+                    Key = AttributeHelper.GetAttributeValue<IKeyAttribute>(property, e => e.Key, property.Name),
                     Alias = AttributeHelper.GetAttributeValue<IAliasAttribute>(property, e => e.Alias),
                     Order = AttributeHelper.GetAttributeValue<IOrderAttribute>(property, e => e.Order),
-                    Column = AttributeHelper.GetAttributeValue<IColumnAttribute>(property, e => e.Column) ?? property.Name,
+                    Column = AttributeHelper.GetAttributeValue<IColumnAttribute>(property, e => e.Column, property.Name),
                     Description = AttributeHelper.GetAttributeValue<IDescriptionAttribute>(property, e => e.Description),
                     Granularity = AttributeHelper.GetAttributeValue<IGranularityAttribute>(property, e => e.Granularity),
+
+                    Meta = AttributeHelper.GetAttributeValues<IMetaAttribute, KeyValuePair<string, object?>>(property, e => new KeyValuePair<string, object?>(e.Key, e.Value)).ToDictionary(),
 
                     Type = !string.IsNullOrWhiteSpace(granularity) ? typeof(Int32) : property.PropertyType
                 };

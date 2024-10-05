@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Querier.Attributes
+﻿namespace Querier.Attributes
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class QueryDimensionAttribute : BaseAttribute, IKeyAttribute, IAliasAttribute, IOrderAttribute, IDescriptionAttribute, IColumnAttribute, ISqlAttribute

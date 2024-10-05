@@ -1,3 +1,87 @@
+# [2.0.0-beta.8](https://github.com/villagers/querier/compare/v2.0.0-beta.7...v2.0.0-beta.8) (2024-10-02)
+
+
+### Bug Fixes
+
+* run schedulers on the same worker ([954863f](https://github.com/villagers/querier/commit/954863f40e698b0f83fe0fc7d30319eb7ed236c8))
+
+# [2.0.0-beta.7](https://github.com/villagers/querier/compare/v2.0.0-beta.6...v2.0.0-beta.7) (2024-10-01)
+
+
+### Bug Fixes
+
+* construct `SqlQueryResult` ([1f6c0e7](https://github.com/villagers/querier/commit/1f6c0e7519006a1a3ebed2c59083f866e1f67a28))
+
+# [2.0.0-beta.6](https://github.com/villagers/querier/compare/v2.0.0-beta.5...v2.0.0-beta.6) (2024-10-01)
+
+
+### Bug Fixes
+
+* remove redundant `.ToString()` ([172dd38](https://github.com/villagers/querier/commit/172dd3833383e0866aa10ce1a3cb7cc4f366456a))
+
+# [2.0.0-beta.5](https://github.com/villagers/querier/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2024-10-01)
+
+
+### Bug Fixes
+
+* calling `QuerySchemaInitiator` multiple times ([74c8cf9](https://github.com/villagers/querier/commit/74c8cf917fdc0734d6e4fb3ceeae9bc9c34361c5))
+
+# [2.0.0-beta.4](https://github.com/villagers/querier/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2024-10-01)
+
+
+### Features
+
+* meta attributes, enable switch, initialization check ([5c3c74f](https://github.com/villagers/querier/commit/5c3c74f2329adde08daf8edf4cb6bccc3c3523ec))
+
+# [2.0.0-beta.3](https://github.com/villagers/querier/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2024-09-28)
+
+
+### Bug Fixes
+
+* group by column order ([5ffa45e](https://github.com/villagers/querier/commit/5ffa45e5b2464b406079be0b43436cbfd5580294))
+
+# [2.0.0-beta.2](https://github.com/villagers/querier/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2024-09-28)
+
+
+### Bug Fixes
+
+* ensure data source file has a `.db` extensions ([d0e8e34](https://github.com/villagers/querier/commit/d0e8e34d9eceb2419f6a7060300271903e6e6cb6))
+* group by sql dimensions and time dimensions ([903375d](https://github.com/villagers/querier/commit/903375d0c32f114a06bf4e638f190b8ec87ea34a))
+* remove extra parameters ([2a6d832](https://github.com/villagers/querier/commit/2a6d83241915e80734055c6a5ac1c9f49342da3b))
+* update `appsettings.ci.json` ([9554d98](https://github.com/villagers/querier/commit/9554d98021122228f206f5c91e9afcf5115a8de2))
+* use `AppendNullValue` when value is `DBNull` ([da3c756](https://github.com/villagers/querier/commit/da3c75636906975f5af1ecc9ee012a66f11cacf2))
+* use `AppendNullValue` when value type is `DBNull` ([58bbaad](https://github.com/villagers/querier/commit/58bbaadec515684be5a84c6d74a4d31a0eb40074))
+
+# [2.0.0-beta.1](https://github.com/villagers/querier/compare/v1.7.2...v2.0.0-beta.1) (2024-09-28)
+
+
+### Features
+
+* allow `Raw` querier, add `Join` methods, add `Case` methods ([b2de599](https://github.com/villagers/querier/commit/b2de599441ad6027d21854cbc31c6aa90a48bb8a))
+* allow `union` queries ([9a2705a](https://github.com/villagers/querier/commit/9a2705a8200e31daef86600329384a3532e216bf))
+* version  2 ([f56fcdf](https://github.com/villagers/querier/commit/f56fcdfd322655a2a1cda79dc98ae8f07ee39160))
+
+
+### BREAKING CHANGES
+
+* Breaking changes to the API
+
+# [1.8.0-beta.1](https://github.com/villagers/querier/compare/v1.7.2...v1.8.0-beta.1) (2024-09-28)
+
+
+### Features
+
+* allow `Raw` querier, add `Join` methods, add `Case` methods ([b2de599](https://github.com/villagers/querier/commit/b2de599441ad6027d21854cbc31c6aa90a48bb8a))
+* allow `union` queries ([9a2705a](https://github.com/villagers/querier/commit/9a2705a8200e31daef86600329384a3532e216bf))
+
+# [1.8.0-beta.1](https://github.com/villagers/querier/compare/v1.7.2...v1.8.0-beta.1) (2024-09-28)
+
+
+### Features
+
+* allow `Raw` querier, add `Join` methods, add `Case` methods ([b2de599](https://github.com/villagers/querier/commit/b2de599441ad6027d21854cbc31c6aa90a48bb8a))
+* allow `union` queries ([9a2705a](https://github.com/villagers/querier/commit/9a2705a8200e31daef86600329384a3532e216bf))
+
 ## [1.7.2](https://github.com/villagers/querier/compare/v1.7.1...v1.7.2) (2024-09-10)
 
 

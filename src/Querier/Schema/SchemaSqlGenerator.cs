@@ -1,11 +1,5 @@
 ﻿using Querier.Interfaces;
 using Querier.SqlQuery.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Querier.Schema
 {
@@ -65,7 +59,7 @@ namespace Querier.Schema
                 {
                     if (!string.IsNullOrWhiteSpace(dimension.Sql))
                     {
-                        sqlQuery.SelectRaw(dimension.Sql, dimension.Alias ?? $"c{columnIndex}");
+                        sqlQuery.SelectRaw(dimension.Sql, dimension.Alias ?? $"c{columnIndex}").GroupBy(columnIndex);
                     }
                     else
                     {
@@ -83,7 +77,7 @@ namespace Querier.Schema
                 {
                     if (!string.IsNullOrWhiteSpace(timeDimension.Sql))
                     {
-                        sqlQuery.SelectRaw(timeDimension.Sql, timeDimension.Alias ?? $"c{columnIndex}");
+                        sqlQuery.SelectRaw(timeDimension.Sql, timeDimension.Alias ?? $"c{columnIndex}").GroupBy(columnIndex);
                     }
                     else
                     {

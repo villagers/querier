@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Querier.Attributes
+﻿namespace Querier.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class QueryAttribute : BaseAttribute, IKeyAttribute, IAliasAttribute, IDescriptionAttribute, ITableAttribute, ISqlAttribute
@@ -17,6 +11,8 @@ namespace Querier.Attributes
 
         public string? RefreshSql { get; set; }
         public string? RefreshInterval { get; set; }
+
+        public bool WarmUp { get; set; } = true;
 
         public QueryAttribute() { }
         public QueryAttribute(string key)

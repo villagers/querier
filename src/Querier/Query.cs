@@ -1,11 +1,9 @@
-﻿using Querier.SqlQuery.Interfaces;
-using Dapper;
+﻿using Dapper;
 using Querier.Interfaces;
-using Querier.Attributes;
-using Querier.SqlQuery.Extensions;
 using Querier.Schema;
 using Querier.SqlQuery;
 using DuckDB.NET.Data;
+using Querier.SqlQuery.Models;
 
 namespace Querier
 {
@@ -21,6 +19,9 @@ namespace Querier
         private readonly IDuckDBQueryBuilder _duckDbQueryBuilder;
 
         private string _table;
+        private int _numColumns = 0;
+
+        private SqlQueryResult SqlResult { get; set; }
 
         public Query(IDuckDBQueryBuilder duckDbQueryBuilder, IQueryDbConnection dbConnection, SchemaStore schemaStore)
         {
@@ -40,6 +41,7 @@ namespace Querier
         public IQuery From(string table)
         {
             _table = table;
+            _numColumns = 0;
 
             var tableKey = _schemaStore.Schemas.FirstOrDefault(e => e.Key == table);
 
@@ -49,10 +51,11 @@ namespace Querier
 
         public IQuery Measure(string property, string? propertyAs = null)
         {
+            _numColumns++;
             var table = _schemaStore.Schemas.First(e => e.Key == _table);
             var tableMeasure = table.Measures.Where(e => e.Key == property).FirstOrDefault();
 
-            _duckDbQueryBuilder.Select(tableMeasure?.Column ?? property, propertyAs ?? property).GroupBy();
+            _duckDbQueryBuilder.Select(tableMeasure?.Column ?? property, propertyAs ?? property).GroupBy(_numColumns);
 
             var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
             _queryMeasures.Add(measure);
@@ -62,6 +65,7 @@ namespace Querier
 
         public IQuery MeasureCount(string property, string? propertyAs = null)
         {
+            _numColumns++;
             var table = _schemaStore.Schemas.First(e => e.Key == _table);
             var tableMeasure = table.Measures.Where(e => e.Key == property).FirstOrDefault();
 
@@ -75,6 +79,7 @@ namespace Querier
 
         public IQuery MeasureSum(string property, string? propertyAs = null)
         {
+            _numColumns++;
             var table = _schemaStore.Schemas.First(e => e.Key == _table);
             var tableMeasure = table.Measures.Where(e => e.Key == property).FirstOrDefault();
 
@@ -88,6 +93,7 @@ namespace Querier
 
         public IQuery MeasureAvg(string property, string? propertyAs = null)
         {
+            _numColumns++;
             var table = _schemaStore.Schemas.First(e => e.Key == _table);
             var tableMeasure = table.Measures.Where(e => e.Key == property).FirstOrDefault();
 
@@ -101,6 +107,7 @@ namespace Querier
 
         public IQuery MeasureMin(string property, string? propertyAs = null)
         {
+            _numColumns++;
             var table = _schemaStore.Schemas.First(e => e.Key == _table);
             var tableMeasure = table.Measures.Where(e => e.Key == property).FirstOrDefault();
 
@@ -114,6 +121,7 @@ namespace Querier
 
         public IQuery MeasureMax(string property, string? propertyAs = null)
         {
+            _numColumns++;
             var table = _schemaStore.Schemas.First(e => e.Key == _table);
             var tableMeasure = table.Measures.Where(e => e.Key == property).FirstOrDefault();
 
@@ -127,10 +135,11 @@ namespace Querier
 
         public IQuery Dimension(string property, string? propertyAs = null)
         {
+            _numColumns++;
             var table = _schemaStore.Schemas.First(e => e.Key == _table);
             var tableDimension = table.Dimensions.Where(e => e.Key == property).FirstOrDefault();
 
-            _duckDbQueryBuilder.Select(tableDimension?.Column ?? property, propertyAs ?? property).GroupBy();
+            _duckDbQueryBuilder.Select(tableDimension?.Column ?? property, propertyAs ?? property).GroupBy(_numColumns);
 
             var dimension = new QueryDimension() { Property = property, PropertyAs = propertyAs };
             _queryDimension.Add(dimension);
@@ -139,24 +148,31 @@ namespace Querier
         }
         public IQuery TimeDimension(string property, string? propertyAs = null)
         {
+            _numColumns++;
             var table = _schemaStore.Schemas.First(e => e.Key == _table);
             var tableDimension = table.Dimensions.Where(e => e.Key == property).FirstOrDefault();
 
-            _duckDbQueryBuilder.Select(tableDimension?.Column ?? property, propertyAs ?? property).GroupBy();
+            _duckDbQueryBuilder.Select(tableDimension?.Column ?? property, propertyAs ?? property).GroupBy(_numColumns);
 
             _queryTimeDimension = new QueryTimeDimension() { Property = property };
 
             return this;
         }
-
         public IQuery FilterRaw(string sql)
         {
             _duckDbQueryBuilder.WhereRaw(sql);
             return this;
         }
+        public IQuery Filter(string column, Func<IQueryFilter, IQueryFilter> filter)
+        {
+            var newFilter = new QueryFilter(_duckDbQueryBuilder, column);
+            filter.Invoke(newFilter);
+            return this;
 
+        }
         public IQuery TimeDimension(string property, string timeDimensionPart, string? propertyAs = null)
         {
+            _numColumns++;
             var table = _schemaStore.Schemas.First(e => e.Key == _table);
             var tableTimeDimension = table.Dimensions.Where(e => e.Key == property).FirstOrDefault();
 
@@ -165,28 +181,28 @@ namespace Querier
             switch (timeDimensionPart)
             {
                 case "date":
-                    _duckDbQueryBuilder.SelectDate(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
+                    _duckDbQueryBuilder.SelectDate(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy(_numColumns);
                     break;
                 case "second":
-                    _duckDbQueryBuilder.SelectSecond(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
+                    _duckDbQueryBuilder.SelectSecond(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy(_numColumns);
                     break;
                 case "minute":
-                    _duckDbQueryBuilder.SelectMinute(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
+                    _duckDbQueryBuilder.SelectMinute(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy(_numColumns);
                     break;
                 case "hour":
-                    _duckDbQueryBuilder.SelectHour(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
+                    _duckDbQueryBuilder.SelectHour(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy(_numColumns);
                     break;
                 case "day":
-                    _duckDbQueryBuilder.SelectDay(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
+                    _duckDbQueryBuilder.SelectDay(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy(_numColumns);
                     break;
                 case "month":
-                    _duckDbQueryBuilder.SelectMonth(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
+                    _duckDbQueryBuilder.SelectMonth(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy(_numColumns);
                     break;
                 case "year":
-                    _duckDbQueryBuilder.SelectYear(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
+                    _duckDbQueryBuilder.SelectYear(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy(_numColumns);
                     break;
                 default:
-                    _duckDbQueryBuilder.Select(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy();
+                    _duckDbQueryBuilder.Select(tableTimeDimension?.Column ?? property, propertyAs ?? property).GroupBy(_numColumns);
                     break;
             }
             _queryTimeDimension = new QueryTimeDimension() { Property = property, PropertyAs = propertyAs, TimeDimensionPart = timeDimensionPart };
@@ -203,7 +219,6 @@ namespace Querier
                 property;
 
             _duckDbQueryBuilder.OrderBy(tableProperty, direction);
-            //_queryTimeDimension = new QueryTimeDimension() { Property = property };
 
             return this;
         }
@@ -246,17 +261,15 @@ namespace Querier
             }
 
 
-            var complie = _duckDbQueryBuilder.Compile();
-
-
+            SqlResult = _duckDbQueryBuilder.Compile();
             var schema = _schemaStore.Schemas.First(e => e.Key == _table);
-            var dbPath = Path.Combine(_schemaStore.LocalStoragePath ?? "", $"{schema.Key}.db");
 
-            using (var duckDBConnection = new DuckDBConnection($"DataSource={dbPath}"))
+            var datasource = _schemaStore.DataSource(schema);
+            using (var duckDBConnection = new DuckDBConnection(datasource))
             {
                 duckDBConnection.Open();
                 result.Data = duckDBConnection
-                    .Query(complie.CompiledSql, complie.SqlParameters)
+                    .Query(SqlResult.CompiledSql, SqlResult.SqlParameters)
                     .Cast<IDictionary<string, object>>()
                     .Select(e => e.ToDictionary(k => k.Key, v => v.Value));
             }
@@ -267,7 +280,7 @@ namespace Querier
         {
             var complie = _duckDbQueryBuilder.Compile();
 
-            return _dbConnection.Connection
+            return _dbConnection.Connection()
                 .Query(complie.CompiledSql, complie.SqlParameters)
                 .Cast<IDictionary<string, object>>()
                 .Select(e => e.ToDictionary(k => k.Key, v => v.Value));

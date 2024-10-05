@@ -1,13 +1,4 @@
-﻿using Org.BouncyCastle.Tls;
-using Querier.Attributes;
-using Querier.Schema;
-using Querier.SqlQuery.Functions;
-using Querier.SqlQuery.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Querier.Schema;
 
 namespace Querier.Interfaces
 {
@@ -32,6 +23,7 @@ namespace Querier.Interfaces
         IQuery Limit(int limit);
 
         IQuery FilterRaw(string sql);
+        IQuery Filter(string column, Func<IQueryFilter, IQueryFilter> filter);
 
         IQuery Union(Func<IQuery, IQuery> query);
 
