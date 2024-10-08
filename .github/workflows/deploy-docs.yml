@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./docs
-        run: yarn install --frozen-lockfile
+        run: npm ci
       - name: Build website
         working-directory: ./docs
         run: yarn build
