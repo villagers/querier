@@ -55,7 +55,6 @@ namespace Querier.Schema
         }
         private QuerySchema LoadDefined(Type type)
         {
-
             var querySchema = new QuerySchema()
             {
                 Sql = AttributeHelper.GetAttributeValue<ISqlAttribute>(type, e => e.Sql),
@@ -66,6 +65,8 @@ namespace Querier.Schema
                 Description = AttributeHelper.GetAttributeValue<IDescriptionAttribute>(type, e => e.Description),
                 RefreshSql = AttributeHelper.GetAttributeValue<QueryAttribute>(type, e => e.RefreshSql),
                 RefreshInterval = AttributeHelper.GetAttributeValue<QueryAttribute>(type, e => e.RefreshInterval, "* * * * *"),
+
+                Joins = AttributeHelper.GetAttributeValues<IJoinAttribute, IJoinAttribute>(type, e => e),
 
                 WarmUp = AttributeHelper.GetAttributeValue<QueryAttribute, bool>(type, e => e.WarmUp, false),
 

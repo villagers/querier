@@ -29,6 +29,15 @@ namespace Querier.Schema
                     sqlQuery.From(schema.Table, schema.Alias);
                 }
 
+                if (schema.Joins.Any())
+                {
+                    foreach (var joins in schema.Joins)
+                    {
+                        sqlQuery.Join(joins.JoinRefTable, joins.JoinRefColumn, joins.JoinColumn);
+                    }
+                    
+                }
+
                 var columnIndex = 1;
                 foreach (var measure in schema.Measures)
                 {
