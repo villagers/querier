@@ -15,6 +15,8 @@ namespace Querier.Schema
         public string? RefreshSql { get; set; }
         public string? RefreshInterval { get; set; }
 
+        public IEnumerable<IJoinDescriptor> Joins { get; set; }
+
         public Dictionary<string, object?> Meta { get; set; }
 
         public required Type Type { get; set; }
@@ -31,6 +33,8 @@ namespace Querier.Schema
 
         public QuerySchema()
         {
+            Joins = new List<IJoinDescriptor>();
+
             Meta = new Dictionary<string, object?>();
 
             Measures = new HashSet<QueryMeasureSchema>();
