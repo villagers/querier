@@ -3,8 +3,8 @@
   <PropertyGroup>
     <Authors>Villagers;Kostas Makris</Authors>
     <Company>Villagers</Company>
-    <Version>2.0.0</Version>
-    <PackageVersion>2.0.0</PackageVersion>
+    <Version>2.1.0</Version>
+    <PackageVersion>2.1.0</PackageVersion>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>

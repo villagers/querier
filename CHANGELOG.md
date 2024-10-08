@@ -1,3 +1,9 @@
+## [2.1.0](https://github.com/villagers/querier/compare/v2.0.0...v2.1.0) (2024-10-08)
+
+### Features
+
+* add `QueryJoin` attribute ([c6f4a82](https://github.com/villagers/querier/commit/c6f4a822c92358dd555ed54146ff895fb83a4b78))
+
 ## [2.0.0](https://github.com/villagers/querier/compare/v1.7.2...v2.0.0) (2024-10-05)
 
 ### ⚠ BREAKING CHANGES
