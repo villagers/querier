@@ -1,4 +1,4 @@
-﻿using Querier.SqlQuery.Functions;;
+﻿using Querier.SqlQuery.Functions;
 
 namespace Querier.SqlQuery.MySql.Tests.Unit
 {
