@@ -1,3 +1,10 @@
+## [2.2.0-beta.2](https://github.com/villagers/querier/compare/v2.2.0-beta.1...v2.2.0-beta.2) (2024-10-10)
+
+### Bug Fixes
+
+* `date` alias to time dimension column ([4a33a93](https://github.com/villagers/querier/commit/4a33a9395ac7510463133283a88ed60f6390c24c))
+* compile query sql parameters ([8301464](https://github.com/villagers/querier/commit/83014641150714cbcaf7a5f1a62a5146876fe035))
+
 ## [2.2.0-beta.1](https://github.com/villagers/querier/compare/v2.1.0...v2.2.0-beta.1) (2024-10-10)
 
 ### Features
