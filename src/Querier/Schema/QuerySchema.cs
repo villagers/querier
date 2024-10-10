@@ -23,6 +23,7 @@ namespace Querier.Schema
         public bool WarmUp { get; set; }
 
         public SchemaQueryCommand? SchemaCommand { get; set; }
+        public SchemaQueryCommand SchemaCommandFillMissingDates { get; set; }
 
         public readonly HashSet<QueryMeasureSchema> Measures;
         public readonly HashSet<QueryDimensionSchema> Dimensions;

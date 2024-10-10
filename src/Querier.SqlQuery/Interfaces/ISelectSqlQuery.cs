@@ -21,7 +21,9 @@
         TQuery SelectMonth(string column, string? columnAs = null);
         TQuery SelectYear(string column, string? columnAs = null);
 
-        TQuery SelectRaw(string sql, string sqlAs);
+        TQuery SelectRaw(string sql, string? sqlAs = null);
+
+        TQuery SelectCoalesce<T>(Func<TQuery, TQuery> query, T value, string? queryAs = null);
 
         TQuery Distinct();
     }
