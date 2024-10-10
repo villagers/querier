@@ -1,3 +1,9 @@
+## [2.2.0-beta.3](https://github.com/villagers/querier/compare/v2.2.0-beta.2...v2.2.0-beta.3) (2024-10-10)
+
+### Bug Fixes
+
+* create specific sets by using `pairs` for `cartesian` cte ([1c1fb80](https://github.com/villagers/querier/commit/1c1fb80a1e833317eafe7d4ed28d1d94ce0c388b))
+
 ## [2.2.0-beta.2](https://github.com/villagers/querier/compare/v2.2.0-beta.1...v2.2.0-beta.2) (2024-10-10)
 
 ### Bug Fixes
