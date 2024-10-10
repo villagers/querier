@@ -266,10 +266,8 @@ namespace Querier
                     $"SELECT DISTINCT {string.Join(",", columns)} " +
                     $"FROM {table.Table} where");
 
-            foreach (var columnValue in columnValues)
-            {
-                newQuery.AppendRaw($"{columnValue.Key} in ({string.Join(",", columnValue.Value)})");
-            }
+            var pairCommand = columnValues.Select(e => $"{e.Key} in ({string.Join(",", e.Value)})");
+            newQuery.AppendRaw(string.Join(" and ", pairCommand));
             newQuery.AppendRaw("),")
                 .AppendRaw(
                     "CartesianProduct as (" +
