@@ -335,6 +335,8 @@ namespace Querier
             SqlResult = _duckDbQueryBuilder.Compile();
             var schema = _schemaStore.Schemas.First(e => e.Key == _table);
 
+            _duckDbQueryBuilder.CompileFull(SqlResult);
+
             var query = _fillMissingDates ? _fillMissingDatesCommand : SqlResult.CompiledSql;
             var queryParameters = _fillMissingDates ? [] : SqlResult.SqlParameters;
 
