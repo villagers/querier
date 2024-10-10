@@ -4,30 +4,25 @@ using Querier.SqlQuery.Tokenizers;
 
 namespace Querier.SqlQuery.Models
 {
-    public class SqlJoin : ISqlJoin
+    public class SqlJoinRaw : ISqlJoin
     {
+        public required string RawSql { get; set; }
         public required string RefenreceTable { get; set; }
-        public string Join { get; set; } = "inner";
         public List<ISqlJoinOn> JoinOn { get; set; } = new List<ISqlJoinOn>();
 
         public SqlQueryResult Compile(ISqlTable table)
         {
             var result = new SqlQueryResult();
+            result.Sql = new SqlTokenizer().AddToken($"{RawSql}").Build();
+
             result.NameParameters.Add("@refTable", RefenreceTable);
             result.NameParameters.Add("@table", table.TableOrAlias);
 
-            var tz = new SqlTokenizer()
-                .AddToken($"{Join} join")
-                .AddToken("@refTable")
-                .AddToken("on");
-            
+            var tz = new SqlTokenizer().AddToken(RawSql);
 
             for (var i = 0; i < JoinOn.Count; i++)
             {
-                if (i > 0)
-                {
-                    tz.AddToken("and");
-                }
+                tz.AddToken("and");
                 var join = JoinOn[i];
                 var compiled = join.Compile(table);
                 result = result.Merge(compiled);

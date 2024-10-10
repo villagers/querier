@@ -51,6 +51,29 @@ namespace Querier.SqlQuery
             return (TQuery)(object)this;
         }
 
+        public TQuery With(string name, Func<TQuery, TQuery> query)
+        {
+            var newQuery = query.Invoke(New());
+            _cte.Add(new SqlCte<TQuery>()
+            {
+                Name = name,
+                Query = newQuery,
+                Recursive = false
+            });
+            return (TQuery)(object)this;
+        }
+        public TQuery WithRecursive(string name, Func<TQuery, TQuery> query)
+        {
+            var newQuery = query.Invoke(New());
+            _cte.Add(new SqlCte<TQuery>()
+            {
+                Name = name,
+                Query = newQuery,
+                Recursive = true
+            });
+            return (TQuery)(object)this;
+        }
+
         public TQuery Select()
         {
             _whereColumn = new SqlColumn() { Column = "*" };
@@ -171,7 +194,7 @@ namespace Querier.SqlQuery
         {
             return SelectDateFunction(_functionFactory.New().Year(column, columnAs));
         }
-        public TQuery SelectRaw(string sql, string sqlAs)
+        public TQuery SelectRaw(string sql, string? sqlAs = null)
         {
             _select.Add(new SqlSelectRaw()
             {
@@ -180,13 +203,87 @@ namespace Querier.SqlQuery
             });
             return (TQuery)(object)this;
         }
-        public TQuery Join(string table, string tableProperty, string property)
+        public TQuery SelectCoalesce<T>(Func<TQuery, TQuery> query, T value, string? queryAs = null)
+        {
+            var newQuery = query.Invoke(New());
+            _select.Add(new SqlSelectQuery<TQuery>()
+            {
+                Query = newQuery,
+                QueryAs = queryAs,
+                Function = "coalesce",
+                FunctionParameters = new List<object> { value }
+            });
+            return (TQuery)(object)this;
+        }
+        public TQuery JoinRaw(string referenceTable, string rawSql)
+        {
+            _join.Add(new SqlJoinRaw()
+            {
+                RawSql = rawSql,
+                RefenreceTable = referenceTable
+            });
+            return (TQuery)(object)this;
+        }
+        public TQuery Join(string column, string referenceTable, string referenceColumn)
         {
             _join.Add(new SqlJoin()
             {
-                Column = property,
-                RefenreceTable = table,
-                RefenreceColumn = tableProperty
+                RefenreceTable = referenceTable,
+            }.On(column, referenceColumn));
+            return (TQuery)(object)this;
+        }
+        public TQuery InnerJoin(string column, string referenceTable, string referenceColumn)
+        {
+            _join.Add(new SqlJoin()
+            {
+                RefenreceTable = referenceTable,
+            }.On(column, referenceColumn));
+            return (TQuery)(object)this;
+        }
+        public TQuery LeftJoin(string column, string referenceTable, string referenceColumn)
+        {
+            _join.Add(new SqlJoin()
+            {
+                Join = "left",
+                RefenreceTable = referenceTable,
+            }.On(column, referenceColumn));
+            return (TQuery)(object)this;
+        }
+        public TQuery RightJoin(string column, string referenceTable, string referenceColumn)
+        {
+            _join.Add(new SqlJoin()
+            {
+                Join = "right",
+                RefenreceTable = referenceTable,
+            }.On(column, referenceColumn));
+            return (TQuery)(object)this;
+        }
+        public TQuery FullJoin(string column, string referenceTable, string referenceColumn)
+        {
+            _join.Add(new SqlJoin()
+            {
+                Join = "full outer",
+                RefenreceTable = referenceTable,
+            }.On(column, referenceColumn));
+            return (TQuery)(object)this;
+        }
+        public TQuery CrossJoin(string column, string referenceTable, string referenceColumn)
+        {
+            _join.Add(new SqlJoin()
+            {
+                Join = "cross outer join",
+                RefenreceTable = referenceTable,
+            }.On(column, referenceColumn));
+            return (TQuery)(object)this;
+        }
+        public TQuery CrossJoinInline<T>(IEnumerable<T> values, string column, string tableAs)
+        {
+            _join.Add(new SqlJoinInline<T>()
+            {
+                Join = "cross join",
+                Column = column,
+                TableAlias = tableAs,
+                Values = values
             });
             return (TQuery)(object)this;
         }
@@ -524,6 +621,39 @@ namespace Querier.SqlQuery
         {
             return WhereOperator(new RawOperator() { RawSql = sql }.Not());
         }
+        public TQuery Raw(string rawSql)
+        {
+            _raw.Add(new SqlRaw()
+            {
+                RawSql = rawSql
+            });
+            return (TQuery)(object)this;
+        }
+        public TQuery AppendRaw(string rawSql)
+        {
+            _raw.Add(new SqlRaw()
+            {
+                RawSql = rawSql
+            });
+            return (TQuery)(object)this;
+        }
+        public TQuery AndOn(string column, string referenceColumn)
+        {
+            var join = _join.LastOrDefault();
+            if (join == null) return (TQuery)(object)this;
+
+            join.On(column, referenceColumn);
+            return (TQuery)(object)this;
+        }
+
+        public TQuery AndOn<T>(string table, string column, T columnValue)
+        {
+            var join = _join.LastOrDefault();
+            if (join == null) return (TQuery)(object)this;
+
+            join.On(table, column, columnValue);
+            return (TQuery)(object)this;
+        }
 
         public TQuery And()
         {
@@ -648,6 +778,13 @@ namespace Querier.SqlQuery
             return (TQuery)(object)this;
         }
 
+        public TQuery UnionAll(Func<TQuery, TQuery> query)
+        {
+            var newQuery = query(New());
+            _union.Add(new SqlUnion<TQuery>() { All = true, Query = newQuery });
+            return (TQuery)(object)this;
+        }
+
         public TQuery OrderBy(int orderId, string? order = "asc")
         {
             _orderBy.Add(new SqlOrderBy()
@@ -687,6 +824,10 @@ namespace Querier.SqlQuery
             result = CompileSql(result);
 
             return result;
+        }
+        public virtual TQuery CompileFull(SqlQueryResult result)
+        {
+            return (TQuery)(object)this;
         }
     }
 }
