@@ -1,3 +1,9 @@
+## [2.2.0-beta.4](https://github.com/villagers/querier/compare/v2.2.0-beta.3...v2.2.0-beta.4) (2024-10-10)
+
+### Bug Fixes
+
+* generate pairs using only from input dictionary ([4a3ebbb](https://github.com/villagers/querier/commit/4a3ebbb32e951b6311a43fdb80e9929a1e977ec2))
+
 ## [2.2.0-beta.3](https://github.com/villagers/querier/compare/v2.2.0-beta.2...v2.2.0-beta.3) (2024-10-10)
 
 ### Bug Fixes
