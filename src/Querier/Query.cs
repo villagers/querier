@@ -262,16 +262,18 @@ namespace Querier
                     "select StartDate.date from StartDate union all " +
                     $"select date_add(DateRange.date, interval 1 day) from DateRange where DateRange.date < '{toDateStr}'),")
                 .AppendRaw(
-                    "CartesianProduct as (" +
-                    $"select date, {string.Join(", ", columns)} from DateRange");
+                    "Pairs AS (" +
+                    $"SELECT DISTINCT {string.Join(",", columns)} " +
+                    $"FROM {table.Table} where");
 
-            foreach (var column in columns)
+            foreach (var columnValue in columnValues)
             {
-                var values = columnValues[column].Select(e => $"({e})");
-                newQuery.AppendRaw(
-                    $"cross join (values {string.Join(", ", values)}) as {column}s({column})");
+                newQuery.AppendRaw($"{columnValue.Key} in ({string.Join(",", columnValue.Value)})");
             }
-            newQuery.AppendRaw("),");
+            newQuery.AppendRaw("),")
+                .AppendRaw(
+                    "CartesianProduct as (" +
+                    $"select date, {string.Join(", ", columns)} from DateRange cross join Pairs),");
 
             var cartesionColumns = columns.Select(e => $"CartesianProduct.{e}");
             var cartecianMetricColumns = metricColumns.Select(e => $"{table.Table}.{e}");
