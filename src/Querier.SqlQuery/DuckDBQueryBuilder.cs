@@ -1,5 +1,4 @@
-﻿using Querier.SqlQuery.Extensions;
-using Querier.SqlQuery.Functions;
+﻿using Querier.SqlQuery.Functions;
 using Querier.SqlQuery.Models;
 
 namespace Querier.SqlQuery
@@ -19,14 +18,15 @@ namespace Querier.SqlQuery
             return new DuckDBQueryBuilder(_functionFactory);
         }
 
-        public override Dictionary<string, object> CompileSqlParameters(SqlQueryResult result)
+        public override IDuckDBQueryBuilder CompileFull(SqlQueryResult result)
         {
-            return SqlParameters
+            result.SqlParameters = result.SqlParameters
                 .Select((e, i) =>
                 {
-                    result.Sql = result.Sql.ReplaceExact(e.Key, $"{SqlParameterPlaceholder}{i}");
                     return new KeyValuePair<string, object>($"{SqlParameterPlaceholder.Substring(1)}{i}", e.Value);
                 }).ToDictionary();
+
+            return this;
         }
 
     }

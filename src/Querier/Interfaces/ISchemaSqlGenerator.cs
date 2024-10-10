@@ -3,5 +3,6 @@
     public interface ISchemaSqlGenerator
     {
         void Generate();
+        void GenerateFillMissingDates();
     }
 }
