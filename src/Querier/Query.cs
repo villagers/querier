@@ -277,13 +277,21 @@ namespace Querier
 
             var cartesionColumns = columns.Select(e => $"CartesianProduct.{e}");
             var cartecianMetricColumns = metricColumns.Select(e => $"{table.Table}.{e}");
+
+            var lastValueColumns = columns.Select(e =>
+                $"last_value({table.Table}.{e} IGNORE NULLS) OVER (ORDER BY {string.Join(", ", cartesionColumns)}, CartesianProduct.date) AS previous_{e}");
             var lastValueMetricColumns = metricColumns.Select(e =>
                 $"last_value({table.Table}.{e} IGNORE NULLS) OVER (ORDER BY {string.Join(", ", cartesionColumns)}, CartesianProduct.date) AS previous_{e}");
 
             newQuery.AppendRaw(
                     "FinancialWithDates AS (" +
-                    $"SELECT CartesianProduct.date, {string.Join(", ", cartesionColumns)}, {string.Join($", ", cartecianMetricColumns)}, {table.Table}.{timeD}," +
-                    $"{string.Join(", ", lastValueMetricColumns)} " +
+                    $"SELECT " +
+                    $"CartesianProduct.date," +
+                    $"{string.Join(",", cartesionColumns)}," +
+                    $"{string.Join(",", cartecianMetricColumns)}," +
+                    $"{string.Join(", ", lastValueColumns)}," +
+                    $"{string.Join(", ", lastValueMetricColumns)}," +
+                    $"{table.Table}.{timeD} " +
                     $"FROM CartesianProduct");
 
             var leftJoinOperators = columns.Select(e => $"{table.Table}.{e} = CartesianProduct.{e}");
@@ -292,7 +300,7 @@ namespace Querier
                     $"LEFT JOIN {table.Table} ON strftime({table.Table}.{timeD}, '%Y-%m-%d') = strftime(CartesianProduct.date, '%Y-%m-%d') " +
                     $"AND {string.Join(" and ", leftJoinOperators)}) ");
 
-            var selectDimensions = columns.Select(e => $"FinancialWithDates.{e}");
+            var selectDimensions = columns.Select(e => $"FinancialWithDates.previous_{e}, COALESCE({e}, previous_{e}) AS {e}");
             var selectMeasures = metricColumns.Select(e => $"FinancialWithDates.previous_{e}, COALESCE({e}, previous_{e}) AS {e}");
             var orderByDimensions = columns.Select(e => $"FinancialWithDates.{e} asc");
             newQuery.AppendRaw(
