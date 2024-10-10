@@ -295,7 +295,7 @@ namespace Querier
             var orderByDimensions = columns.Select(e => $"FinancialWithDates.{e} asc");
             newQuery.AppendRaw(
                 "select " +
-                "FinancialWithDates.date," +
+                $"FinancialWithDates.date as {timeD}," +
                 $"{string.Join(", ", selectDimensions)}," +
                 $"{string.Join(", ", selectMeasures)} " +
                 $"from FinancialWithDates as FinancialWithDates " +
