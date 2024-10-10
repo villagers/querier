@@ -1,3 +1,9 @@
+## [2.2.0-beta.5](https://github.com/villagers/querier/compare/v2.2.0-beta.4...v2.2.0-beta.5) (2024-10-10)
+
+### Bug Fixes
+
+* add `and` keyword in `Pairs` cte where clause ([2d01fed](https://github.com/villagers/querier/commit/2d01fedb7e48e2662fdf177f9eed2a9ca3ddfd53))
+
 ## [2.2.0-beta.4](https://github.com/villagers/querier/compare/v2.2.0-beta.3...v2.2.0-beta.4) (2024-10-10)
 
 ### Bug Fixes
