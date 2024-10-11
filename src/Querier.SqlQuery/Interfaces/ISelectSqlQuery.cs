@@ -24,6 +24,7 @@
         TQuery SelectRaw(string sql, string? sqlAs = null);
 
         TQuery SelectCoalesce<T>(Func<TQuery, TQuery> query, T value, string? queryAs = null);
+        TQuery SelectCoalesceRaw(Func<TQuery, TQuery> query, string rawSql, string? queryAs = null);
 
         TQuery Distinct();
     }

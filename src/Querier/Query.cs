@@ -20,8 +20,10 @@ namespace Querier
 
         private string _table;
         private int _numColumns = 0;
-        private bool _fillMissingDates = false;
-        private string? _fillMissingDatesCommand;
+
+        private SchemaQueryCommand? _queryOverrideCommand;
+
+        private readonly Dictionary<string, List<SchemaQueryCommand>> _columnFilters;
 
         private SqlQueryResult SqlResult { get; set; }
 
@@ -34,6 +36,8 @@ namespace Querier
             _queryMeasures = new List<QueryMeasure>();
             _queryDimension = new List<QueryDimension>();
             _queryFilter = new QueryFilter(duckDbQueryBuilder);
+
+            _columnFilters = new Dictionary<string, List<SchemaQueryCommand>>();
         }
 
         public IQuery New()
@@ -169,6 +173,19 @@ namespace Querier
         {
             var newFilter = new QueryFilter(_duckDbQueryBuilder, column);
             filter.Invoke(newFilter);
+
+            var columnFilter = filter(new QueryFilter(_duckDbQueryBuilder.New(), column));
+            var columFilterCompiled = columnFilter.Compile();
+
+            if (!_columnFilters.ContainsKey(column))
+            {
+                _columnFilters.Add(column, new List<SchemaQueryCommand>());
+            }
+            _columnFilters[column].Add(new SchemaQueryCommand()
+            {
+                Sql = columFilterCompiled.CompiledSql.Replace("where", "").Trim(),
+                Parameters = columFilterCompiled.SqlParameters
+            });
             return this;
 
         }
@@ -243,71 +260,81 @@ namespace Querier
 
         public IQuery FillMissingDates(DateTime fromDate, DateTime toDate, Dictionary<string, List<object>> columnValues)
         {
-            _fillMissingDates = true;
-
             var table = _schemaStore.Schemas.First(e => e.Key == _table);
 
-            var timeD = _queryTimeDimension.Property;
+            var date = _queryTimeDimension.Property;
             var fromDateStr = fromDate.ToString("yyyy-MM-dd");
             var toDateStr = toDate.ToString("yyyy-MM-dd");
 
             var columns = _queryDimension.Select(e => e.Property).ToList();
             var metricColumns = _queryMeasures.Select(e => e.Property).ToList();
 
-            var newQuery = _duckDbQueryBuilder.New()
-                .AppendRaw(
-                 $"with recursive StartDate as (select coalesce((select max({timeD}) FROM {table.Table} WHERE {timeD} <= '{fromDateStr}'), '{fromDateStr}'::DATE) AS date),")
-                .AppendRaw(
-                    "DateRange as (" +
-                    "select StartDate.date from StartDate union all " +
-                    $"select date_add(DateRange.date, interval 1 day) from DateRange where DateRange.date < '{toDateStr}'),")
-                .AppendRaw(
-                    "CartesianProduct as (" +
-                    $"select date, {string.Join(", ", columns)} from DateRange");
+            var query = _duckDbQueryBuilder.New();
+
+            // CTE StartDate
+            query.WithRecursive("StartDate", e => e.SelectCoalesceRaw(e => e.SelectMax(date).From(table.Table).WhereRaw($"{date} <= cast('{fromDateStr}' as date)"), $"cast('{fromDateStr}' as date)", "date"));
+           
+            // CTE DateRange
+            query.With("DateRange", e => e.Select("date").From("StartDate").UnionAll(e => e.SelectRaw("date_add(DateRange.date, interval 1 day)").From("DateRange").WhereRaw($"date < cast('{toDateStr}' as date)")));
+
+            // CTE Pairs
+            var pairCommand = columnValues.Select(e => $"{e.Key} in ({string.Join(",", e.Value)})");
+            query.With("Pairs", e => e.SelectRaw(string.Join(",", columns)).Distinct().From(table.Table).WhereRaw(string.Join(" and ", pairCommand)));
+
+            // CTE Cartesian
+            query.With("Cartesian", e => e.Select("date").SelectRaw(string.Join(", ", columns)).From("DateRange").CrossJoin("Pairs"));
+
+            var cartesionColumns = columns.Select(e => $"Cartesian.{e}");
+            var cartecianMetricColumns = metricColumns.Select(e => $"{table.Table}.{e}");
+            var lastValueColumns = columns.Select(e =>
+                $"last_value({table.Table}.{e} IGNORE NULLS) OVER (ORDER BY {string.Join(", ", cartesionColumns)}, Cartesian.date) AS previous_{e}");
+            var lastValueMetricColumns = metricColumns.Select(e =>
+                $"last_value({table.Table}.{e} IGNORE NULLS) OVER (ORDER BY {string.Join(", ", cartesionColumns)}, Cartesian.date) AS previous_{e}");
+            var leftJoinOperators = columns.Select(e => $"{table.Table}.{e} = Cartesian.{e}");
+
+            // CTE Cartesian Table
+            var cartesianTable = query.New().Select("date")
+                .SelectRaw(string.Join(",", cartesionColumns))
+                .SelectRaw(string.Join(",", cartecianMetricColumns))
+                .SelectRaw(string.Join(",", lastValueColumns))
+                .SelectRaw(string.Join(",", lastValueMetricColumns))
+                .SelectRaw($"{table.Table}.{date}")
+                .From("Cartesian")
+                .JoinRaw(table.Table, $"left join {table.Table} on strftime({table.Table}.{date}, '%Y-%m-%d') = strftime(Cartesian.date, '%Y-%m-%d') ");
+            foreach (var column in columns)
+            {
+                cartesianTable.AndOn(column, column);
+            }
+
+            // CTE Mixed Data
+            query.With("MixedData", e => cartesianTable);
+
+            // Main Query
+            var selectDimensions = columns.Select(e => $"MixedData.previous_{e}, COALESCE({e}, previous_{e}) AS {e}");
+            var selectMeasures = metricColumns.Select(e => $"MixedData.previous_{e}, COALESCE({e}, previous_{e}) AS {e}");
+            var orderByDimensions = columns.Select(e => $"MixedData.{e}");
+
+            query
+                .Select("date", date)
+                .SelectRaw(string.Join(", ", selectDimensions))
+                .SelectRaw(string.Join(", ", selectMeasures))
+                .From("MixedData")
+                .WhereRaw($"date >= cast('{fromDateStr}' as date)")
+                .WhereRaw($"date <= cast('{toDateStr}' as date)")
+                .OrderBy("date", "desc");
 
             foreach (var column in columns)
             {
-                var values = columnValues[column].Select(e => $"({e})");
-                newQuery.AppendRaw(
-                    $"cross join (values {string.Join(", ", values)}) as {column}s({column})");
+                query.OrderBy(column);
             }
-            newQuery.AppendRaw("),");
 
-            var cartesionColumns = columns.Select(e => $"CartesianProduct.{e}");
-            var cartecianMetricColumns = metricColumns.Select(e => $"{table.Table}.{e}");
-            var lastValueMetricColumns = metricColumns.Select(e =>
-                $"last_value({table.Table}.{e} IGNORE NULLS) OVER (ORDER BY {string.Join(", ", cartesionColumns)}, CartesianProduct.date) AS previous_{e}");
+            var fResult = query.Compile();
 
-            newQuery.AppendRaw(
-                    "FinancialWithDates AS (" +
-                    $"SELECT CartesianProduct.date, {string.Join(", ", cartesionColumns)}, {string.Join($", ", cartecianMetricColumns)}, {table.Table}.{timeD}," +
-                    $"{string.Join(", ", lastValueMetricColumns)} " +
-                    $"FROM CartesianProduct");
-
-            var leftJoinOperators = columns.Select(e => $"{table.Table}.{e} = CartesianProduct.{e}");
-
-            newQuery.AppendRaw(
-                    $"LEFT JOIN {table.Table} ON strftime({table.Table}.{timeD}, '%Y-%m-%d') = strftime(CartesianProduct.date, '%Y-%m-%d') " +
-                    $"AND {string.Join(" and ", leftJoinOperators)}) ");
-
-            var selectDimensions = columns.Select(e => $"FinancialWithDates.{e}");
-            var selectMeasures = metricColumns.Select(e => $"FinancialWithDates.previous_{e}, COALESCE({e}, previous_{e}) AS {e}");
-            var orderByDimensions = columns.Select(e => $"FinancialWithDates.{e} asc");
-            newQuery.AppendRaw(
-                "select " +
-                "FinancialWithDates.date," +
-                $"{string.Join(", ", selectDimensions)}," +
-                $"{string.Join(", ", selectMeasures)} " +
-                $"from FinancialWithDates as FinancialWithDates " +
-                $"where FinancialWithDates.date >= '{fromDateStr}' " +
-                $"and FinancialWithDates.date <= '{toDateStr}' " +
-                $"order by FinancialWithDates.date desc, {string.Join(", ", orderByDimensions)}");
-
-            var qCompile = newQuery.Compile();
-            newQuery.CompileFull(qCompile);
-
-
-            _fillMissingDatesCommand = qCompile.CompiledSql;
+            _queryOverrideCommand = new SchemaQueryCommand()
+            {
+                Sql = fResult.CompiledSql,
+                Parameters = fResult.SqlParameters
+            };
 
             return this;
         }
@@ -319,6 +346,16 @@ namespace Querier
         public HashSet<QueryTimeDimensionSchema> GetTimeDimensions<TType>() => _schemaStore.Schemas.FirstOrDefault(e => e.Type == typeof(TType))?.TimeDimensions ?? [];
         public HashSet<QueryTimeDimensionSchema> GetTimeDimensions(string queryKey) => _schemaStore.Schemas.FirstOrDefault(e => e.Key == queryKey)?.TimeDimensions ?? [];
 
+        private SchemaQueryCommand Compile()
+        {
+            if (_queryOverrideCommand != null)
+            {
+                return _queryOverrideCommand;
+            }
+            SqlResult = _duckDbQueryBuilder.Compile();
+
+            return new SchemaQueryCommand() { Sql = SqlResult.Sql, Parameters = SqlResult.SqlParameters };
+        }
         public QueryResult Execute()
         {
             var result = new QueryResult()
@@ -331,19 +368,15 @@ namespace Querier
                 result.TimeDimensions = new List<QueryProperty>() { new QueryProperty() { Key = _queryTimeDimension.Property, DisplayName = _queryTimeDimension.Property } };
             }
 
+            var compiled = Compile();
 
-            SqlResult = _duckDbQueryBuilder.Compile();
             var schema = _schemaStore.Schemas.First(e => e.Key == _table);
-
-            var query = _fillMissingDates ? _fillMissingDatesCommand : SqlResult.CompiledSql;
-            var queryParameters = _fillMissingDates ? [] : SqlResult.SqlParameters;
-
             var datasource = _schemaStore.DataSource(schema);
             using (var duckDBConnection = new DuckDBConnection(datasource))
             {
                 duckDBConnection.Open();
                 result.Data = duckDBConnection
-                    .Query(query, queryParameters)
+                    .Query(compiled.Sql, compiled.Parameters)
                     .Cast<IDictionary<string, object>>()
                     .Select(e => e.ToDictionary(k => k.Key, v => v.Value));
             }

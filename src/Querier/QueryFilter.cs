@@ -1,5 +1,6 @@
 ﻿using Querier.Interfaces;
 using Querier.SqlQuery;
+using Querier.SqlQuery.Models;
 
 namespace Querier
 {
@@ -145,6 +146,11 @@ namespace Querier
         {
             _query.Or(value);
             return this;
+        }
+
+        public SqlQueryResult Compile()
+        {
+            return _query.Compile();
         }
     }
 }
