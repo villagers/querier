@@ -12,10 +12,14 @@ namespace Querier.SqlQuery.Models
         {
             var result = new SqlQueryResult();
 
-            result.NameParameters.Add("@table", table.TableOrAlias);
+            var token = table != null ? "@table.@column" : "@column";
+            if (table != null)
+            {
+                result.NameParameters.Add("@table", table.TableOrAlias);
+            }
             result.NameParameters.Add("@column", Column);
             result.SqlTokenizer
-                .AddToken(e => Column == "*" ? e.AddToken("*") : e.AddToken("@table").AddToken(".").AddToken("@column"), "");
+                .AddToken(e => Column == "*" ? e.AddToken("*") : e.AddToken(token), "");
 
             if (!string.IsNullOrEmpty(ColumnAs))
             {
