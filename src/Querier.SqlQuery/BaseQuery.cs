@@ -215,6 +215,18 @@ namespace Querier.SqlQuery
             });
             return (TQuery)(object)this;
         }
+        public TQuery SelectCoalesceRaw(Func<TQuery, TQuery> query, string rawSql, string? queryAs = null)
+        {
+            var newQuery = query.Invoke(New());
+            _select.Add(new SqlSelectQueryRaw<TQuery>()
+            {
+                RawSql = rawSql,
+                Query = newQuery,
+                QueryAs = queryAs,
+                Function = "coalesce",
+            });
+            return (TQuery)(object)this;
+        }
         public TQuery JoinRaw(string referenceTable, string rawSql)
         {
             _join.Add(new SqlJoinRaw()
@@ -265,6 +277,15 @@ namespace Querier.SqlQuery
                 Join = "full outer",
                 RefenreceTable = referenceTable,
             }.On(column, referenceColumn));
+            return (TQuery)(object)this;
+        }
+        public TQuery CrossJoin(string table)
+        {
+            _join.Add(new SqlJoinTable()
+            {
+                Join = "cross",
+                Table = table,
+            });
             return (TQuery)(object)this;
         }
         public TQuery CrossJoin(string column, string referenceTable, string referenceColumn)
@@ -824,10 +845,6 @@ namespace Querier.SqlQuery
             result = CompileSql(result);
 
             return result;
-        }
-        public virtual TQuery CompileFull(SqlQueryResult result)
-        {
-            return (TQuery)(object)this;
         }
     }
 }

@@ -8,6 +8,7 @@
         TQuery LeftJoin(string column, string referenceTable, string referenceColumn);
         TQuery RightJoin(string column, string referenceTable, string referenceColumn);
         TQuery FullJoin(string column, string referenceTable, string referenceColumn);
+        TQuery CrossJoin(string table);
         TQuery CrossJoin(string column, string referenceTable, string referenceColumn);
         TQuery CrossJoinInline<T>(IEnumerable<T> values, string column, string tableAs);
 

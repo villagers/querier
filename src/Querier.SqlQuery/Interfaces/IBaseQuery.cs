@@ -16,7 +16,6 @@ namespace Querier.SqlQuery.Interfaces
     {
         TQuery New();
         SqlQueryResult Compile();
-        TQuery CompileFull(SqlQueryResult result);
         SqlQueryResult CompileSql(SqlQueryResult result);
         TQuery Limit(int limit);
     }
