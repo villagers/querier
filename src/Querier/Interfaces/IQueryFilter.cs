@@ -1,4 +1,4 @@
-﻿using Querier.SqlQuery.Functions;
+﻿using Querier.SqlQuery.Models;
 
 namespace Querier.Interfaces
 {
@@ -26,5 +26,7 @@ namespace Querier.Interfaces
         IQueryFilter And<T>(T value);
         IQueryFilter Or();
         IQueryFilter Or<T>(T value);
+
+        SqlQueryResult Compile();
     }
 }
