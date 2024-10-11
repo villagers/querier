@@ -1,3 +1,49 @@
+## [2.2.0](https://github.com/villagers/querier/compare/v2.1.0...v2.2.0) (2024-10-11)
+
+### Features
+
+* add `SelectCoalesceRaw` and `CrossJoin` and remove `CompileFull` ([91ea6e7](https://github.com/villagers/querier/commit/91ea6e7f9453324aab05ce32aa42e8f9328afb02))
+* allow compile query filter statements ([32288fc](https://github.com/villagers/querier/commit/32288fc2a2b9df85a9799c3a47e5c8ad0ee34ea1))
+* fill missing dates ([a2b3d72](https://github.com/villagers/querier/commit/a2b3d7211c2d3f40a727e70c9d8cca17b013c0c5))
+
+### Bug Fixes
+
+* `date` alias to time dimension column ([4a33a93](https://github.com/villagers/querier/commit/4a33a9395ac7510463133283a88ed60f6390c24c))
+* add `and` keyword in `Pairs` cte where clause ([2d01fed](https://github.com/villagers/querier/commit/2d01fedb7e48e2662fdf177f9eed2a9ca3ddfd53))
+* append table token only when table is provided ([07f0f79](https://github.com/villagers/querier/commit/07f0f795d0b40fcc37160aaed2ad77a676773a0f))
+* compile query sql parameters ([8301464](https://github.com/villagers/querier/commit/83014641150714cbcaf7a5f1a62a5146876fe035))
+* create specific sets by using `pairs` for `cartesian` cte ([1c1fb80](https://github.com/villagers/querier/commit/1c1fb80a1e833317eafe7d4ed28d1d94ce0c388b))
+* generate pairs using only from input dictionary ([4a3ebbb](https://github.com/villagers/querier/commit/4a3ebbb32e951b6311a43fdb80e9929a1e977ec2))
+* prevent string escpaed twice ([2cf760b](https://github.com/villagers/querier/commit/2cf760bd299ad9acf9a1527e3c8e0ea33aa0c28e))
+* re-implement `FillMissingDates` ([2285bec](https://github.com/villagers/querier/commit/2285bec1e69828b003faff844f2603b15a02dc4f))
+* remove redundant sql generator method ([418a12c](https://github.com/villagers/querier/commit/418a12c662f393777f200813be65c65731888c15))
+* tests ([d890e22](https://github.com/villagers/querier/commit/d890e2265a6206a90daf4a3fd157839b0dd771ca))
+* typo ([4f8f42b](https://github.com/villagers/querier/commit/4f8f42b1262ac346139fb0e610e0584317b2cbd3))
+
+### Documentation
+
+* initial docs ([5245427](https://github.com/villagers/querier/commit/5245427e4274b228762779a99a36326bd39f89f0))
+* set `baseUrl` to `/` ([15baf1b](https://github.com/villagers/querier/commit/15baf1b0397fa762db50109297675248b465d7de))
+
+### Miscellaneous Chores
+
+* add deploy docs github action ([0f99d1c](https://github.com/villagers/querier/commit/0f99d1ce79858ed66ac8de97c2ac4bc706410513))
+* **docs:** set `baseUrl` to `/querier/` ([9de052a](https://github.com/villagers/querier/commit/9de052a0e6370d86972cd56781614045f1b1cb6e))
+* **release:** 2.2.0-beta.1 [skip ci] ([6f5161b](https://github.com/villagers/querier/commit/6f5161bc074405578610d216b0150bcf0104c105))
+* **release:** 2.2.0-beta.2 [skip ci] ([e830202](https://github.com/villagers/querier/commit/e830202f7bf0a83b7e20ed7a85360b752d675367))
+* **release:** 2.2.0-beta.3 [skip ci] ([eb4f4d6](https://github.com/villagers/querier/commit/eb4f4d69843b3e29ba9299a4ea613218f1915ad1))
+* **release:** 2.2.0-beta.4 [skip ci] ([742154a](https://github.com/villagers/querier/commit/742154a3aec61670683b37ca0944cf3eaee1283e))
+* **release:** 2.2.0-beta.5 [skip ci] ([42ba879](https://github.com/villagers/querier/commit/42ba87984fb71ac507d939f61b498fa1888711f5))
+* update `.releaserc` prerelease branches ([e1365f6](https://github.com/villagers/querier/commit/e1365f60431deb25f99461cd9f7a5f00d3a0940e))
+* update `deploy-docs.yml` ([d18ec3a](https://github.com/villagers/querier/commit/d18ec3a32513d7c2339b3dc5df6919dc3c039e0c))
+* update `deploy-docs.yml` ([f1f1f8f](https://github.com/villagers/querier/commit/f1f1f8f093ac9e6e395bbf973e8e8a2f1872edb2))
+* update `deploy-docs.yml` ([22eb281](https://github.com/villagers/querier/commit/22eb28199f970c4291cb8e26f66e6cbb4c1c7e9b))
+* update `deploy-docs.yml` ([b05a249](https://github.com/villagers/querier/commit/b05a249f102f9b11b153ae5099724d05895d3a4d))
+* update `deploy-docs.yml` ([a0b7a49](https://github.com/villagers/querier/commit/a0b7a49de6cc516b169b455091c6632568b3b0d8))
+* update `deploy-docs.yml` ([90f9ac6](https://github.com/villagers/querier/commit/90f9ac634f956f18364432a368d4cd585a8527a4))
+* update `deploy-docs.yml` ([5b51edf](https://github.com/villagers/querier/commit/5b51edf1ccec733511190a008223f4375f2cccbf))
+* update workflows ([a63ee14](https://github.com/villagers/querier/commit/a63ee141241fafe0de401bf3562ffcd767bc8a60))
+
 ## [2.2.0-beta.5](https://github.com/villagers/querier/compare/v2.2.0-beta.4...v2.2.0-beta.5) (2024-10-10)
 
 ### Bug Fixes
