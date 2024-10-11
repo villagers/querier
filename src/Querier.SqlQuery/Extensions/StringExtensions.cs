@@ -7,7 +7,7 @@ namespace Querier.SqlQuery.Extensions
         public static string ReplaceExact(this string str, string oldValue, string newValue)
         {
             var escaped = Regex.Escape(oldValue);
-            var pattern = $@"(?<!\w){Regex.Escape(escaped)}(?!\w)";
+            var pattern = $@"(?<!\w){escaped}(?!\w)";
             return Regex.Replace(str, pattern, newValue);
         }
     }

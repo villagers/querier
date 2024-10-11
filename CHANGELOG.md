@@ -1,3 +1,57 @@
+## [2.2.0-beta.5](https://github.com/villagers/querier/compare/v2.2.0-beta.4...v2.2.0-beta.5) (2024-10-10)
+
+### Bug Fixes
+
+* add `and` keyword in `Pairs` cte where clause ([2d01fed](https://github.com/villagers/querier/commit/2d01fedb7e48e2662fdf177f9eed2a9ca3ddfd53))
+
+## [2.2.0-beta.4](https://github.com/villagers/querier/compare/v2.2.0-beta.3...v2.2.0-beta.4) (2024-10-10)
+
+### Bug Fixes
+
+* generate pairs using only from input dictionary ([4a3ebbb](https://github.com/villagers/querier/commit/4a3ebbb32e951b6311a43fdb80e9929a1e977ec2))
+
+## [2.2.0-beta.3](https://github.com/villagers/querier/compare/v2.2.0-beta.2...v2.2.0-beta.3) (2024-10-10)
+
+### Bug Fixes
+
+* create specific sets by using `pairs` for `cartesian` cte ([1c1fb80](https://github.com/villagers/querier/commit/1c1fb80a1e833317eafe7d4ed28d1d94ce0c388b))
+
+## [2.2.0-beta.2](https://github.com/villagers/querier/compare/v2.2.0-beta.1...v2.2.0-beta.2) (2024-10-10)
+
+### Bug Fixes
+
+* `date` alias to time dimension column ([4a33a93](https://github.com/villagers/querier/commit/4a33a9395ac7510463133283a88ed60f6390c24c))
+* compile query sql parameters ([8301464](https://github.com/villagers/querier/commit/83014641150714cbcaf7a5f1a62a5146876fe035))
+
+## [2.2.0-beta.1](https://github.com/villagers/querier/compare/v2.1.0...v2.2.0-beta.1) (2024-10-10)
+
+### Features
+
+* fill missing dates ([a2b3d72](https://github.com/villagers/querier/commit/a2b3d7211c2d3f40a727e70c9d8cca17b013c0c5))
+
+### Bug Fixes
+
+* tests ([d890e22](https://github.com/villagers/querier/commit/d890e2265a6206a90daf4a3fd157839b0dd771ca))
+* typo ([4f8f42b](https://github.com/villagers/querier/commit/4f8f42b1262ac346139fb0e610e0584317b2cbd3))
+
+### Documentation
+
+* initial docs ([5245427](https://github.com/villagers/querier/commit/5245427e4274b228762779a99a36326bd39f89f0))
+* set `baseUrl` to `/` ([15baf1b](https://github.com/villagers/querier/commit/15baf1b0397fa762db50109297675248b465d7de))
+
+### Miscellaneous Chores
+
+* add deploy docs github action ([0f99d1c](https://github.com/villagers/querier/commit/0f99d1ce79858ed66ac8de97c2ac4bc706410513))
+* **docs:** set `baseUrl` to `/querier/` ([9de052a](https://github.com/villagers/querier/commit/9de052a0e6370d86972cd56781614045f1b1cb6e))
+* update `deploy-docs.yml` ([d18ec3a](https://github.com/villagers/querier/commit/d18ec3a32513d7c2339b3dc5df6919dc3c039e0c))
+* update `deploy-docs.yml` ([f1f1f8f](https://github.com/villagers/querier/commit/f1f1f8f093ac9e6e395bbf973e8e8a2f1872edb2))
+* update `deploy-docs.yml` ([22eb281](https://github.com/villagers/querier/commit/22eb28199f970c4291cb8e26f66e6cbb4c1c7e9b))
+* update `deploy-docs.yml` ([b05a249](https://github.com/villagers/querier/commit/b05a249f102f9b11b153ae5099724d05895d3a4d))
+* update `deploy-docs.yml` ([a0b7a49](https://github.com/villagers/querier/commit/a0b7a49de6cc516b169b455091c6632568b3b0d8))
+* update `deploy-docs.yml` ([90f9ac6](https://github.com/villagers/querier/commit/90f9ac634f956f18364432a368d4cd585a8527a4))
+* update `deploy-docs.yml` ([5b51edf](https://github.com/villagers/querier/commit/5b51edf1ccec733511190a008223f4375f2cccbf))
+* update workflows ([a63ee14](https://github.com/villagers/querier/commit/a63ee141241fafe0de401bf3562ffcd767bc8a60))
+
 ## [2.1.0](https://github.com/villagers/querier/compare/v2.0.0...v2.1.0) (2024-10-08)
 
 ### Features

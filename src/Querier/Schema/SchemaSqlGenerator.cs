@@ -33,7 +33,7 @@ namespace Querier.Schema
                 {
                     foreach (var joins in schema.Joins)
                     {
-                        sqlQuery.Join(joins.JoinRefTable, joins.JoinRefColumn, joins.JoinColumn);
+                        sqlQuery.Join(joins.JoinColumn, joins.JoinRefTable, joins.JoinRefColumn);
                     }
                     
                 }

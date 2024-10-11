@@ -27,6 +27,8 @@ namespace Querier.Interfaces
 
         IQuery Union(Func<IQuery, IQuery> query);
 
+        IQuery FillMissingDates(DateTime fromDate, DateTime toDate, Dictionary<string, List<object>> columnValues);
+
         HashSet<QueryMeasureSchema> GetMeasures<TType>();
         HashSet<QueryMeasureSchema> GetMeasures(string queryKey);
         HashSet<QueryDimensionSchema> GetDimensions<TType>();

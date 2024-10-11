@@ -25,9 +25,22 @@ namespace Querier.SqlQuery
                 .Select((e, i) =>
                 {
                     result.Sql = result.Sql.ReplaceExact(e.Key, $"{SqlParameterPlaceholder}{i}");
-                    return new KeyValuePair<string, object>($"{SqlParameterPlaceholder.Substring(1)}{i}", e.Value);
+                    return new KeyValuePair<string, object>($"{SqlParameterPlaceholder}{i}", e.Value);
                 }).ToDictionary();
         }
 
+        public override SqlQueryResult CompileSql(SqlQueryResult result)
+        {
+            result = base.CompileSql(result);
+            var sqlParameters = result.SqlParameters.ToList();
+            foreach (var parameter in sqlParameters)
+            {
+                var item = parameter;
+                result.SqlParameters.Remove(item.Key);
+                result.SqlParameters.Add(item.Key.Replace(SqlParameterPlaceholder, "p"), item.Value);
+            }
+
+            return result;
+        }
     }
 }

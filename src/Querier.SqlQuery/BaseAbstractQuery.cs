@@ -13,11 +13,15 @@ namespace Querier.SqlQuery
 
         public ISqlTable _table;
         protected readonly List<ISqlSelect> _select;
-        protected readonly List<SqlJoin> _join;
+        protected readonly List<ISqlJoin> _join;
         protected readonly List<SqlWhere> _where;
         protected readonly List<ISqlGroupBy> _groupBy;
         protected readonly List<SqlUnion<TQuery>> _union;
         protected readonly List<SqlOrderBy> _orderBy;
+        protected readonly List<SqlCte<TQuery>> _cte;
+        protected readonly List<ISqlRaw> _raw;
+
+        protected bool cteRecursive = false;
 
         protected readonly Dictionary<string, string> _alias;
 
@@ -41,12 +45,14 @@ namespace Querier.SqlQuery
             _functionFactory = functionFactory;
 
             _select = new List<ISqlSelect>();
-            _join = new List<SqlJoin>();
+            _join = new List<ISqlJoin>();
             _where = new List<SqlWhere>();
             _groupBy = new List<ISqlGroupBy>();
             _union = new List<SqlUnion<TQuery>>();
             _orderBy = new List<SqlOrderBy>();
             _alias = new Dictionary<string, string>();
+            _cte = new List<SqlCte<TQuery>>();
+            _raw = new List<ISqlRaw>();
 
             SqlParameters = new Dictionary<string, object>();
             NameParameters = new Dictionary<string, string>();
@@ -69,7 +75,9 @@ namespace Querier.SqlQuery
         }
         public virtual SqlTokenizer CompileTokens(SqlQueryResult result)
         {
-            return CreateSelect()
+            return CreateRaw()
+                .Merge(CreateCte())
+                .Merge(CreateSelect())
                 .Merge(CreateTable())
                 .Merge(CreateJoin())
                 .Merge(CreateWhere())
@@ -96,17 +104,71 @@ namespace Querier.SqlQuery
                     return new KeyValuePair<string, string>($"{NameParameterPlaceholder}{i}", e.Value);
                 }).ToDictionary();
         }
+
+        public virtual SqlQueryResult CreateRaw()
+        {
+            var result = new SqlQueryResult();
+
+            if (_raw.Count <= 0) return result;
+
+            var tz = new SqlTokenizer();
+            foreach (var raw in _raw)
+            {
+                var compiled = raw.Compile(_table);
+                result = result.Merge(compiled);
+                tz.AddToken(compiled.Sql);
+            }
+
+            result.SqlTokenizer = tz;
+            result.Sql = tz.Build();
+            return result;
+        }
+
+        public virtual SqlQueryResult CreateCte()
+        {
+            var result = new SqlQueryResult();
+
+            if (_cte.Count <= 0) return result;
+
+            var tz = new SqlTokenizer("with");
+            if (_cte.First().Recursive)
+            {
+                tz.AddToken("recursive");
+            }
+            for (var i = 0; i < _cte.Count; i++)
+            {
+                if (i > 0)
+                {
+                    tz.AddToken(",");
+                }
+
+                var cte = _cte[i];
+                var compiled = cte.Compile(_table);
+                result = result.Merge(compiled);
+                tz.AddToken(compiled.Sql);
+            }
+
+            result.NameParameters.CopyTo(NameParameters, "@n");
+            result.SqlParameters.CopyTo(SqlParameters, "@p");
+
+            result.SqlTokenizer = tz;
+            result.Sql = tz.Build();
+            return result.Enumerate();
+        }
+
         public virtual SqlQueryResult CreateSelect()
         {
             var result = new SqlQueryResult();
 
+            if (_select.Count <= 0) return result;
+
             var selectTz = new SqlTokenizer().AddToken("select");
-            if (_select.Count <= 0)
-            {
-                result.Sql = selectTz.AddToken("*").Build(" ");
-                result.SqlTokenizer = selectTz;
-                return result.Enumerate();
-            }
+            //if (_select.Count <= 0)
+            //{
+            //    result.Sql = selectTz.AddToken("*").Build(" ");
+            //    result.SqlTokenizer = selectTz;
+            //    return result.Enumerate();
+            //}
 
             if (_distinct)
             {
@@ -157,6 +219,8 @@ namespace Querier.SqlQuery
         public virtual SqlQueryResult CreateTable()
         {
             var result = new SqlQueryResult();
+
+            if (_table == null) return result;
 
             var tableTz = new SqlTokenizer().AddToken("from");
 
