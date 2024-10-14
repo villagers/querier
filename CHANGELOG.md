@@ -1,3 +1,9 @@
+## [2.3.1](https://github.com/villagers/querier/compare/v2.3.0...v2.3.1) (2024-10-14)
+
+### Bug Fixes
+
+* use `CompiledSql` instead of `Sql` ([b7266f8](https://github.com/villagers/querier/commit/b7266f819204cdd75d99dd6eacf3ee4b4bd9216d))
+
 ## [2.3.0](https://github.com/villagers/querier/compare/v2.2.0...v2.3.0) (2024-10-14)
 
 ### Features
