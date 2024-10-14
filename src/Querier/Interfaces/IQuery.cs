@@ -1,4 +1,5 @@
-﻿using Querier.Schema;
+﻿using Querier.Options;
+using Querier.Schema;
 
 namespace Querier.Interfaces
 {
@@ -27,7 +28,7 @@ namespace Querier.Interfaces
 
         IQuery Union(Func<IQuery, IQuery> query);
 
-        IQuery FillMissingDates(DateTime fromDate, DateTime toDate, Dictionary<string, List<object>> columnValues);
+        IQuery FillMissingDates(DateTime fromDate, DateTime toDate, Dictionary<string, List<object>> columnValues, FillMissingOption? options = null);
 
         HashSet<QueryMeasureSchema> GetMeasures<TType>();
         HashSet<QueryMeasureSchema> GetMeasures(string queryKey);

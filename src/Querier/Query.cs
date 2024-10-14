@@ -4,6 +4,7 @@ using Querier.Schema;
 using Querier.SqlQuery;
 using DuckDB.NET.Data;
 using Querier.SqlQuery.Models;
+using Querier.Options;
 
 namespace Querier
 {
@@ -258,8 +259,10 @@ namespace Querier
             return this;
         }
 
-        public IQuery FillMissingDates(DateTime fromDate, DateTime toDate, Dictionary<string, List<object>> columnValues)
+        public IQuery FillMissingDates(DateTime fromDate, DateTime toDate, Dictionary<string, List<object>> columnValues, FillMissingOption? options = null)
         {
+            if (options == null) options = new FillMissingOption();
+
             var table = _schemaStore.Schemas.First(e => e.Key == _table);
 
             var date = _queryTimeDimension.Property;
@@ -275,7 +278,7 @@ namespace Querier
             query.WithRecursive("StartDate", e => e.SelectCoalesceRaw(e => e.SelectMax(date).From(table.Table).WhereRaw($"{date} <= cast('{fromDateStr}' as date)"), $"cast('{fromDateStr}' as date)", "date"));
            
             // CTE DateRange
-            query.With("DateRange", e => e.Select("date").From("StartDate").UnionAll(e => e.SelectRaw("date_add(DateRange.date, interval 1 day)").From("DateRange").WhereRaw($"date < cast('{toDateStr}' as date)")));
+            query.With("DateRange", e => e.Select("date").From("StartDate").UnionAll(e => e.SelectRaw($"date_add(DateRange.date, interval {options.Interval} {options.Unit})").From("DateRange").WhereRaw($"date < cast('{toDateStr}' as date)")));
 
             // CTE Pairs
             var pairCommand = columnValues.Select(e => $"{e.Key} in ({string.Join(",", e.Value)})");
@@ -310,8 +313,8 @@ namespace Querier
             query.With("MixedData", e => cartesianTable);
 
             // Main Query
-            var selectDimensions = columns.Select(e => $"MixedData.previous_{e}, COALESCE({e}, previous_{e}) AS {e}");
-            var selectMeasures = metricColumns.Select(e => $"MixedData.previous_{e}, COALESCE({e}, previous_{e}) AS {e}");
+            var selectDimensions = columns.Select(e => $"COALESCE({e}, previous_{e}) AS {e}");
+            var selectMeasures = metricColumns.Select(e => $"COALESCE({e}, previous_{e}) AS {e}");
             var orderByDimensions = columns.Select(e => $"MixedData.{e}");
 
             query
