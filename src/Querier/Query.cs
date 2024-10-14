@@ -357,7 +357,7 @@ namespace Querier
             }
             SqlResult = _duckDbQueryBuilder.Compile();
 
-            return new SchemaQueryCommand() { Sql = SqlResult.Sql, Parameters = SqlResult.SqlParameters };
+            return new SchemaQueryCommand() { Sql = SqlResult.CompiledSql, Parameters = SqlResult.SqlParameters };
         }
         public QueryResult Execute()
         {
