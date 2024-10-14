@@ -1,3 +1,9 @@
+## [2.3.0](https://github.com/villagers/querier/compare/v2.2.0...v2.3.0) (2024-10-14)
+
+### Features
+
+* allow specify fill missing dates `interval` and `unit` ([1650ada](https://github.com/villagers/querier/commit/1650ada4044df3759185dad2f2d068d33cadca93))
+
 ## [2.2.0](https://github.com/villagers/querier/compare/v2.1.0...v2.2.0) (2024-10-11)
 
 ### Features
