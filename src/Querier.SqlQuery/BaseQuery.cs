@@ -828,10 +828,7 @@ namespace Querier.SqlQuery
             return (TQuery)(object)this;
         }
 
-
-
-
-
+        public virtual SqlQueryResult PostCompile(SqlQueryResult result) => result;
         public virtual SqlQueryResult Compile()
         {
             SqlParameters = new Dictionary<string, object>();
