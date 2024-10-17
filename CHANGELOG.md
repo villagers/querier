@@ -1,3 +1,10 @@
+## [2.4.0-beta.2](https://github.com/villagers/querier/compare/v2.4.0-beta.1...v2.4.0-beta.2) (2024-10-17)
+
+### Bug Fixes
+
+* add check to query filter result ([a8b9711](https://github.com/villagers/querier/commit/a8b971146a63472b16c1b68b09ca2cf06c9e45fe))
+* use `PARTITION BY` and `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` ([8bc3abc](https://github.com/villagers/querier/commit/8bc3abc71d20436e28463a1dd71e2e45501f1a3d))
+
 ## [2.4.0-beta.1](https://github.com/villagers/querier/compare/v2.3.1...v2.4.0-beta.1) (2024-10-17)
 
 ### Features
