@@ -272,7 +272,7 @@ namespace Querier
         private SqlQueryResult PostCompile(SqlQueryResult result) => _duckDbQueryBuilder.PostCompile(result);
         private SchemaQueryCommand Compile()
         {
-            if (_queryFiller != null)
+            if (_queryFiller.Result != null)
             {
                 SqlResult = PostCompile(_queryFiller.Result);
             } else
