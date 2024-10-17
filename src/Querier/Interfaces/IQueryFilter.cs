@@ -1,10 +1,12 @@
-﻿using Querier.SqlQuery.Models;
+﻿using Querier.SqlQuery;
+using Querier.SqlQuery.Models;
 
 namespace Querier.Interfaces
 {
     public interface IQueryFilter
     {
         IQueryFilter New();
+        IQueryFilter Column(string column);
         IQueryFilter In<T>(IEnumerable<T> value);
         IQueryFilter Equal<T>(T value);
         IQueryFilter Equal(string rawSql);
@@ -28,5 +30,6 @@ namespace Querier.Interfaces
         IQueryFilter Or<T>(T value);
 
         SqlQueryResult Compile();
+        IDuckDBQueryBuilder GetQuery();
     }
 }

@@ -23,11 +23,8 @@ namespace Querier
         private int _numColumns = 0;
 
         private SchemaQueryCommand? _queryOverrideCommand;
-
-        private readonly Dictionary<string, List<SchemaQueryCommand>> _columnFilters;
-
         private SqlQueryResult SqlResult { get; set; }
-
+        private QueryFiller _queryFiller;
         public Query(IDuckDBQueryBuilder duckDbQueryBuilder, IQueryDbConnection dbConnection, SchemaStore schemaStore)
         {
             _schemaStore = schemaStore;
@@ -37,8 +34,7 @@ namespace Querier
             _queryMeasures = new List<QueryMeasure>();
             _queryDimension = new List<QueryDimension>();
             _queryFilter = new QueryFilter(duckDbQueryBuilder);
-
-            _columnFilters = new Dictionary<string, List<SchemaQueryCommand>>();
+            _queryFiller = new QueryFiller(duckDbQueryBuilder);
         }
 
         public IQuery New()
@@ -50,9 +46,10 @@ namespace Querier
             _table = table;
             _numColumns = 0;
 
-            var tableKey = _schemaStore.Schemas.FirstOrDefault(e => e.Key == table);
+            var schema = _schemaStore.Schemas.FirstOrDefault(e => e.Key == table);
+            _queryFiller.Schema = schema;
 
-            _duckDbQueryBuilder.From(tableKey?.Table ?? table);
+            _duckDbQueryBuilder.From(schema?.Table ?? table);
             return this;
         }
 
@@ -64,8 +61,7 @@ namespace Querier
 
             _duckDbQueryBuilder.Select(tableMeasure?.Column ?? property, propertyAs ?? property).GroupBy(_numColumns);
 
-            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
-            _queryMeasures.Add(measure);
+            AddMeasure(property, propertyAs);
 
             return this;
         }
@@ -78,8 +74,7 @@ namespace Querier
 
             _duckDbQueryBuilder.SelectCount(tableMeasure?.Column ?? property, propertyAs ?? property);
 
-            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
-            _queryMeasures.Add(measure);
+            AddMeasure(property, propertyAs);
 
             return this;
         }
@@ -92,8 +87,7 @@ namespace Querier
 
             _duckDbQueryBuilder.SelectSum(tableMeasure?.Column ?? property, propertyAs ?? property);
 
-            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
-            _queryMeasures.Add(measure);
+            AddMeasure(property, propertyAs);
 
             return this;
         }
@@ -106,8 +100,7 @@ namespace Querier
 
             _duckDbQueryBuilder.SelectAvg(tableMeasure?.Column ?? property, propertyAs ?? property);
 
-            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
-            _queryMeasures.Add(measure);
+            AddMeasure(property, propertyAs);
 
             return this;
         }
@@ -120,8 +113,7 @@ namespace Querier
 
             _duckDbQueryBuilder.SelectMin(tableMeasure?.Column ?? property, propertyAs ?? property);
 
-            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
-            _queryMeasures.Add(measure);
+            AddMeasure(property, propertyAs);
 
             return this;
         }
@@ -134,8 +126,7 @@ namespace Querier
 
             _duckDbQueryBuilder.SelectMax(tableMeasure?.Column ?? property, propertyAs ?? property);
 
-            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
-            _queryMeasures.Add(measure);
+            AddMeasure(property, propertyAs);
 
             return this;
         }
@@ -151,6 +142,8 @@ namespace Querier
             var dimension = new QueryDimension() { Property = property, PropertyAs = propertyAs };
             _queryDimension.Add(dimension);
 
+            _queryFiller.QueryDimensions.Add(dimension);
+
             return this;
         }
         public IQuery TimeDimension(string property, string? propertyAs = null)
@@ -163,8 +156,19 @@ namespace Querier
 
             _queryTimeDimension = new QueryTimeDimension() { Property = property };
 
+            _queryFiller.QueryTimeDimension = _queryTimeDimension;
+
             return this;
         }
+
+        private void AddMeasure(string property, string? propertyAs = null)
+        {
+            var measure = new QueryMeasure() { Property = property, PropertyAs = propertyAs };
+
+            _queryMeasures.Add(measure);
+            _queryFiller.QueryMeasures.Add(measure);
+        }
+
         public IQuery FilterRaw(string sql)
         {
             _duckDbQueryBuilder.WhereRaw(sql);
@@ -175,18 +179,7 @@ namespace Querier
             var newFilter = new QueryFilter(_duckDbQueryBuilder, column);
             filter.Invoke(newFilter);
 
-            var columnFilter = filter(new QueryFilter(_duckDbQueryBuilder.New(), column));
-            var columFilterCompiled = columnFilter.Compile();
-
-            if (!_columnFilters.ContainsKey(column))
-            {
-                _columnFilters.Add(column, new List<SchemaQueryCommand>());
-            }
-            _columnFilters[column].Add(new SchemaQueryCommand()
-            {
-                Sql = columFilterCompiled.CompiledSql.Replace("where", "").Trim(),
-                Parameters = columFilterCompiled.SqlParameters
-            });
+            _queryFiller.AddFilter(column, filter);
             return this;
 
         }
@@ -227,6 +220,8 @@ namespace Querier
             }
             _queryTimeDimension = new QueryTimeDimension() { Property = property, PropertyAs = propertyAs, TimeDimensionPart = timeDimensionPart };
 
+            _queryFiller.QueryTimeDimension = _queryTimeDimension;
+
             return this;
         }
         public IQuery OrderBy(string property, string direction)
@@ -240,15 +235,15 @@ namespace Querier
 
             _duckDbQueryBuilder.OrderBy(tableProperty, direction);
 
+            _queryFiller.AddOrderBy(tableProperty, direction);
+
             return this;
         }
-
         public IQuery Limit(int limit)
         {
             _duckDbQueryBuilder.Limit(limit);
             return this;
         }
-
         public IQuery Union(Func<IQuery, IQuery> query)
         {
             var newT = _duckDbQueryBuilder.New();
@@ -259,85 +254,10 @@ namespace Querier
             return this;
         }
 
-        public IQuery FillMissingDates(DateTime fromDate, DateTime toDate, Dictionary<string, List<object>> columnValues, FillMissingOption? options = null)
+        public IQuery FillMissingDates(DateTime fromDate, DateTime toDate, FillMissingOption? options = null)
         {
-            if (options == null) options = new FillMissingOption();
-
-            var table = _schemaStore.Schemas.First(e => e.Key == _table);
-
-            var date = _queryTimeDimension.Property;
-            var fromDateStr = fromDate.ToString("yyyy-MM-dd");
-            var toDateStr = toDate.ToString("yyyy-MM-dd");
-
-            var columns = _queryDimension.Select(e => e.Property).ToList();
-            var metricColumns = _queryMeasures.Select(e => e.Property).ToList();
-
-            var query = _duckDbQueryBuilder.New();
-
-            // CTE StartDate
-            query.WithRecursive("StartDate", e => e.SelectCoalesceRaw(e => e.SelectMax(date).From(table.Table).WhereRaw($"{date} <= cast('{fromDateStr}' as date)"), $"cast('{fromDateStr}' as date)", "date"));
-           
-            // CTE DateRange
-            query.With("DateRange", e => e.Select("date").From("StartDate").UnionAll(e => e.SelectRaw($"date_add(DateRange.date, interval {options.Interval} {options.Unit})").From("DateRange").WhereRaw($"date < cast('{toDateStr}' as date)")));
-
-            // CTE Pairs
-            var pairCommand = columnValues.Select(e => $"{e.Key} in ({string.Join(",", e.Value)})");
-            query.With("Pairs", e => e.SelectRaw(string.Join(",", columns)).Distinct().From(table.Table).WhereRaw(string.Join(" and ", pairCommand)));
-
-            // CTE Cartesian
-            query.With("Cartesian", e => e.Select("date").SelectRaw(string.Join(", ", columns)).From("DateRange").CrossJoin("Pairs"));
-
-            var cartesionColumns = columns.Select(e => $"Cartesian.{e}");
-            var cartecianMetricColumns = metricColumns.Select(e => $"{table.Table}.{e}");
-            var lastValueColumns = columns.Select(e =>
-                $"last_value({table.Table}.{e} IGNORE NULLS) OVER (ORDER BY {string.Join(", ", cartesionColumns)}, Cartesian.date) AS previous_{e}");
-            var lastValueMetricColumns = metricColumns.Select(e =>
-                $"last_value({table.Table}.{e} IGNORE NULLS) OVER (ORDER BY {string.Join(", ", cartesionColumns)}, Cartesian.date) AS previous_{e}");
-            var leftJoinOperators = columns.Select(e => $"{table.Table}.{e} = Cartesian.{e}");
-
-            // CTE Cartesian Table
-            var cartesianTable = query.New().Select("date")
-                .SelectRaw(string.Join(",", cartesionColumns))
-                .SelectRaw(string.Join(",", cartecianMetricColumns))
-                .SelectRaw(string.Join(",", lastValueColumns))
-                .SelectRaw(string.Join(",", lastValueMetricColumns))
-                .SelectRaw($"{table.Table}.{date}")
-                .From("Cartesian")
-                .JoinRaw(table.Table, $"left join {table.Table} on strftime({table.Table}.{date}, '%Y-%m-%d') = strftime(Cartesian.date, '%Y-%m-%d') ");
-            foreach (var column in columns)
-            {
-                cartesianTable.AndOn(column, column);
-            }
-
-            // CTE Mixed Data
-            query.With("MixedData", e => cartesianTable);
-
-            // Main Query
-            var selectDimensions = columns.Select(e => $"COALESCE({e}, previous_{e}) AS {e}");
-            var selectMeasures = metricColumns.Select(e => $"COALESCE({e}, previous_{e}) AS {e}");
-            var orderByDimensions = columns.Select(e => $"MixedData.{e}");
-
-            query
-                .Select("date", date)
-                .SelectRaw(string.Join(", ", selectDimensions))
-                .SelectRaw(string.Join(", ", selectMeasures))
-                .From("MixedData")
-                .WhereRaw($"date >= cast('{fromDateStr}' as date)")
-                .WhereRaw($"date <= cast('{toDateStr}' as date)")
-                .OrderBy("date", "desc");
-
-            foreach (var column in columns)
-            {
-                query.OrderBy(column);
-            }
-
-            var fResult = query.Compile();
-
-            _queryOverrideCommand = new SchemaQueryCommand()
-            {
-                Sql = fResult.CompiledSql,
-                Parameters = fResult.SqlParameters
-            };
+            var schema = _schemaStore.Schemas.First(e => e.Key == _table);
+            _queryFiller.Build(fromDate, toDate, options);
 
             return this;
         }
@@ -349,14 +269,17 @@ namespace Querier
         public HashSet<QueryTimeDimensionSchema> GetTimeDimensions<TType>() => _schemaStore.Schemas.FirstOrDefault(e => e.Type == typeof(TType))?.TimeDimensions ?? [];
         public HashSet<QueryTimeDimensionSchema> GetTimeDimensions(string queryKey) => _schemaStore.Schemas.FirstOrDefault(e => e.Key == queryKey)?.TimeDimensions ?? [];
 
+        private SqlQueryResult PostCompile(SqlQueryResult result) => _duckDbQueryBuilder.PostCompile(result);
         private SchemaQueryCommand Compile()
         {
-            if (_queryOverrideCommand != null)
+            if (_queryFiller != null)
             {
-                return _queryOverrideCommand;
+                SqlResult = PostCompile(_queryFiller.Result);
+            } else
+            {
+                SqlResult = _duckDbQueryBuilder.Compile();
+                SqlResult = PostCompile(SqlResult);
             }
-            SqlResult = _duckDbQueryBuilder.Compile();
-
             return new SchemaQueryCommand() { Sql = SqlResult.CompiledSql, Parameters = SqlResult.SqlParameters };
         }
         public QueryResult Execute()

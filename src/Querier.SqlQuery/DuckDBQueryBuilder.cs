@@ -8,8 +8,9 @@ namespace Querier.SqlQuery
     {
         protected override string NameParameterOpening => "";
         protected override string NameParameterClosing => "";
-        protected override string NameParameterPlaceholder { get; set; } = "@n";
         protected override string SqlParameterPlaceholder { get; set; } = "$p";
+
+        
         public DuckDBQueryBuilder(IFunction functionFactory) : base(functionFactory)
         {
         }
@@ -19,27 +20,15 @@ namespace Querier.SqlQuery
             return new DuckDBQueryBuilder(_functionFactory);
         }
 
-        public override Dictionary<string, object> CompileSqlParameters(SqlQueryResult result)
+        public override SqlQueryResult PostCompile(SqlQueryResult result)
         {
-            return SqlParameters
-                .Select((e, i) =>
-                {
-                    result.Sql = result.Sql.ReplaceExact(e.Key, $"{SqlParameterPlaceholder}{i}");
-                    return new KeyValuePair<string, object>($"{SqlParameterPlaceholder}{i}", e.Value);
-                }).ToDictionary();
-        }
-
-        public override SqlQueryResult CompileSql(SqlQueryResult result)
-        {
-            result = base.CompileSql(result);
-            var sqlParameters = result.SqlParameters.ToList();
-            foreach (var parameter in sqlParameters)
+            result.CompiledSql = result.CompiledSql.Replace("$", "$");
+            foreach (var param in result.SqlParameters.ToList())
             {
-                var item = parameter;
+                var item = param;
                 result.SqlParameters.Remove(item.Key);
-                result.SqlParameters.Add(item.Key.Replace(SqlParameterPlaceholder, "p"), item.Value);
+                result.SqlParameters.Add(item.Key.Replace("$", ""), item.Value);
             }
-
             return result;
         }
     }

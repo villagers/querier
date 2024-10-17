@@ -123,7 +123,6 @@ namespace Querier.SqlQuery
             result.Sql = tz.Build();
             return result;
         }
-
         public virtual SqlQueryResult CreateCte()
         {
             var result = new SqlQueryResult();
@@ -155,7 +154,6 @@ namespace Querier.SqlQuery
             result.Sql = tz.Build();
             return result.Enumerate();
         }
-
         public virtual SqlQueryResult CreateSelect()
         {
             var result = new SqlQueryResult();
@@ -194,7 +192,6 @@ namespace Querier.SqlQuery
             result.Sql = selectTz.Build(" ");
             return result.Enumerate();
         }
-
         public virtual SqlQueryResult CreateJoin()
         {
             var result = new SqlQueryResult();
