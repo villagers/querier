@@ -24,7 +24,11 @@ namespace Querier
         {
             return new QueryFilter(_query);
         }
-
+        public IQueryFilter Column(string column)
+        {
+            _query.Where(column);
+            return this;
+        }
         public IQueryFilter In<T>(IEnumerable<T> value)
         {
             _query.In(value);
@@ -151,6 +155,10 @@ namespace Querier
         public SqlQueryResult Compile()
         {
             return _query.Compile();
+        }
+        public IDuckDBQueryBuilder GetQuery()
+        {
+            return _query;
         }
     }
 }
