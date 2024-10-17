@@ -1,3 +1,13 @@
+## [2.4.0-beta.1](https://github.com/villagers/querier/compare/v2.3.1...v2.4.0-beta.1) (2024-10-17)
+
+### Features
+
+* pass orderby statements & update `last_value` function ([ac68f27](https://github.com/villagers/querier/commit/ac68f2796a1ba5902fb513d5c2dc51e409a40166))
+
+### Miscellaneous Chores
+
+* **release:** 2.3.0-beta.1 [skip ci] ([e836bf6](https://github.com/villagers/querier/commit/e836bf6ed3c9aab561f9e58f3647e6bc74ca151f))
+
 ## [2.3.1](https://github.com/villagers/querier/compare/v2.3.0...v2.3.1) (2024-10-14)
 
 ### Bug Fixes
