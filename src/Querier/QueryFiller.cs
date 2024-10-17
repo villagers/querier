@@ -104,9 +104,9 @@ namespace Querier
             var cartesionColumns = dimensionProperties.Select(e => $"Cartesian.{e}");
             var cartecianMetricColumns = measureProperties.Select(e => $"{table}.{e}");
             var lastValueColumns = dimensionProperties.Select(e =>
-                $"last_value({table}.{e} IGNORE NULLS) OVER (ORDER BY {string.Join(", ", cartesionColumns)}, Cartesian.date) AS previous_{e}");
+                $"last_value({table}.{e} IGNORE NULLS) OVER (PARTITION BY {string.Join(", ", cartesionColumns)} ORDER BY Cartesian.date ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS previous_{e}");
             var lastValueMetricColumns = measureProperties.Select(e =>
-                $"last_value({table}.{e} IGNORE NULLS) OVER (ORDER BY {string.Join(", ", cartesionColumns)}, Cartesian.date) AS previous_{e}");
+                $"last_value({table}.{e} IGNORE NULLS) OVER (PARTITION BY {string.Join(", ", cartesionColumns)} ORDER BY Cartesian.date ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS previous_{e}");
             var leftJoinOperators = dimensionProperties.Select(e => $"{table}.{e} = Cartesian.{e}");
 
             // CTE Cartesian Table
